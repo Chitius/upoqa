@@ -18,7 +18,7 @@ UPOQA
 =====
 
 UPOQA is a derivative-free model-based optimization method for partially 
-separable problem, whose name is the abbreviation for Unconstrained 
+separable problems, whose name is the abbreviation for Unconstrained 
 Partially-Separable Optimization By Quadratic Approximation.
 """
 
