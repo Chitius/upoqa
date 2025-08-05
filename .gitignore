@@ -1,0 +1,13 @@
+.cursorignore
+**/__pycache__/
+**/.ruff_cache/
+**/*.pyc
+/.ipynb_checkpoints/
+**/*.egg-info/
+**/backup/
+**/outcmaes/
+**/.conda/
+**/.venv/
+**/tmp*
+**/*.log
+**/*.out

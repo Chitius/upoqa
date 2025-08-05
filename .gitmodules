@@ -1,0 +1,3 @@
+[submodule "upoqa/problems/S2MPJ"]
+	path = upoqa/problems/S2MPJ
+	url = https://github.com/GrattonToint/S2MPJ.git
