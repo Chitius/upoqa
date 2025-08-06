@@ -2,7 +2,7 @@
 
 UPOQA is a derivative-free model-based optimizer designed for unconstrained optimization problems with **partially-separable** structures. This solver leverages quadratic interpolation models within a trust-region framework to efficiently solve complex optimization problems without requiring gradient information.
 
-For more details, please refer to [our paper](https://arxiv.org/abs/2506.21948).
+For more details, please refer to the [documentation](https://upoqa.readthedocs.io/en/latest/) or [our paper](https://arxiv.org/abs/2506.21948).
 
 ## Installation
 
