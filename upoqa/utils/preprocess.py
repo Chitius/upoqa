@@ -50,7 +50,7 @@ def get_reorganized_inputs_or_exit_info(
 ) -> Union[ExitInfo, Dict[str, Any]]:
     """Preprocess the input parameters of UPOQA."""
     # Initialize and check the settings of sub functions
-    default_ele_name = 'fun'
+    default_ele_name = "fun"
     # default_xform = [lambda X: X, lambda _: 1, lambda _: 0]  # fun, grad, hess
     default_xform = None
     if callable(fun):
@@ -69,7 +69,10 @@ def get_reorganized_inputs_or_exit_info(
         )
         xform_bounds = (
             {default_ele_name: tuple(xform_bounds)}
-            if (isinstance(xform_bounds, (list, tuple, np.ndarray)) and len(xform_bounds) == 2)
+            if (
+                isinstance(xform_bounds, (list, tuple, np.ndarray))
+                and len(xform_bounds) == 2
+            )
             else xform_bounds
         )
     elif isinstance(fun, dict):
@@ -107,7 +110,7 @@ def get_reorganized_inputs_or_exit_info(
             f"`tr_shape` must be a string, but get {type(tr_shape)}",
         )
 
-    avail_shapes = ['structured', 'spherical']
+    avail_shapes = ["structured", "spherical"]
     tr_shape = tr_shape.lower()
     if tr_shape not in avail_shapes:
         return ExitInfo(
@@ -116,7 +119,7 @@ def get_reorganized_inputs_or_exit_info(
         )
 
     # check coords and make it a dict
-    exit_info, coords = _preprocess(coords, 'coords', np.arange(n), ele_names)
+    exit_info, coords = _preprocess(coords, "coords", np.arange(n), ele_names)
     if exit_info:
         return exit_info
 
@@ -126,39 +129,45 @@ def get_reorganized_inputs_or_exit_info(
         if isinstance(weights, (int, float))
         else weights
     )
-    exit_info, weights = _preprocess(weights, 'weights', 1.0, ele_names)
+    exit_info, weights = _preprocess(weights, "weights", 1.0, ele_names)
     if exit_info:
         return exit_info
 
     # check npt and make it a dict
-    npt = get_default_valued_dict(ele_names, npt) if isinstance(npt, (int, float)) else npt
-    exit_info, npt = _preprocess(npt, 'npt', None, ele_names)
+    npt = (
+        get_default_valued_dict(ele_names, npt)
+        if isinstance(npt, (int, float))
+        else npt
+    )
+    exit_info, npt = _preprocess(npt, "npt", None, ele_names)
     if exit_info:
         return exit_info
 
     # check maxfev and make it a dict
     maxfev = (
-        get_default_valued_dict(ele_names, maxfev) if isinstance(maxfev, (int, float)) else maxfev
+        get_default_valued_dict(ele_names, maxfev)
+        if isinstance(maxfev, (int, float))
+        else maxfev
     )
-    exit_info, maxfev = _preprocess(maxfev, 'maxfev', np.inf, ele_names)
+    exit_info, maxfev = _preprocess(maxfev, "maxfev", np.inf, ele_names)
     if exit_info:
         return exit_info
 
     # check xforms and make it a dict
-    exit_info, xforms = _preprocess(xforms, 'xforms', default_xform, ele_names)
+    exit_info, xforms = _preprocess(xforms, "xforms", default_xform, ele_names)
     if exit_info:
         return exit_info
 
     # check xform_bounds and make it a dict
     exit_info, xform_bounds = _preprocess(
-        xform_bounds, 'xform_bounds', (-np.inf, np.inf), ele_names
+        xform_bounds, "xform_bounds", (-np.inf, np.inf), ele_names
     )
     if exit_info:
         return exit_info
 
     # By now, parameters have become dicts, but they may have invalid (key, value).
     fun, exit_info = check_dict_validness_and_sort(
-        fun, ele_names, 'fun', False, None, False, Callable
+        fun, ele_names, "fun", False, None, False, Callable
     )
     is_extra_fun_scalar = False
     if exit_info is None:
@@ -198,7 +207,7 @@ def get_reorganized_inputs_or_exit_info(
         coords, exit_info = check_dict_validness_and_sort(
             coords,
             ele_names,
-            'coords',
+            "coords",
             True,
             np.arange(n),
             True,
@@ -224,7 +233,7 @@ def get_reorganized_inputs_or_exit_info(
                     )
     if exit_info is None:
         weights, exit_info = check_dict_validness_and_sort(
-            weights, ele_names, 'weights', True, 1.0, True, (float, int)
+            weights, ele_names, "weights", True, 1.0, True, (float, int)
         )
         if exit_info is None:
             for ele_name in ele_names:
@@ -238,7 +247,7 @@ def get_reorganized_inputs_or_exit_info(
         xforms, exit_info = check_dict_validness_and_sort(
             xforms,
             ele_names,
-            'xforms',
+            "xforms",
             True,
             default_xform,
             False,
@@ -262,17 +271,17 @@ def get_reorganized_inputs_or_exit_info(
                         )
     if exit_info is None:
         npt, exit_info = check_dict_validness_and_sort(
-            npt, ele_names, 'npt', True, None, False, int
+            npt, ele_names, "npt", True, None, False, int
         )
     if exit_info is None:
         maxfev, exit_info = check_dict_validness_and_sort(
-            maxfev, ele_names, 'maxfev', True, np.inf, True, (int, float)
+            maxfev, ele_names, "maxfev", True, np.inf, True, (int, float)
         )
     if exit_info is None:
         xform_bounds, exit_info = check_dict_validness_and_sort(
             xform_bounds,
             ele_names,
-            'xform_bounds',
+            "xform_bounds",
             True,
             (-np.inf, np.inf),
             True,
@@ -345,7 +354,8 @@ def get_reorganized_inputs_or_exit_info(
             except ValueError as e:
                 return ExitInfo(
                     ExitStatus.INPUT_ERROR,
-                    "(When initializing hyper-parameters) " + f"{e}\n\n{traceback.format_exc()}",
+                    "(When initializing hyper-parameters) "
+                    + f"{e}\n\n{traceback.format_exc()}",
                 )
 
     # Set npt
@@ -386,11 +396,17 @@ def get_reorganized_inputs_or_exit_info(
     radius_init, radius_final = float(radius_init), float(radius_final)
     resolution_init, resolution_final = radius_init, radius_final
     if resolution_init < 0:
-        return ExitInfo(ExitStatus.INPUT_ERROR, "radius_init must be strictly positive.")
+        return ExitInfo(
+            ExitStatus.INPUT_ERROR, "radius_init must be strictly positive."
+        )
     if resolution_final < 0:
-        return ExitInfo(ExitStatus.INPUT_ERROR, "radius_final must be strictly positive.")
+        return ExitInfo(
+            ExitStatus.INPUT_ERROR, "radius_final must be strictly positive."
+        )
     if resolution_init <= resolution_final:
-        return ExitInfo(ExitStatus.INPUT_ERROR, "radius_init must be larger than radius_final")
+        return ExitInfo(
+            ExitStatus.INPUT_ERROR, "radius_init must be larger than radius_final"
+        )
     if maxiter < 0:
         return ExitInfo(ExitStatus.INPUT_ERROR, "maxiter cannot be negative.")
     if callback is not None and (not callable(callback)):
@@ -451,7 +467,9 @@ def _preprocess(
     extra_keys = check_extra_ele_keys(obj, ele_names)
     if extra_keys:
         return (
-            ExitInfo(ExitStatus.INPUT_ERROR, f"Unexpected keys {extra_keys} in `{obj_name}`."),
+            ExitInfo(
+                ExitStatus.INPUT_ERROR, f"Unexpected keys {extra_keys} in `{obj_name}`."
+            ),
             obj,
         )
     obj = (
@@ -494,8 +512,9 @@ def check_dict_validness_and_sort(
     type_of_val: Optional[type] = None,
 ) -> Tuple[Optional[Dict[Any, Any]], Optional[ExitInfo]]:
     """
-    Arrange the order of keys of `obj` to make it consistent with `ele_names`.
-    If find unexpected keys in `obj`, return an ``~upoqa.utils.ExitInfo`` object to terminate the algorithm.
+    Arrange the order of keys of ``obj`` to make it consistent with ``ele_names``.
+    If find unexpected keys in ``obj``, return an :class:`~upoqa.utils.ExitInfo` 
+    object to terminate the algorithm.
     """
     if not isinstance(obj, dict):
         return None, ExitInfo(
@@ -513,7 +532,9 @@ def check_dict_validness_and_sort(
         if ele_name in obj:
             if obj[ele_name] is None:
                 new_dict[ele_name] = default_value if reset_none_value else None
-            elif (type_of_val is not None) and (not isinstance(obj[ele_name], type_of_val)):
+            elif (type_of_val is not None) and (
+                not isinstance(obj[ele_name], type_of_val)
+            ):
                 return None, ExitInfo(
                     ExitStatus.INPUT_ERROR,
                     f"The value of key {ele_name} in `{obj_name}` = {obj} "

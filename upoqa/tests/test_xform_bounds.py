@@ -62,21 +62,21 @@ xopt = [0.0, 0.0]
 fopt = 0.0
 
 fun = {
-    'f1': f1,
-    'g2': g2,
+    "f1": f1,
+    "g2": g2,
 }
 xforms = {
-    'g2': [xform_func, xform_grad, xform_hess],
+    "g2": [xform_func, xform_grad, xform_hess],
 }
-xform_bounds = {'g2': (1e-16, np.inf)}
+xform_bounds = {"g2": (1e-16, np.inf)}
 
 noise_level = 0.0
-exact_res = sp_minimize(obj, x0, method='L-BFGS-B')
+exact_res = sp_minimize(obj, x0, method="L-BFGS-B")
 
 noise_level = 1e-6
 
 res_wrong_res = upoqa.minimize(
-    fun, x0=x0, xforms=xforms, noise_level=1, tr_shape='spherical', maxfev=600, disp=1
+    fun, x0=x0, xforms=xforms, noise_level=1, tr_shape="spherical", maxfev=600, disp=1
 )
 
 res_with_bound_check = upoqa.minimize(
@@ -85,7 +85,7 @@ res_with_bound_check = upoqa.minimize(
     xforms=xforms,
     xform_bounds=xform_bounds,
     noise_level=1,
-    tr_shape='spherical',
+    tr_shape="spherical",
     maxfev=600,
     disp=1,
 )

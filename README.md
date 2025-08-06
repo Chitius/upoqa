@@ -24,11 +24,10 @@ pip install upoqa[profile]  # + all benchmarking dependencies
 ### API in a nutshell
 
 ```python
-minimize(fun, x0, coords=dict(), maxiter=None, maxfev=dict(), weights=dict(), xforms=dict(), 
-         xforms_bounds=dict(), extra_fun=None, npt=None, radius_init=1.0, radius_final=1e-6, 
-         noise_level=0, seek_global_minimum=False, f_target=None, tr_shape="structured", 
-         callback=None, disp=True, verbose=False, debug=False, return_internals=False, 
-         options=dict(), **kwargs)
+upoqa.minimize(fun, x0, coords={}, maxiter=None, maxfev={}, weights={}, xforms={}, xform_bounds={}, 
+               extra_fun=None, npt=None, radius_init=1.0, radius_final=1e-06, noise_level=0, 
+               seek_global_minimum=False, f_target=None, tr_shape='structured', callback=None, 
+               disp=True, verbose=False, debug=False, return_internals=False, options={}, **kwargs)
 ```
 
 Returned object (`upoqa.utils.OptimizeResult`) contains `x`, `fun`, element values `funs`, evaluation counts `nfev`, and more—see the full docstring and documentation.
@@ -114,7 +113,7 @@ $$
 \min_{x\in\mathbb{R}^n} \quad f_0(x) + \sum_{i=1}^q w_i h_i\left(f_i(U_i x)\right),
 $$
 
-Where:
+where:
 
 - $f_0$ is a white-box component with known derivatives
 - $w_i$ are element weights

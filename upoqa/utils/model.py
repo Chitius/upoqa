@@ -19,11 +19,11 @@ Interpolation Surrogate Model
 
 Maintain two core classes:
 
-1. ``~upoqa.utils.QuadSurrogate``: Quadratic interpolation surrogate model 
-   using the derivative-free symmetric Broyden update [1]_. Serves as the 
+1. :class:`~upoqa.utils.model.QuadSurrogate`: Quadratic interpolation surrogate 
+   model using the derivative-free symmetric Broyden update [1]_. Serves as the 
    element model in UPOQA.
 
-2. ``~upoqa.utils.OverallSurrogate``: Overall surrogate model formed by 
+2. :class:`~upoqa.utils.model.OverallSurrogate`: Overall surrogate model formed by 
    assembling multiple element models.
 
 References
@@ -58,7 +58,10 @@ class SurrogateLinAlgError(Exception):
     """
 
     def __init__(
-        self, message: str, ele_idx: Optional[int] = None, ele_name: Optional[Any] = None
+        self,
+        message: str,
+        ele_idx: Optional[int] = None,
+        ele_name: Optional[Any] = None,
     ) -> None:
         super().__init__(message)
         self.ele_idx = ele_idx
@@ -67,21 +70,21 @@ class SurrogateLinAlgError(Exception):
 
 class QuadSurrogate:
     """
-    Quadratic interpolation surrogate model using the derivative-free symmetric
-    Broyden update [1]_. Serves as the elemental surrogate model in UPOQA.
+    Quadratic interpolation surrogate model using the *derivative-free symmetric
+    Broyden update* [1]_. Serves as the elemental surrogate model in UPOQA.
 
     Parameters
     ----------
-    interp_set: ``~upoqa.utils.InterpSet``
+    interp_set: :class:`~upoqa.utils.interp_set.InterpSet`
         The interpolation set. It must be provided in order for the interpolation
         surrogate model to be built based on the interpolation points.
     center: ndarray, optional
-        The initial center of the surrogate model. If provided, it overrides the `n`
+        The initial center of the surrogate model. If provided, it overrides the ``n``
         argument. Otherwise, the center will be set as a zero vector.
     n : int, optional
-        Problem dimension. Required if `center` is not provided.
-        Note that either `n` or `center` must be provided.
-    ref_surrogate : ``~upoqa.utils.QuadSurrogate``, optional
+        Problem dimension. Required if ``center`` is not provided.
+        Note that either ``n`` or ``center`` must be provided.
+    ref_surrogate : :class:`~upoqa.utils.model.QuadSurrogate`, optional
         A reference surrogate model to help initialize the KKT coefficients
         and other cached information.
 
@@ -89,7 +92,7 @@ class QuadSurrogate:
     ----------
     n : int
         Problem dimension
-    interp_set : ``~upoqa.utils.InterpSet``
+    interp_set : :class:`~upoqa.utils.interp_set.InterpSet`
         The interpolation set used to build the surrogate model
     npt : int
         Number of interpolation points in the interpolation set
@@ -115,7 +118,7 @@ class QuadSurrogate:
         interp_set: InterpSet,
         center: Optional[np.ndarray] = None,
         n: Optional[int] = None,
-        ref_surrogate: Optional['QuadSurrogate'] = None,
+        ref_surrogate: Optional["QuadSurrogate"] = None,
     ) -> None:
         if center is None:
             assert n is not None
@@ -131,7 +134,7 @@ class QuadSurrogate:
         self,
         interp_set: InterpSet,
         center: np.ndarray,
-        ref_surrogate: Optional['QuadSurrogate'] = None,
+        ref_surrogate: Optional["QuadSurrogate"] = None,
     ) -> None:
         """
         Reset the model with the given interpolation set, center point and dimension,
@@ -139,12 +142,12 @@ class QuadSurrogate:
 
         Parameters
         ----------
-        interp_set: ``~upoqa.utils.InterpSet``
+        interp_set: :class:`~upoqa.utils.interp_set.InterpSet`
             The interpolation set. It must be provided in order for the interpolation
             surrogate model to be built based on the interpolation points.
         center: ndarray
             The initial center of the surrogate model.
-        ref_surrogate : ``~upoqa.utils.QuadSurrogate``, optional
+        ref_surrogate : :class:`~upoqa.utils.model.QuadSurrogate`, optional
             A reference surrogate model to help initialize the KKT coefficients
             and other cached information.
         """
@@ -159,7 +162,9 @@ class QuadSurrogate:
         self.model_grad = np.zeros(n, dtype=np.float64)
         self.model_cons = 0.0
         self.model_center = (
-            center.reshape((n,)) if center is not None else np.zeros(n, dtype=np.float64)
+            center.reshape((n,))
+            if center is not None
+            else np.zeros(n, dtype=np.float64)
         )
 
         if ref_surrogate is not None:
@@ -177,7 +182,9 @@ class QuadSurrogate:
             # otherwise, initialize all KKT coefficients to zero and update them later
             self._KKT_R = np.zeros((self.npt - self.n - 1, self.npt), dtype=np.float64)
             self._KKT_B = np.zeros((self.npt + self.n, self.n), dtype=np.float64)
-            self.cached_Y_shift = self.interp_set.get_interp_set()[0] - self.model_center
+            self.cached_Y_shift = (
+                self.interp_set.get_interp_set()[0] - self.model_center
+            )
             self.cached_x_anchor = self.interp_set.get_anchor()[0].copy()
             self.cached_x_anchor_idx = self.interp_set.x_anchor_idx
             self._negative_s_idx = 0
@@ -234,15 +241,17 @@ class QuadSurrogate:
 
         self._update_surrogate_coeff()
 
-    def inv_kkt_matrix_dot(self, x: np.ndarray, w_star: Optional[np.ndarray] = None) -> np.ndarray:
+    def inv_kkt_matrix_dot(
+        self, x: np.ndarray, w_star: Optional[np.ndarray] = None
+    ) -> np.ndarray:
         """
         Compute inv(W) @ x, where W is the coefficient matrix of the KKT equation generated
         by the derivative-free symmetric Broyden update [1]_, and return the vector formed
-        by the first `npt` and last `n` dimensions of the result.
+        by the first ``npt`` and last ``n`` dimensions of the result.
 
-        In the multiplication, we can safely ignore the `(npt + 1)`-th dimension of `x`.
-        Therefore, the input vector `x` only needs to include the first `npt` and the last
-        `n` elements, instead of the full `(npt + 1 + n)`-dimensional vector.
+        In the multiplication, we can safely ignore the ``(npt + 1)``-th dimension of ``x``.
+        Therefore, the input vector ``x`` only needs to include the first ``npt`` and the last
+        ``n`` elements, instead of the full ``(npt + 1 + n)``-dimensional vector.
 
         Parameters
         ----------
@@ -251,15 +260,15 @@ class QuadSurrogate:
         w_star : ndarray, shape (npt + n,), optional
             The auxiliary vector to assist in the calculation. It is formed by
 
-                `[0.5 * ((yi - center) @ (Y - center).T) ** 2, yi - center]`,
+                ``[0.5 * ((yi - center) @ (Y - center).T) ** 2, yi - center]``,
 
-            where `Y` is of shape `(npt, n)` which represents the interpolation points.
-            `yi` can be any point in the interpolation set, and is `x_anchor` by default.
+            where ``Y`` is of shape ``(npt, n)`` which represents the interpolation points.
+            ``yi`` can be any point in the interpolation set, and is ``x_anchor`` by default.
 
         Returns
         -------
         ndarray, shape (npt + n,)
-            The vector formed by the first `npt` and last `n` dimensions of the result.
+            The vector formed by the first ``npt`` and last ``n`` dimensions of the result.
 
         References
         ----------
@@ -288,10 +297,10 @@ class QuadSurrogate:
         """
         Compute inv(W) @ x, where W is the coefficient matrix of the KKT equation
         generated by the derivative-free symmetric Broyden update [1]_, and return the
-        vector formed by the first `npt` and last `n` dimensions of the result.
+        vector formed by the first ``npt`` and last ``n`` dimensions of the result.
 
-        Unlike `self.inv_kkt_matrix_dot(x)`, this method assumes that `x` is zero for
-        indices `[npt:]`, allowing for a simplified calculation.
+        Unlike ``self.inv_kkt_matrix_dot(x)``, this method assumes that ``x`` is zero for
+        indices ``[npt:]``, allowing for a simplified calculation.
 
         Parameters
         ----------
@@ -301,7 +310,7 @@ class QuadSurrogate:
         Returns
         -------
         ndarray, shape (npt + n,)
-            The vector formed by the first `npt` and last `n` dimensions of the result.
+            The vector formed by the first ``npt`` and last ``n`` dimensions of the result.
 
         References
         ----------
@@ -341,13 +350,19 @@ class QuadSurrogate:
         )
 
     def _get_w(self, x_shift: Optional[np.ndarray] = None) -> np.ndarray:
-        x_shift = self.cached_x_anchor - self.model_center if x_shift is None else x_shift.copy()
+        x_shift = (
+            self.cached_x_anchor - self.model_center
+            if x_shift is None
+            else x_shift.copy()
+        )
         w = np.zeros(self.n + self.npt, dtype=np.float64)
         w[: self.npt] = 0.5 * ((x_shift @ self.cached_Y_shift.T) ** 2)
         w[self.npt :] = x_shift
         return w.copy()
 
-    def get_determinant_ratio(self, x_new: np.ndarray, idx: Optional[int] = None) -> Tuple[
+    def get_determinant_ratio(
+        self, x_new: np.ndarray, idx: Optional[int] = None
+    ) -> Tuple[
         Union[np.ndarray, float],
         float,
         Union[np.ndarray, float],
@@ -355,9 +370,9 @@ class QuadSurrogate:
         np.ndarray,
     ]:
         """
-        Calculate key intermediate quantities (`alpha`, `beta`, `tau`, `sigma`) for
+        Calculate key intermediate quantities (``alpha``, ``beta``, ``tau``, ``sigma``) for
         updating the inverse KKT matrix in the derivative-free symmetric Broyden
-        update [1]_. These quantities are defined in [2]_, where `sigma` (the denominator
+        update [1]_. These quantities are defined in [2]_, where ``sigma`` (the denominator
         in the update equation) represents the ratio of the determinant of the inverse
         KKT matrix before and after update.
 
@@ -366,23 +381,23 @@ class QuadSurrogate:
         x_new : ndarray, shape (n,)
             New point to be added to the interpolation set (not yet added).
         idx : int, optional
-            Index of the interpolation point to be replaced by `x_new`.
+            Index of the interpolation point to be replaced by ``x_new``.
             If provided, returns scalar values at this index; otherwise returns full arrays.
 
         Returns
         -------
         alpha : ndarray or float
-            Quantity `alpha`. Returns `alpha[idx]` if `idx` is provided.
+            Quantity ``alpha``. Returns ``alpha[idx]`` if ``idx`` is provided.
         beta : float
-            Quantity `beta`.
+            Quantity ``beta``.
         tau : ndarray or float
-            Quantity `tau`. Returns `tau[idx]` if `idx` is provided.
+            Quantity ``tau``. Returns ``tau[idx]`` if ``idx`` is provided.
         sigma : ndarray or float
-            Quantity `sigma`. Returns `sigma[idx]` if `idx` is provided.
+            Quantity ``sigma``. Returns ``sigma[idx]`` if ``idx`` is provided.
         ndarray
-            Result of `self.inv_kkt_matrix_dot(w)`, where:
-            `w = [0.5 * ((x_new - center) @ (Y - center).T) ** 2, x_new - center]`,
-            where `Y` is of shape `(npt, n)` which represents the interpolation points.
+            Result of ``self.inv_kkt_matrix_dot(w)``, where:
+            ``w = [0.5 * ((x_new - center) @ (Y - center).T) ** 2, x_new - center]``,
+            where ``Y`` is of shape ``(npt, n)`` which represents the interpolation points.
 
         References
         ----------
@@ -417,8 +432,8 @@ class QuadSurrogate:
         Parameters
         ----------
         cached_kkt_info : tuple, optional
-            If not None, it should be the cached output of `self.get_determinant_ratio(x_new)`,
-            where `x_new` denotes the new point just added into the interpolation set.
+            If not None, it should be the cached output of ``self.get_determinant_ratio(x_new)``,
+            where ``x_new`` denotes the new point just added into the interpolation set.
 
         References
         ----------
@@ -456,13 +471,13 @@ class QuadSurrogate:
         x_new : ndarray, shape (n,)
             The new point which was just added into the interpolation set.
         idx : int
-            The index in the interpolation set where `x_new` was added.
+            The index in the interpolation set where ``x_new`` was added.
         cached_kkt_info : tuple, optional
-            If not None, it should be the cached output of `self.get_determinant_ratio(x_new)`,
-            where `x_new` denotes the new point just added into the interpolation set.
+            If not None, it should be the cached output of ``self.get_determinant_ratio(x_new)``,
+            where ``x_new`` denotes the new point just added into the interpolation set.
 
-        Note
-        -------
+        Notes
+        -----
         The implementation here largely references that in COBYQA [4]_.
 
         References
@@ -486,8 +501,8 @@ class QuadSurrogate:
 
         def householder_transform(mat: np.ndarray, idx: int) -> None:
             """
-            Perform an in-place Householder transformation on `mat` to make the `idx`-th
-            column align with the first standard basis vector `e_1`.
+            Perform an in-place Householder transformation on ``mat`` to make the ``idx``-th
+            column align with the first standard basis vector ``e_1``.
             """
             vec = mat[:, idx].reshape((-1,)).copy()
             vec_norm = LA.norm(vec)
@@ -523,14 +538,16 @@ class QuadSurrogate:
         Zw_minus_e_ell[idx] -= 1
         temp_vec1 = (alpha * Zw[self.npt :] - tau * _KKT_B_on_idx) / sigma
         temp_vec2 = (tau * Zw[self.npt :] + beta * _KKT_B_on_idx) / sigma
-        self._KKT_B[: self.npt] += np.outer(Zw_minus_e_ell[: self.npt], temp_vec1) - np.outer(
-            Ze_ell[: self.npt], temp_vec2
-        )
+        self._KKT_B[: self.npt] += np.outer(
+            Zw_minus_e_ell[: self.npt], temp_vec1
+        ) - np.outer(Ze_ell[: self.npt], temp_vec2)
         self._KKT_B[self.npt :] += np.outer(Zw_minus_e_ell[self.npt :], temp_vec1)
         self._KKT_B[self.npt :] -= np.outer(Ze_ell[self.npt :], temp_vec2)
 
         # Then update _KKT_R
-        jdz = self._negative_s_idx if self._negative_s_idx < self.npt - self.n - 1 else 0
+        jdz = (
+            self._negative_s_idx if self._negative_s_idx < self.npt - self.n - 1 else 0
+        )
         if jdz == 0:
             self._KKT_R[0] = (
                 tau * self._KKT_R[0] - self._KKT_R[0, idx] * Zw_minus_e_ell[: self.npt]
@@ -545,7 +562,8 @@ class QuadSurrogate:
             tempb = self._KKT_R[jdz, idx] * tau / sigma
             tmp1 = 1.0 / np.sqrt(abs(beta) * self._KKT_R[jdz, idx] ** 2.0 + tau**2.0)
             self._KKT_R[kdz] = (
-                tau * self._KKT_R[kdz] - self._KKT_R[jdz, idx] * Zw_minus_e_ell[: self.npt]
+                tau * self._KKT_R[kdz]
+                - self._KKT_R[jdz, idx] * Zw_minus_e_ell[: self.npt]
             )
             self._KKT_R[kdz] *= tmp1
             self._KKT_R[jdz] -= (self._KKT_R[jdz, idx] * beta / sigma) * (
@@ -558,19 +576,21 @@ class QuadSurrogate:
                     self._negative_s_idx += 1
                 else:
                     self._negative_s_idx -= 1
-                    self._KKT_R[[0, self._negative_s_idx]] = self._KKT_R[[self._negative_s_idx, 0]]
+                    self._KKT_R[[0, self._negative_s_idx]] = self._KKT_R[
+                        [self._negative_s_idx, 0]
+                    ]
 
     def shift_center_to(self, x: np.ndarray) -> None:
         """
-        Shift the model center to `x`, then update the KKT and model coefficients.
+        Shift the model center to ``x``, then update the KKT and model coefficients.
 
         Parameters
         ----------
         x : ndarray, shape (n,)
             The new model center.
 
-        Note
-        -------
+        Notes
+        -----
         The computational cost is O(npt^3) with BLAS-3 operations.
         """
         x = x.copy()
@@ -616,11 +636,11 @@ class QuadSurrogate:
         ----------
         deleted_x : ndarray, shape (n,), optional
             The old interpolation point that was replaced with a new point at the index
-            `idx`. Both `deleted_x` and `idx` should be None if the model is being
+            ``idx``. Both ``deleted_x`` and ``idx`` should be None if the model is being
             updated for the first time after being established.
         idx : int, optional
-            The index where the old interpolation point `deleted_x` was replaced with a
-            new point. Both `deleted_x` and `idx` should be None if the model is being
+            The index where the old interpolation point ``deleted_x`` was replaced with a
+            new point. Both ``deleted_x`` and ``idx`` should be None if the model is being
             updated for the first time after being established.
         """
         Y_new, f_Y_new = self.interp_set.get_interp_set()
@@ -631,7 +651,9 @@ class QuadSurrogate:
         if idx is not None:
             # assert deleted_x is not None
             deleted_x = deleted_x - self.model_center
-            model_hess_explicit_p1 += self.model_hess_implicit[idx] * np.outer(deleted_x, deleted_x)
+            model_hess_explicit_p1 += self.model_hess_implicit[idx] * np.outer(
+                deleted_x, deleted_x
+            )
             model_hess_implicit_p1[idx] = model_lambda[idx]
         model_grad_p1 = self.grad_eval(self.model_center) + model_g
         self.model_hess_explicit = model_hess_explicit_p1
@@ -642,7 +664,9 @@ class QuadSurrogate:
             self.interp_set.x_anchor
         )
 
-    def solve_interpolation_KKT(self, f_Y_shift=np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    def solve_interpolation_KKT(
+        self, f_Y_shift=np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Given the interpolation set, solves the first-order KKT optimality conditions
         for the derivative-free symmetric Broyden update subproblem and returns the solution:
@@ -651,7 +675,7 @@ class QuadSurrogate:
         Parameters
         ----------
         f_Y_shift : ndarray, shape (npt,)
-            Represents `fun(Y) - surrogate(Y)`, where `Y` denotes the interpolation points.
+            Represents ``fun(Y) - surrogate(Y)``, where ``Y`` denotes the interpolation points.
 
         Returns
         -------
@@ -681,24 +705,25 @@ class QuadSurrogate:
 
     def alt_grad_eval(self, x: np.ndarray) -> np.ndarray:
         """
-        Evaluate gradient of a newly-instantiated surrogate model at point `x`.
+        Evaluate gradient of a newly-instantiated surrogate model at point ``x``.
 
         Conceptually equivalent to:
+        
         1. Creating a new surrogate model with current interpolation set
         2. Updating its coefficients from zero
-        3. Returning its gradient at `x`
+        3. Returning its gradient at ``x``
 
         Avoids actual model reconstruction by leveraging KKT solution.
 
         Parameters
-        -------------
+        ----------
         x : ndarray, shape (n,)
             Evaluation point for gradient calculation.
 
         Returns
         -------
         g : ndarray
-            Gradient vector of the conceptual surrogate model at `x`.
+            Gradient vector of the conceptual surrogate model at ``x``.
         """
         _, f_Y = self.interp_set.get_interp_set()
         model_lambda, model_g = self.solve_interpolation_KKT(f_Y_shift=f_Y)
@@ -718,13 +743,14 @@ class QuadSurrogate:
         Returns
         -------
         fval : float or ndarray, shape (n_samples,)
-            Model value(s). Scalar for single point input, array of shape `(n_samples,)`
+            Model value(s). Scalar for single point input, array of shape (n_samples,)
             for multiple points.
         """
         X_shift = X - self.model_center
         if X_shift.ndim == 1:
             return (
-                X_shift.dot(0.5 * self.hess_operator(X_shift) + self.model_grad) + self.model_cons
+                X_shift.dot(0.5 * self.hess_operator(X_shift) + self.model_grad)
+                + self.model_cons
             )
         else:
             value = (
@@ -732,7 +758,11 @@ class QuadSurrogate:
                 + X_shift @ self.model_grad
                 + self.model_cons
             )
-            return value.item() if isinstance(value, np.ndarray) and value.size == 1 else value
+            return (
+                value.item()
+                if isinstance(value, np.ndarray) and value.size == 1
+                else value
+            )
 
     def grad_eval(self, X: np.ndarray) -> np.ndarray:
         """
@@ -746,7 +776,7 @@ class QuadSurrogate:
         Returns
         -------
         g : ndarray, shape (n, ) or ndarray, shape (n_samples, n)
-            Gradient vector(s). Shape `(n,)` for single point, `(n_samples, n)` for
+            Gradient vector(s). Shape (n,) for single point, (n_samples, n) for
             multiple points.
         """
         return self.hess_operator(X - self.model_center) + self.model_grad
@@ -765,7 +795,7 @@ class QuadSurrogate:
         Returns
         -------
         H : ndarray, shape (n, n)
-            Hessian matrix (same as `model_hess` property).
+            Hessian matrix (same as ``model_hess`` property).
         """
         return self.model_hess
 
@@ -781,8 +811,8 @@ class QuadSurrogate:
         Returns
         -------
         HV : ndarray, shape (n, ) or ndarray, shape (n_samples, n)
-            Hessian-vector product(s). Shape `(n,)` for single input vector,
-            `(n_samples, n)` for multiple vectors.
+            Hessian-vector product(s). Shape (n,) for single input vector,
+            (n_samples, n) for multiple vectors.
         """
         if V.ndim == 1:
             V = V[np.newaxis, :]
@@ -803,17 +833,19 @@ class OverallSurrogate:
     ----------
     n : int
         Problem dimension
-    interp_set : ``~upoqa.utils.OverallInterpSet``
+    interp_set : :class:`~upoqa.utils.interp_set.OverallInterpSet`
         Interpolation set for the overall surrogate model
     proj_onto_ele : callable
         Projection function mapping full-space points to element subspaces:
 
-            ``(full_point: ndarray, element_name: Any) -> element_point: ndarray``
+        .. code-block:: python
 
-        For example, `proj_onto_ele([1.0, 2.0], "f_1")` yields `[1.0,]`, where
-        `"f_1"` denotes a function that depends only on the first variable of `x`.
+            (full_point: ndarray, element_name: Any) -> element_point: ndarray
+
+        For example, ``proj_onto_ele([1.0, 2.0], "f_1")`` yields ``[1.0,]``, where
+        ``"f_1"`` denotes a function that depends only on the first variable of ``x``.
     coords : list of 1D arrays
-        Variable indices for each element's subspace (parallel to `ele_names`).
+        Variable indices for each element's subspace (parallel to ``ele_names``).
     ele_models : list
         List of elemental surrogate models
     xforms : list
@@ -823,7 +855,7 @@ class OverallSurrogate:
     extra_fun : list
         The white-box component :math:`f_0` of the objective function, which is a list of
         length 3 containing callables to evaluate the function value, gradient, and Hessian.
-    params : `~upoqa.utils.UPOQAParameterList`
+    params : :class:`~upoqa.utils.params.UPOQAParameterList`
         Parameter list used for the algorithm
     ele_names : list
         List containing the names of all elements in order
@@ -875,7 +907,8 @@ class OverallSurrogate:
         self.weights = deepcopy(weights)
 
     def set_xforms(
-        self, xforms: List[Optional[List[Callable[[np.ndarray], Union[np.ndarray, float]]]]]
+        self,
+        xforms: List[Optional[List[Callable[[np.ndarray], Union[np.ndarray, float]]]]],
     ) -> None:
         """
         Set transformation functions for the elements.
@@ -888,15 +921,19 @@ class OverallSurrogate:
         self.xforms = deepcopy(xforms)
 
     def update_weights(
-        self, weights: Union[Dict[Any, Union[int, float]], List[Union[int, float]], np.ndarray]
+        self,
+        weights: Union[
+            Dict[Any, Union[int, float]], List[Union[int, float]], np.ndarray
+        ],
     ) -> None:
         """
         Update the weights for the elements, handling both list and dictionary inputs.
 
-        If `weights` is a dictionary, it maps element names to weight values.
+        If ``weights`` is a dictionary, it maps element names to weight values.
         Missing elements retain their current weights.
 
-        This method should only be called by `~upoqa.utils.manager.update_weights`.
+        This method should only be called by 
+        :meth:`~upoqa.utils.manager.UPOQAManager.update_weights()`.
 
         Parameters
         ----------
@@ -922,13 +959,14 @@ class OverallSurrogate:
     ) -> None:
         """
         Update transformation functions with input validation.
-        This method should only be called by `~upoqa.utils.manager.update_xforms`.
+        This method should only be called by 
+        :meth:`~upoqa.utils.manager.UPOQAManager.update_xforms()`.
 
         Parameters
         ----------
         xforms : list
             List of updated transformation lists for all elements. each transformation
-            list should contain exactly 3 callables: `[function, gradient, hessian]`.
+            list should contain exactly 3 callables: ``[function, gradient, hessian]``.
         """
         if isinstance(xforms, dict):
             xforms_list = []
@@ -954,7 +992,7 @@ class OverallSurrogate:
 
     def shift_center_to(self, x: np.ndarray) -> None:
         """
-        Shift the model center to a new point `x`.
+        Shift the model center to a new point ``x``.
         Note that this does not change the centers of the element models.
 
         Parameters
@@ -980,8 +1018,8 @@ class OverallSurrogate:
         want_update : list of bool
             A list of flags indicating whether each element model should be updated.
         cached_KKT_info_eles : list of tuples, optional
-            List of cached outputs of `ele_surrogate.get_determinant_ratio(x_ele_new)`
-            for each element model `ele_surrogate`, where `x_ele_new` denotes the new
+            List of cached outputs of ``ele_surrogate.get_determinant_ratio(x_ele_new)``
+            for each element model ``ele_surrogate``, where ``x_ele_new`` denotes the new
             point just added into the corresponding elemental interpolation set.
         """
         for ele_idx in self.ele_idxs:
@@ -990,7 +1028,9 @@ class OverallSurrogate:
                 try:
                     ele_surrogate.update(
                         cached_kkt_info=(
-                            cached_KKT_info_eles[ele_idx] if cached_KKT_info_eles else None
+                            cached_KKT_info_eles[ele_idx]
+                            if cached_KKT_info_eles
+                            else None
                         )
                     )
                 except (LA.LinAlgError, ZeroDivisionError) as e:
@@ -1010,7 +1050,7 @@ class OverallSurrogate:
         Returns
         -------
         fval : float
-            The model value of the overall surrogate model at the point `x`.
+            The model value of the overall surrogate model at the point ``x``.
         """
         value = float(self.extra_fun[0](x))
         for ele_idx in self.ele_idxs:
@@ -1043,7 +1083,7 @@ class OverallSurrogate:
         Returns
         -------
         g : ndarray, shape (n, )
-            The gradient vector of the overall surrogate model at the point `x`.
+            The gradient vector of the overall surrogate model at the point ``x``.
         """
         grad = np.array(self.extra_fun[1](x), dtype=np.float64)
         for ele_idx in self.ele_idxs:
@@ -1078,7 +1118,7 @@ class OverallSurrogate:
         Returns
         -------
         H : ndarray, shape (n, n)
-            The Hessian matrix of the overall surrogate model at the point `x`.
+            The Hessian matrix of the overall surrogate model at the point ``x``.
         """
         hess = np.array(self.extra_fun[2](x), dtype=np.float64)
         for ele_idx in self.ele_idxs:
@@ -1132,12 +1172,17 @@ class OverallSurrogate:
                 xform_grad = self.xforms[ele_idx][1](ele_model_fval)
                 xform_hess = self.xforms[ele_idx][2](ele_model_fval)
                 hess_operator_ele = self.weights[ele_idx] * (
-                    xform_hess * np.outer(ele_model_grad, v_ele.dot(ele_model_grad)).squeeze()
+                    xform_hess
+                    * np.outer(ele_model_grad, v_ele.dot(ele_model_grad)).squeeze()
                     + xform_grad * ele_surrogate.hess_operator(v_ele)
                 )
             else:
-                hess_operator_ele = self.weights[ele_idx] * ele_surrogate.hess_operator(v_ele)
-            if self.params("debug.check_nan_fval") and np.any(np.isnan(hess_operator_ele)):
+                hess_operator_ele = self.weights[ele_idx] * ele_surrogate.hess_operator(
+                    v_ele
+                )
+            if self.params("debug.check_nan_fval") and np.any(
+                np.isnan(hess_operator_ele)
+            ):
                 raise ValueError(
                     f"(element {self.ele_names[ele_idx]}) NaN encountered in the return "
                     "value of the surrogate hessian operator. "

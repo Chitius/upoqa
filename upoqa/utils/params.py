@@ -27,7 +27,7 @@ import numpy as np
 from typing import Any, Dict, Optional, Union, Tuple, List, Literal
 
 __all__ = [
-    'UPOQAParameterList',
+    "UPOQAParameterList",
 ]
 
 
@@ -47,7 +47,7 @@ class ParameterList(object):
         Access or update a parameter value.
 
         Parameters
-        -------
+        ----------
         key : str
             The name of the parameter.
         new_value : float or int or str, optional
@@ -69,7 +69,9 @@ class ParameterList(object):
                 return self.params[key]
             else:
                 if self.params_changed[key]:
-                    raise ValueError("Trying to update parameter '%s' for a second time" % key)
+                    raise ValueError(
+                        "Trying to update parameter '%s' for a second time" % key
+                    )
                 self.params[key] = new_value
                 self.params_changed[key] = True
                 return self.params[key]
@@ -82,17 +84,17 @@ class ParameterList(object):
 
     def check_param(self, key: str, value: Union[float, int, str]) -> bool:
         type_str, nonetype_ok, lower, upper = self.param_type(key)
-        if type_str == 'int':
+        if type_str == "int":
             val_ok, converted_val = check_integer(
                 value, lower=lower, upper=upper, allow_nonetype=nonetype_ok
             )
-        elif type_str == 'float':
+        elif type_str == "float":
             val_ok, converted_val = check_float(
                 value, lower=lower, upper=upper, allow_nonetype=nonetype_ok
             )
-        elif type_str == 'bool':
+        elif type_str == "bool":
             val_ok, converted_val = check_bool(value, allow_nonetype=nonetype_ok)
-        elif type_str == 'str':
+        elif type_str == "str":
             val_ok, converted_val = check_str(value, allow_nonetype=nonetype_ok)
         else:
             assert False, "Unknown type_str '%s' for parameter '%s'" % (type_str, key)
@@ -138,8 +140,8 @@ class UPOQAParameterList(ParameterList):
         Maximum number of function evaluations to go before termination for each element.
     noise_level : int, default=0
         Indicates how noisy the objective function is. Should be 0, 1, or 2.
-        Default number of interpolation points (`npt`) increases as the `noise_level`
-        increases, and when `noise_level` > 0, restart mechanism is enabled.
+        Default number of interpolation points (``npt``) increases as the ``noise_level``
+        increases, and when ``noise_level`` > 0, restart mechanism is enabled.
     seek_global_minimum : bool, default=False
         Whether to seek a global minimum. Defaults to False. If True, restart mechanism
         is enabled, but the parameters for restart are different.
@@ -147,7 +149,7 @@ class UPOQAParameterList(ParameterList):
         Whether to enable debug mode. Defaults to False. If True, the algorithm will check
         for NaN values in the objective function and the surrogate model.
 
-        Note that nan check will incur additional runtime costs.
+        Note that NaN check will incur additional runtime costs.
     """
 
     def __init__(
@@ -202,11 +204,11 @@ class UPOQAParameterList(ParameterList):
         self.params["general.alt_model_check_thresh"] = 0.01
         # when updating sub-interpolation-set, a new point may be declined if it's too close to the center
         # and provides bad update on the interpolation system.
-        self.params['general.filter_element_point'] = True
+        self.params["general.filter_element_point"] = True
         # the threshold on sigma of an acceptable new point.
-        self.params['general.filter_element_point_thresh'] = 1e-5
+        self.params["general.filter_element_point_thresh"] = 1e-5
         # the maximum size of the overall interpolation point set will be params["general.overall_interp_set_size_factor"] * dimension of the problem.
-        self.params['general.overall_interp_set_size_factor'] = 10.0
+        self.params["general.overall_interp_set_size_factor"] = 10.0
 
         ## Initialisation
         # whether to search for the optimal start point, otherwise we will use x0 as the start point
@@ -217,9 +219,9 @@ class UPOQAParameterList(ParameterList):
         self.params["init.overall_interp_set_size"] = 10
 
         ## Debug
-        # if nan detected in the return value of the objective function or the surrogate model,
+        # if NaN detected in the return value of the objective function or the surrogate model,
         # raise error and terminate the algorithm immediately.
-        # Note that nan check will incur additional runtime costs.
+        # Note that NaN check will incur additional runtime costs.
         self.params["debug.check_nan_fval"] = True if debug else False
 
         ## Trust Region Radius Management
@@ -291,91 +293,91 @@ class UPOQAParameterList(ParameterList):
     def param_type(self, key=str) -> Tuple[str, bool, Any, Any]:
         # Use the check_* methods below, but switch based on key
         if key == "general.center_shift_threshold":
-            type_str, nonetype_ok, lower, upper = 'float', False, 0.0, None
+            type_str, nonetype_ok, lower, upper = "float", False, 0.0, None
         elif key == "general.max_short_steps":
-            type_str, nonetype_ok, lower, upper = 'int', False, 1, None
+            type_str, nonetype_ok, lower, upper = "int", False, 1, None
         elif key == "general.short_step_thresh":
-            type_str, nonetype_ok, lower, upper = 'float', False, 0.0, 1.0
+            type_str, nonetype_ok, lower, upper = "float", False, 0.0, 1.0
         elif key == "general.max_very_short_steps":
-            type_str, nonetype_ok, lower, upper = 'int', False, 1, None
+            type_str, nonetype_ok, lower, upper = "int", False, 1, None
         elif key == "general.very_short_step_thresh":
-            type_str, nonetype_ok, lower, upper = 'float', False, 0.0, 1.0
+            type_str, nonetype_ok, lower, upper = "float", False, 0.0, 1.0
         elif key == "general.max_alt_model_steps":
-            type_str, nonetype_ok, lower, upper = 'int', False, 1, None
+            type_str, nonetype_ok, lower, upper = "int", False, 1, None
         elif key == "general.alt_model_thresh":
-            type_str, nonetype_ok, lower, upper = 'float', False, 1.0, None
+            type_str, nonetype_ok, lower, upper = "float", False, 1.0, None
         elif key == "general.alt_model_check_thresh":
-            type_str, nonetype_ok, lower, upper = 'float', False, None, None
+            type_str, nonetype_ok, lower, upper = "float", False, None, None
         elif key == "general.filter_element_point":
-            type_str, nonetype_ok, lower, upper = 'bool', False, None, None
+            type_str, nonetype_ok, lower, upper = "bool", False, None, None
         elif key == "general.filter_element_point_thresh":
-            type_str, nonetype_ok, lower, upper = 'float', False, 0.0, None
+            type_str, nonetype_ok, lower, upper = "float", False, 0.0, None
         elif key == "general.overall_interp_set_size_factor":
-            type_str, nonetype_ok, lower, upper = 'float', False, 1.0, None
+            type_str, nonetype_ok, lower, upper = "float", False, 1.0, None
         elif key == "init.search_opt_x0":
-            type_str, nonetype_ok, lower, upper = 'bool', False, None, None
+            type_str, nonetype_ok, lower, upper = "bool", False, None, None
         elif key == "init.search_opt_x0_max_trials":
-            type_str, nonetype_ok, lower, upper = 'int', False, 0, None
+            type_str, nonetype_ok, lower, upper = "int", False, 0, None
         elif key == "init.overall_interp_set_size":
-            type_str, nonetype_ok, lower, upper = 'int', False, 1, None
+            type_str, nonetype_ok, lower, upper = "int", False, 1, None
         elif key == "debug.check_nan_fval":
-            type_str, nonetype_ok, lower, upper = 'bool', False, None, None
+            type_str, nonetype_ok, lower, upper = "bool", False, None, None
         elif key == "tr_radius.eta1":
-            type_str, nonetype_ok, lower, upper = 'float', False, 0.0, 1.0
+            type_str, nonetype_ok, lower, upper = "float", False, 0.0, 1.0
         elif key == "tr_radius.eta2":
-            type_str, nonetype_ok, lower, upper = 'float', False, 0.0, 1.0
+            type_str, nonetype_ok, lower, upper = "float", False, 0.0, 1.0
         elif key == "tr_radius.theta1":
-            type_str, nonetype_ok, lower, upper = 'float', False, 0.0, 1.0
+            type_str, nonetype_ok, lower, upper = "float", False, 0.0, 1.0
         elif key == "tr_radius.theta2":
-            type_str, nonetype_ok, lower, upper = 'float', False, 1.0, None
+            type_str, nonetype_ok, lower, upper = "float", False, 1.0, None
         elif key == "tr_radius.theta3":
-            type_str, nonetype_ok, lower, upper = 'float', False, 1.0, None
+            type_str, nonetype_ok, lower, upper = "float", False, 1.0, None
         elif key == "tr_radius.theta4":
-            type_str, nonetype_ok, lower, upper = 'float', False, 1.0, None
+            type_str, nonetype_ok, lower, upper = "float", False, 1.0, None
         elif key == "tr_radius.theta5":
-            type_str, nonetype_ok, lower, upper = 'float', False, 0.0, 1.0
+            type_str, nonetype_ok, lower, upper = "float", False, 0.0, 1.0
         elif key == "tr_radius.theta6":
-            type_str, nonetype_ok, lower, upper = 'float', False, 1.0, None
+            type_str, nonetype_ok, lower, upper = "float", False, 1.0, None
         elif key == "tr_radius.alpha1":
-            type_str, nonetype_ok, lower, upper = 'float', False, 0.0, 1.0
+            type_str, nonetype_ok, lower, upper = "float", False, 0.0, 1.0
         elif key == "tr_radius.alpha2":
-            type_str, nonetype_ok, lower, upper = 'float', False, 0.0, 1.0
+            type_str, nonetype_ok, lower, upper = "float", False, 0.0, 1.0
         elif key == "tr_radius.alpha3":
-            type_str, nonetype_ok, lower, upper = 'float', False, 0.0, 1.0
+            type_str, nonetype_ok, lower, upper = "float", False, 0.0, 1.0
         elif key == "slow.terminate_when_slow":
-            type_str, nonetype_ok, lower, upper = 'bool', False, None, None
+            type_str, nonetype_ok, lower, upper = "bool", False, None, None
         elif key == "slow.history_for_slow":
-            type_str, nonetype_ok, lower, upper = 'int', False, 0, None
+            type_str, nonetype_ok, lower, upper = "int", False, 0, None
         elif key == "slow.thresh_for_slow":
-            type_str, nonetype_ok, lower, upper = 'float', False, 0, None
+            type_str, nonetype_ok, lower, upper = "float", False, 0, None
         elif key == "slow.max_slow_iters":
-            type_str, nonetype_ok, lower, upper = 'int', False, 0, None
+            type_str, nonetype_ok, lower, upper = "int", False, 0, None
         elif key == "restarts.use_restarts":
-            type_str, nonetype_ok, lower, upper = 'bool', False, None, None
+            type_str, nonetype_ok, lower, upper = "bool", False, None, None
         elif key == "restarts.max_unsuccessful_restarts":
-            type_str, nonetype_ok, lower, upper = 'int', False, 0, None
+            type_str, nonetype_ok, lower, upper = "int", False, 0, None
         elif key == "restarts.max_unsuccessful_restarts_total":
-            type_str, nonetype_ok, lower, upper = 'int', False, 0, None
+            type_str, nonetype_ok, lower, upper = "int", False, 0, None
         elif key == "restarts.resolution_final_scale":
-            type_str, nonetype_ok, lower, upper = 'float', False, 0.0, None
+            type_str, nonetype_ok, lower, upper = "float", False, 0.0, None
         elif key == "restarts.resolution_restart_init_ratio":
-            type_str, nonetype_ok, lower, upper = 'float', False, 0.0, None
+            type_str, nonetype_ok, lower, upper = "float", False, 0.0, None
         elif key == "restarts.resolution_restart_rel_ratio":
-            type_str, nonetype_ok, lower, upper = 'float', False, 0.0, None
+            type_str, nonetype_ok, lower, upper = "float", False, 0.0, None
         elif key == "restarts.random_trial_num":
-            type_str, nonetype_ok, lower, upper = 'int', False, 1, None
+            type_str, nonetype_ok, lower, upper = "int", False, 1, None
         elif key == "restarts.resolution_restart_scale_after_unsuccessful_restart":
-            type_str, nonetype_ok, lower, upper = 'float', False, 0.0, None
+            type_str, nonetype_ok, lower, upper = "float", False, 0.0, None
         elif key == "restarts.num_geom_steps":
-            type_str, nonetype_ok, lower, upper = 'int', False, 0, None
+            type_str, nonetype_ok, lower, upper = "int", False, 0, None
         elif key == "restarts.auto_detect":
-            type_str, nonetype_ok, lower, upper = 'bool', False, None, None
+            type_str, nonetype_ok, lower, upper = "bool", False, None, None
         elif key == "restarts.auto_detect.history":
-            type_str, nonetype_ok, lower, upper = 'int', False, 1, None
+            type_str, nonetype_ok, lower, upper = "int", False, 1, None
         elif key == "restarts.auto_detect.min_chg_model_slope":
-            type_str, nonetype_ok, lower, upper = 'float', False, 0.0, None
+            type_str, nonetype_ok, lower, upper = "float", False, 0.0, None
         elif key == "restarts.auto_detect.min_correl":
-            type_str, nonetype_ok, lower, upper = 'float', False, 0.0, 1.0
+            type_str, nonetype_ok, lower, upper = "float", False, 0.0, 1.0
         else:
             assert False, "ParameterList.param_type() has unknown key: %s" % key
         return type_str, nonetype_ok, lower, upper
@@ -387,7 +389,7 @@ class UPOQAParameterList(ParameterList):
         Access or update a parameter value.
 
         Parameters
-        -------
+        ----------
         key : str
             The name of the parameter.
         new_value : dict or list or float or int or str, optional
@@ -412,7 +414,9 @@ class UPOQAParameterList(ParameterList):
                 # Check the type of `new_value`
                 if isinstance(new_value, list):
                     if len(new_value) != len(self.ele_names):
-                        raise ValueError(f"Invalid length for `general.npt`: {len(new_value)}")
+                        raise ValueError(
+                            f"Invalid length for `general.npt`: {len(new_value)}"
+                        )
                     for ele_idx, npt in enumerate(new_value):
                         self.params["general.npt"][ele_idx] = npt
                 elif isinstance(new_value, dict):
@@ -420,7 +424,9 @@ class UPOQAParameterList(ParameterList):
                         if ele_name in new_value:
                             self.params["general.npt"][ele_idx] = new_value[ele_name]
                 else:
-                    raise ValueError(f"Invalid type for `general.npt`: {type(new_value)}")
+                    raise ValueError(
+                        f"Invalid type for `general.npt`: {type(new_value)}"
+                    )
                 self.params_changed["general.npt"] = True
                 return self.params["general.npt"]
         else:
@@ -439,7 +445,10 @@ class UPOQAParameterList(ParameterList):
 
 
 def check_integer(
-    val: int, lower: Optional[int] = None, upper: Optional[int] = None, allow_nonetype: bool = False
+    val: int,
+    lower: Optional[int] = None,
+    upper: Optional[int] = None,
+    allow_nonetype: bool = False,
 ) -> Tuple[bool, Optional[int]]:
     """
     Check that val is an integer (or convertible to an integer) and (optionally) that lower <= val <= upper

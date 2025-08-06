@@ -25,7 +25,7 @@ import numpy as np
 import warnings
 from typing import Any, Callable, Optional, Union, Tuple, List
 
-__all__ = ['InterpSet', 'OverallInterpSet']
+__all__ = ["InterpSet", "OverallInterpSet"]
 
 
 class InterpSet:
@@ -37,7 +37,7 @@ class InterpSet:
     n : int
         Problem dimension
     npt : int, optional
-        Number of interpolation points. By default, it is set to `2 * n + 1`.
+        Number of interpolation points. By default, it is set to ``2 * n + 1``.
         If the user provides a custom value, it should fall within the range
         ``[2 * n + 1, (n + 1) * (n + 2) / 2]``.
 
@@ -46,7 +46,7 @@ class InterpSet:
     n : int
         Problem dimension
     npt : int
-        Number of interpolation points. By default, it is set to `2 * n + 1`.
+        Number of interpolation points. By default, it is set to ``2 * n + 1``.
     interp_set_Y : ndarray, shape (npt, n)
         Interpolation points
     interp_set_fval : ndarray, shape (npt,)
@@ -57,9 +57,13 @@ class InterpSet:
         Index of the interpolation point used as the center for solving the trust region
         subproblem.
     x_opt
+        See :attr:`~InterpSet.x_opt` property
     x_anchor
+        See :attr:`~InterpSet.x_anchor` property
     f_opt
+        See :attr:`~InterpSet.f_opt` property
     f_anchor
+        See :attr:`~InterpSet.f_anchor` property
     """
 
     def __init__(self, n: int, npt: Optional[int] = None) -> None:
@@ -89,7 +93,9 @@ class InterpSet:
         float
             The lowest objective function value found in the interpolation set.
         """
-        return self.interp_set_Y[self.x_opt_idx].copy(), float(self.interp_set_fval[self.x_opt_idx])
+        return self.interp_set_Y[self.x_opt_idx].copy(), float(
+            self.interp_set_fval[self.x_opt_idx]
+        )
 
     def get_anchor(self) -> Tuple[np.ndarray, float]:
         """
@@ -132,16 +138,16 @@ class InterpSet:
     @property
     def f_anchor(self) -> float:
         """
-        value of objective function at the anchor point (`self.x_anchor`)
+        value of objective function at the anchor point (``self.x_anchor``)
         """
         return float(self.interp_set_fval[self.x_anchor_idx])
 
     def update_x_opt(self) -> None:
         """
-        Update the optimal interpolation point (`self.x_opt`) based on the current
+        Update the optimal interpolation point (``self.x_opt``) based on the current
         objective function values in the interpolation set.
 
-        If `self.x_anchor` is None, it will be updated to `self.x_opt`.
+        If ``self.x_anchor`` is None, it will be updated to ``self.x_opt``.
         """
         self.x_opt_idx = np.argsort(self.interp_set_fval)[0]
         if self.x_anchor_idx is None:
@@ -162,11 +168,11 @@ class InterpSet:
         Returns
         -------
         ndarray, shape (npt, n) or ndarray, shape (n,)
-            The interpolation set if `idx` is None, or the interpolation point at
-            the specified index `idx`.
+            The interpolation set if ``idx`` is None, or the interpolation point at
+            the specified index ``idx``.
         ndarray, shape (npt,) or float
-            Values of objective function for the interpolation set if `idx` is None,
-            or objective function value at the interpolation point with index `idx`.
+            Values of objective function for the interpolation set if ``idx`` is None,
+            or objective function value at the interpolation point with index ``idx``.
         """
         if idx is None:
             return self.interp_set_Y, self.interp_set_fval
@@ -177,8 +183,8 @@ class InterpSet:
         self, x: np.ndarray, idx: int, fval: float, update_x_anchor: bool = True
     ) -> None:
         """
-        Replace the interpolation point at index `idx` with a new point `x` and
-        update its corresponding function value `fval`.
+        Replace the interpolation point at index ``idx`` with a new point ``x`` and
+        update its corresponding function value ``fval``.
 
         Parameters
         ----------
@@ -187,7 +193,7 @@ class InterpSet:
         idx : int
             The index of the point to be updated.
         fval : float
-            The function value at `x`.
+            The function value at ``x``.
         """
         if update_x_anchor and fval < self.f_anchor:
             self.x_anchor_idx = idx
@@ -204,8 +210,8 @@ class InterpSet:
         step_size: float = 1.0,
     ):
         """
-        Initialize the interpolation set and computes the corresponding objective function
-        values.
+        Initialize the interpolation set and computes the corresponding objective 
+        function values.
 
         Parameters
         ----------
@@ -215,9 +221,10 @@ class InterpSet:
 
                 ``fun(x: np.ndarray) -> (ndarray | float)``
 
-            It should internally track its evaluation count and raise ``~upoqa.utils.MaxEvalNumReached``
-            if the maximum number of evaluations is exceeded, or `ValueError` if the function
-            returns an invalid value.
+            It should internally track its evaluation count and raise 
+            :class:`~upoqa.utils.manager.MaxEvalNumReached` if the maximum number of 
+            evaluations is exceeded, or ``ValueError`` if the function returns an 
+            invalid value.
         center: ndarray, shape (n,)
             Center point around which the interpolation set is generated.
         step_size: float, default=1.0
@@ -236,7 +243,8 @@ class InterpSet:
     def _update_interp_set_fval(self, fun: Callable[[np.ndarray], float]) -> None:
         """
         Update objective function values for all points in the interpolation set.
-        If `run_in_parallel` is True, the function evaluations will be performed in parallel.
+        If ``run_in_parallel`` is True, the function evaluations will be performed in 
+        parallel.
 
         Parameters
         ----------
@@ -249,7 +257,7 @@ class InterpSet:
     def set_interp_set_fval(self, fvals: np.ndarray) -> None:
         """
         Set objective function values of the interpolation set to the provided values
-        `fvals`.
+        ``fvals``.
 
         Parameters
         ----------
@@ -268,7 +276,7 @@ class InterpSet:
         """
         Initialize the interpolation set.
 
-        The center point is set to `center`, the next `2n` points are constructed
+        The center point is set to ``center``, the next ``2n`` points are constructed
         as a CFD (central finite difference) stencil, and the remaining points are
         generated by combining previous points.
 
@@ -283,7 +291,7 @@ class InterpSet:
         Raises
         ------
         AssertionError
-            If `center` size does not match problem dimension
+            If ``center`` size does not match problem dimension
 
         References
         ----------
@@ -295,10 +303,11 @@ class InterpSet:
         Notes
         -----
         The interpolation set is constructed as follows:
-        1. Point 0: center
-        2. Points 1 to n: center + step_size * e_i
-        3. Points n+1 to 2*n: center - step_size * e_i
-        4. Points > 2*n: combinations of previous points
+        
+        - Point 0: ``center``
+        - Points 1 to n: ``center + step_size * e_i``
+        - Points n+1 to 2*n: ``center - step_size * e_i``
+        - Points > 2*n: combinations of previous points
         """
         self.init_step_size = float(step_size)
         assert (
@@ -326,7 +335,7 @@ class InterpSet:
 class OverallInterpSet:
     r"""
     The interpolation set for an overall surrogate model of the partially separable form
-    `m(x) = \sum_i m_i(x)`, where each `m_i` is an element model.
+    :math:`m(x) = \sum_i m_i(x)`, where each :math:`m_i` is an element model.
 
     Note that this interpolation set does not directly use the stored points to construct
     the interpolation system; its primary functionality is to manage the elemental
@@ -345,10 +354,12 @@ class OverallInterpSet:
     proj_onto_ele : callable
         Projection function mapping full-space points to element subspaces:
 
-            ``(full_point: ndarray, element_name: Any) -> element_point: ndarray``
+        .. code-block:: python
 
-        For example, `proj_onto_ele([1.0, 2.0], "f_1")` yields `[1.0,]`, where
-        `"f_1"` denotes a function that depends only on the first variable of `x`.
+            (full_point: ndarray, element_name: Any) -> element_point: ndarray
+
+        For example, ``proj_onto_ele([1.0, 2.0], "f_1")`` yields ``[1.0,]``, where
+        ``"f_1"`` denotes a function that depends only on the first variable of ``x``.
 
     Attributes
     ----------
@@ -359,10 +370,12 @@ class OverallInterpSet:
     proj_onto_ele : callable
         Projection function mapping full-space points to element subspaces:
 
-            ``(full_point: ndarray, element_name: Any) -> element_point: ndarray``
+        .. code-block:: python
 
-        For example, `proj_onto_ele([1.0, 2.0], "f_1")` yields `[1.0,]`, where
-        `"f_1"` denotes a function that depends only on the first variable of `x`.
+            (full_point: ndarray, element_name: Any) -> element_point: ndarray
+
+        For example, ``proj_onto_ele([1.0, 2.0], "f_1")`` yields ``[1.0,]``, where
+        ``"f_1"`` denotes a function that depends only on the first variable of ``x``.
     ele_names : list
         List of names for each element function
     ele_idxs : list of int
@@ -386,13 +399,21 @@ class OverallInterpSet:
         Boolean array indicating whether each point in the interpolation set is enabled
         (True) or disabled (False).
     ele_num
+        See :attr:`~OverallInterpSet.ele_num` property
     set_size
+        See :attr:`~OverallInterpSet.set_size` property
     disable
+        See :attr:`~OverallInterpSet.disable` property
     capacity
+        See :attr:`~OverallInterpSet.capacity` property
     unallocated_idx
+        See :attr:`~OverallInterpSet.unallocated_idx` property
     allocated_idx
+        See :attr:`~OverallInterpSet.allocated_idx` property
     x_opt
+        See :attr:`~OverallInterpSet.x_opt` property
     f_opt
+        See :attr:`~OverallInterpSet.f_opt` property
     """
 
     def __init__(
@@ -483,7 +504,9 @@ class OverallInterpSet:
         appended_interp_set_Y = np.empty((enlarge_size, self.n))
         self.interp_set_Y = np.append(self.interp_set_Y, appended_interp_set_Y, axis=0)
         appended_interp_set_fval = np.ones((enlarge_size,)) * np.inf
-        self.interp_set_fval = np.append(self.interp_set_fval, appended_interp_set_fval, axis=0)
+        self.interp_set_fval = np.append(
+            self.interp_set_fval, appended_interp_set_fval, axis=0
+        )
         self.interp_set_fval_eles = (
             self.interp_set_fval_eles
             + [
@@ -491,7 +514,9 @@ class OverallInterpSet:
             ]
             * enlarge_size
         )
-        self.interp_set_extra_fval = np.append(self.interp_set_extra_fval, np.zeros(enlarge_size))
+        self.interp_set_extra_fval = np.append(
+            self.interp_set_extra_fval, np.zeros(enlarge_size)
+        )
         self.enable = np.append(self.enable, np.zeros((enlarge_size), dtype=bool))
 
     def append(
@@ -509,11 +534,11 @@ class OverallInterpSet:
         x : ndarray, shape (n,)
             The point to be added to the interpolation set
         fval : float
-            Value of objective function at `x`
+            Value of objective function at ``x``
         fval_eles : list of float
-            Values of element functions at `x`
+            Values of element functions at ``x``
         extra_fval : float, default=0.0
-            Value of extra objective function at `x`.
+            Value of extra objective function at ``x``.
             The "extra function" represents the differentiable white-box component
             of the objective.
 
@@ -562,7 +587,9 @@ class OverallInterpSet:
             If the point does not exist, return None.
         """
         if self.enable[idx]:
-            return self.interp_set_fval_eles[idx], float(self.interp_set_extra_fval[idx])
+            return self.interp_set_fval_eles[idx], float(
+                self.interp_set_extra_fval[idx]
+            )
         else:
             return None, None
 
@@ -589,9 +616,9 @@ class OverallInterpSet:
         f_opt : float
             The lowest objective function value found in the interpolation set
         fval_eles : list of float, optional
-            Values of element functions at the optimal point, if `verbose` is True.
+            Values of element functions at the optimal point, if ``verbose=True``.
         extra_fval : float, optional
-            Value of the extra function at the optimal point, if `verbose` is True.
+            Value of the extra function at the optimal point, if ``verbose=True``.
         """
         if self.x_opt_idx is None:
             if verbose:
@@ -629,7 +656,7 @@ class OverallInterpSet:
 
     def update_x_opt(self) -> None:
         """
-        Update the optimal interpolation point (`self.x_opt`) based on the current
+        Update the optimal interpolation point (``self.x_opt``) based on the current
         objective function values in the interpolation set.
         """
         self.x_opt_idx = np.argsort(self.interp_set_fval)[0]
@@ -657,12 +684,12 @@ class OverallInterpSet:
 
                 ``extra_fun_eval(x: ndarray) -> float``
 
-            where `x` is a 1-D array with shape (n,).
+            where ``x`` is a 1-D array with shape (n,).
 
         Returns
         -------
         bool
-            True if the optimal point (`x_opt`) changes after the update, otherwise False.
+            True if the optimal point (``x_opt``) changes after the update, otherwise False.
         """
         for idx in self.allocated_idx:
             value = 0.0
@@ -673,7 +700,9 @@ class OverallInterpSet:
                         * weights[ele_idx]
                     )
                 else:
-                    value_ele = weights[ele_idx] * self.interp_set_fval_eles[idx][ele_idx]
+                    value_ele = (
+                        weights[ele_idx] * self.interp_set_fval_eles[idx][ele_idx]
+                    )
                 value += value_ele
             self.interp_set_extra_fval[idx] = extra_fun_eval(self.interp_set_Y[idx])
             self.interp_set_fval[idx] = value + self.interp_set_extra_fval[idx]
@@ -696,11 +725,11 @@ class OverallInterpSet:
         Returns
         -------
         ndarray, shape (set_size, n) or ndarray, shape (n,)
-            The interpolation point set if `idx` is None, or the interpolation point at
-            the specified index `idx`.
+            The interpolation point set if ``idx`` is None, or the interpolation point at
+            the specified index ``idx``.
         ndarray, shape (set_size,) or float
-            Objective function values at the interpolation points if `idx` is None,
-            or objective function value at the interpolation point with index `idx`.
+            Objective function values at the interpolation points if ``idx`` is None,
+            or objective function value at the interpolation point with index ``idx``.
         """
         if idx is None:
             return self.interp_set_Y, self.interp_set_fval
@@ -717,7 +746,7 @@ class OverallInterpSet:
             Indices (or a single index) of the points to delete from the interpolation set.
 
         Raises
-        -------
+        ------
         RuntimeWarning
             If attempting to delete a point that does not exist in the interpolation set.
         """
@@ -759,10 +788,10 @@ class OverallInterpSet:
     def clear_invalid_point(self) -> None:
         """
         Delete the worst points from the interpolation set to ensure the number of
-        maintained points does not exceed `self.max_size`.
+        maintained points does not exceed ``self.max_size``.
 
         Notes
-        -------
+        -----
         Points are deleted based on their objective function values, with the worst
         (highest) values being removed first.
         """
@@ -779,7 +808,7 @@ class OverallInterpSet:
         Delete all but the optimal point from the interpolation set, leaving only one point.
 
         Notes
-        -------
+        -----
         The optimal point is determined by the lowest objective function value.
         """
         if self.set_size > 1:

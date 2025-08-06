@@ -29,7 +29,7 @@ from copy import deepcopy
 import warnings
 
 __all__ = [
-    'minimize',
+    "minimize",
 ]
 
 TERMINATION_MSG = "\n# Optimization terminated: {msg}"
@@ -42,10 +42,14 @@ def minimize(
         List[Callable[[np.ndarray], float]],
     ],
     x0: np.ndarray,
-    coords: Union[Dict[Any, Union[List, np.ndarray]], List[Union[List, np.ndarray]]] = dict(),
+    coords: Union[
+        Dict[Any, Union[List, np.ndarray]], List[Union[List, np.ndarray]]
+    ] = dict(),
     maxiter: Optional[int] = None,
     maxfev: Optional[Union[int, Dict[Any, int], List[int]]] = dict(),
-    weights: Union[Dict[Any, Union[float, int]], List[Union[float, int]], int, float] = dict(),
+    weights: Union[
+        Dict[Any, Union[float, int]], List[Union[float, int]], int, float
+    ] = dict(),
     xforms: Union[
         Dict[Any, Optional[List[Callable[[np.ndarray], Union[np.ndarray, float]]]]],
         List[Optional[List[Callable[[np.ndarray], Union[np.ndarray, float]]]]],
@@ -60,7 +64,7 @@ def minimize(
     noise_level: int = 0,
     seek_global_minimum: bool = False,
     f_target: Optional[float] = None,
-    tr_shape: Literal['structured', 'spherical'] = 'structured',
+    tr_shape: Literal["structured", "spherical"] = "structured",
     callback: Optional[
         Union[
             Callable[[OptimizeResult], Optional[bool]],
@@ -88,15 +92,18 @@ def minimize(
     functions (termed as *element function* or *element*) whose gradients and 
     Hessians are unavailable, :math:`U_i:\mathbb{R}^n \to \mathbb{R}^{|\mathcal{I}_i|}` 
     are projection operators, and :math:`\mathcal{I}_i \subset [i]` is an index 
-    set satisfying :math:`|\mathcal{I}_i| < n`.
+    set satisfying :math:`|\mathcal{I}_i| < n` (element functions depend on small 
+    subsets of variables). 
     
     The solver also supports a more general objective form:
 
     .. math::
 
-        \min_{x\in\mathbb{R}^n} \quad f_0(x) + \sum_{i=1}^q w_i h_i\left(f_i(U_i x)\right),
+        \min_{x\in\mathbb{R}^n} \quad f_0(x) + 
+        \sum_{i=1}^q w_i h_i\left(f_i(U_i x)\right),
         
-    where:
+    where: 
+    
     - :math:`f_0: \mathbb{R}^n \to \mathbb{R}` is a white-box component with 
       computable gradients and Hessians
     - :math:`w_i \in \mathbb{R}` are element weights
@@ -107,6 +114,7 @@ def minimize(
     ----------
     fun : list of callables, dict of callables, or callable
         The objective element function(s). Can be:
+        
         - A dictionary mapping element names to element functions
         - A list containing all element functions
         - A single function (not recommended; treated as a single element without 
@@ -116,7 +124,7 @@ def minimize(
         input is recommended for better readability, especially when elements have 
         different contexts or lack inherent ordering.
         
-        For list input, the solver assigns default names as `"fun[0]"`, `"fun[1]"`, 
+        For list input, the solver assigns default names as ``"fun[0]"``, ``"fun[1]"``, 
         etc.
     x0 : ndarray, shape (n,)
         Initial guess for the optimization variables.
@@ -125,31 +133,35 @@ def minimize(
         variables an element depends on.
         
         Example for dictionary input: 
-            `{'f1': [0, 1], 'f2': [2, 3]}` indicates:
+            ``{'f1': [0, 1], 'f2': [2, 3]}`` indicates:
+            
             - Element f1 depends on variables 0 and 1
             - Element f2 depends on variables 2 and 3
             
         Example for list input: 
-            `[[0, 1], [2, 3]]` assigns indices to elements in list order.
+            ``[[0, 1], [2, 3]]`` assigns indices to elements in list order.
         
         If not provided, all elements default to depending on all variables.
     maxiter : int, optional
-        Maximum number of iterations. Default: 1000 * dimension of problem.
+        Maximum number of iterations. Default: ``1000 * n``.
     maxfev : int, dict of int or list of int, optional
         Maximum function evaluations:
-        - dict: Per-element limits (keys match `fun`)
-        - list: Per-element limits (order matches `fun`)
+        
+        - dict: Per-element limits (keys match ``fun``)
+        - list: Per-element limits (order matches ``fun``)
         - int: Uniform limit for all elements
     weights : dict or list, optional
         Nonnegative weights :math:`w_i` for elements. Formats:
-        - dict: Per-element weights (keys match `fun`)
-        - list: Per-element weights (order matches `fun`)
+        
+        - dict: Per-element weights (keys match ``fun``)
+        - list: Per-element weights (order matches ``fun``)
         - scalar: Uniform weight for all elements
     xforms : dict or list, optional
         Transformations :math:`h_i` for element outputs. Each entry must be a list 
         of length 3 containing [function, gradient, Hessian] callables.
         
         Example for two simple transformations:
+        
         .. code-block:: python
         
             xforms = {
@@ -172,7 +184,7 @@ def minimize(
         automatically performs bound checking on transformation inputs, ensuring 
         they remain within specified limits.
         
-        Example: `{'log_transform': (1e-8, np.inf)}` prevents log(0) errors.
+        Example: ``{'log_transform': (1e-8, np.inf)}`` prevents log(0) errors.
         
         Note: Even if element function outputs naturally stay within bounds, 
         surrogate model outputs may exceed valid ranges during optimization. If your
@@ -181,25 +193,27 @@ def minimize(
         due to invalid transformation evaluations.
     extra_fun : list of callables, optional
         White-box component :math:`f_0` of the objective function, which is a list 
-        of length 3 specified as [function_value, gradient, Hessian] callables.
+        of length 3 specified as ``[function_value, gradient, Hessian]`` callables.
     npt : int or dict or list, optional
-        Number of interpolation points per element. Formats similar to `maxfev`.
+        Number of interpolation points per element. Formats similar to ``maxfev``.
     radius_init : float, default=1.0
         Initial trust region radius
     radius_final : float, default=1e-6
         Final (minimum) trust region radius
     noise_level : {0, 1, 2}, default=0
         Estimated noise level in objective function:
-        - 0: No noise
-        - 1: Moderate noise. Restart mechanisms enabled and the default 
-          interpolation points are set to 
+        
+        - ``noise_level=0``: No noise
+        - ``noise_level=1``: Moderate noise. Restart mechanisms enabled and the 
+          default interpolation points are set to 
           
           .. math::
                 
-                \max\{\min\{0.8 n_i ^ 1.5 + n_i + 1, (n_i + 1)(n_i + 2) / 2\}, 2 n_i + 1\}
+                \max\{\min\{0.8 n_i ^{1.5} + n_i + 1, (n_i + 1)(n_i + 2) / 2\}, 
+                2 n_i + 1\}
                 
           where :math:`n_i` are the dimension of the :math:`i`-th element.
-        - 2: Significant noise. Restart mechanisms enabled and the default 
+        - ``noise_level=2``: Significant noise. Restart mechanisms enabled and the default 
           interpolation points are set to 
           
           .. math::
@@ -216,15 +230,15 @@ def minimize(
          terminated when the objective function value at the iterate is less 
          than or equal to this target.
     tr_shape : {'structured', 'spherical'}, default='structured'
-        geometry of the trust region:
-        - 'structured': Complex region formed by intersecting cylinders with 
+        Geometry of the trust region:
+        
+        - ``'structured'``: Complex region formed by intersecting cylinders with 
           element-specific radii. In simple cases (e.g., two orthogonal cylinders), 
           resembles a Steinmetz solid. Allows larger steps in well-modeled 
           directions while restricting poorly-modeled ones. 
-        - 'spherical': Traditional spherical trust region. Simpler but less adaptive
-          to element-wise model accuracy. Recommended if the `structured` option 
-          incurs excessive runtime overhead (typically when the number of elements 
-          is very large).
+        - ``'spherical'``: Traditional spherical trust region. Simpler but less 
+          adaptive to element-wise model accuracy. Recommended if the ``'structured'`` option incurs excessive runtime overhead (typically when the number of 
+          elements is very large).
     callback : callable, optional
         A callback executed at each objective function evaluation. The method
         terminates if a ``StopIteration`` exception is raised by the callback
@@ -233,11 +247,12 @@ def minimize(
             ``callback(intermediate_result)``
 
         where ``intermediate_result`` is a keyword parameter that contains an
-        instance of ``~upoqa.utils.OptimizeResult``, with attributes ``x``
-        , ``fun`` and other useful information, being the point at which the 
+        instance of :class:`~upoqa.utils.result.OptimizeResult`, with attributes 
+        ``x``, ``fun`` and other useful information, being the point at which the 
         objective function is evaluated and the value of the objective function, 
         respectively. The name of the parameter must be ``intermediate_result`` 
-        for the callback to be passed an instance of ``~upoqa.utils.OptimizeResult``.
+        for the callback to be passed an instance of 
+        :class:`~upoqa.utils.result.OptimizeResult`.
 
         Alternatively, the callback function can have the signature:
 
@@ -251,34 +266,36 @@ def minimize(
         Whether to display detailed progress information.
     debug : bool, default=False
         Enable debugging features:
-        1. NaN checking in function evaluations
-        2. Include solver internals (manager, interp_set, model) in result
-        3. Enhanced verbosity when both disp and verbose are True
+        
+        - ``debug=1``: NaN checking in function evaluations
+        - ``debug=2``: Include solver internals (manager, interp_set, model) in result
+        - ``debug=3``: Enhanced verbosity when both disp and verbose are True
     return_internals : bool, default=False
         If True, the returned result will contain the fields ``manager``,
         ``interp_set`` and ``model`` for debugging purposes even if 
-        ``debug`` is False.
+        ``debug=False``.
     options : dict
-        Advanced algorithm parameters. See `upoqa.utils.UPOQAParameterList` for 
-        available options.
+        Advanced algorithm parameters. See the source code of 
+        :class:`~upoqa.utils.params.UPOQAParameterList` for available options.
         
     Returns
     -------
-    ``~upoqa.utils.OptimizeResult``
+    :class:`~upoqa.utils.result.OptimizeResult`
         Result of the optimization procedure, with the following fields:
     
             message : str
-                Description of the cause of the termination
+                Description of the cause of the termination.
             success : bool
-                Whether the optimization procedure terminated successfully
+                Whether the optimization procedure terminated successfully.
             fun : float
-                Value of objective function at the solution
+                Value of objective function at the solution.
             funs : dict or list
                 Values of the element functions evaluated at the solution. The 
-                type matches the input `fun`:
-                - If `fun` was a dictionary, return a dictionary mapping element
+                type matches the input ``fun``:
+                
+                - If ``fun`` was a dictionary, return a dictionary mapping element
                   names to their function values.
-                - If `fun` was a list, return a list of function values in the 
+                - If ``fun`` was a list, return a list of function values in the 
                   same order as the input list.
             extra_fun : float
                 Value of extra function (the white-box component :math:`f_0`) 
@@ -286,42 +303,44 @@ def minimize(
             x : ndarray
                 The solution of the optimization.
             jac, hess : ndarray
-                Values of objective function's Jacobian and its Hessian at `x`.
+                Values of objective function's Jacobian and its Hessian at ``x``.
                 The Hessian is an approximation.
             nit : int
-                Number of iterations performed by the optimizer
+                Number of iterations performed by the optimizer.
             nfev : dict or list
-                Number of evaluations of element functions. The type matches the 
-                input `fun`:
-                - If `fun` was a dictionary, return a dictionary mapping element 
+                Number of evaluations of element functions. 
+                
+                The type matches the input ``fun``:
+                
+                - If ``fun`` was a dictionary, return a dictionary mapping element 
                   names to their numbers of function evaluations.
-                - If `fun` was a list, return a list of evaluation numbers in the
+                - If ``fun`` was a list, return a list of evaluation numbers in the
                   same order as the input list.
             max_nfev : int
-                Maximum number of evaluations of element functions
+                Maximum number of evaluations of element functions.
             avg_nfev : float
-                Average number of evaluations of element functions
+                Average number of evaluations of element functions.
             nrun : int
                 Number of runs (when enabling restarts).
         
-        If ``debug`` or ``return_internals`` is True, the result also has the 
+        If ``debug=True`` or ``return_internals=True``, the result also has the 
         following fields:
                 
-            manager : ``~upoqa.utils.UPOQAManager``
-                Algorithm manager
-            interp_set : ``~upoqa.utils.OverallInterpSet``
-                Interpolation point set
-            model : ``~upoqa.utils.OverallSurrogate``
-                Surrogate model
+            manager : :class:`~upoqa.utils.manager.UPOQAManager`
+                Algorithm manager.
+            interp_set : :class:`~upoqa.utils.interp_set.OverallInterpSet`
+                Interpolation point set.
+            model : :class:`~upoqa.utils.model.OverallSurrogate`
+                Surrogate model.
                 
         If an exception is raised during the optimization that cannot be handled  
         by the algorithm, the result will also contain the following fields:
         
             exception : Exception
                 Exception raised during the optimization that caused the 
-                termination, if any
+                termination, if any.
             traceback : str
-                Traceback of the exception, if any  
+                Traceback of the exception, if any.
                 
     References
     ----------
@@ -508,12 +527,15 @@ def minimize(
             def ele_fun_eval(x: np.ndarray) -> float:
                 """
                 Wrapped element function, which internally tracks its evaluation count and
-                raises ``~upoqa.utils.MaxEvalNumReached`` if the maximum number of evaluations is exceeded,
-                or `ValueError` if the function returns an invalid value.
+                raises :class:`~upoqa.utils.manager.MaxEvalNumReached` if the maximum number 
+                of evaluations is exceeded, or ``ValueError`` if the function returns an 
+                invalid value.
                 """
                 nonlocal manager
                 if manager.nfev[ele_idx] >= manager.maxfev[ele_idx]:
-                    raise MaxEvalNumReached(ele_idx=ele_idx, ele_name=ele_names[ele_idx])
+                    raise MaxEvalNumReached(
+                        ele_idx=ele_idx, ele_name=ele_names[ele_idx]
+                    )
 
                 manager.nfev[ele_idx] += 1  # increase the evaluation counter
                 try:
@@ -543,7 +565,9 @@ def minimize(
         if disp_level >= 1:
             import tqdm
 
-            progress_bar = tqdm.tqdm(total=len(ele_names), desc="Initializing surrogate models")
+            progress_bar = tqdm.tqdm(
+                total=len(ele_names), desc="Initializing surrogate models"
+            )
 
         for ele_idx in ele_idxs:
             if disp_level >= 1:
@@ -556,7 +580,9 @@ def minimize(
                 step_size=resolution_init,
             )
             ele_models[ele_idx] = QuadSurrogate(
-                interp_set=ele_interp_set, center=proj_onto_ele(x_best, ele_idx), n=dims[ele_idx]
+                interp_set=ele_interp_set,
+                center=proj_onto_ele(x_best, ele_idx),
+                n=dims[ele_idx],
             )
             if disp_level >= 1:
                 progress_bar.update(1)
@@ -566,7 +592,10 @@ def minimize(
 
         def fun_eles_eval(x: np.ndarray) -> Tuple[List[float], float]:
             """Given input x, return [ele1(x), ele2(x), ..., elek(x)] and extra_fun(x)."""
-            fval_eles = [element_funcs[ele_idx](proj_onto_ele(x, ele_idx)) for ele_idx in ele_idxs]
+            fval_eles = [
+                element_funcs[ele_idx](proj_onto_ele(x, ele_idx))
+                for ele_idx in ele_idxs
+            ]
             try:
                 extra_fval = float(extra_fun[0](x))
             except Exception as e:
@@ -614,11 +643,15 @@ def minimize(
 
         if params("init.search_opt_x0"):
             # Search the optimal start point from combinations of elemental interpolation points.
-            start_x, start_fval, fval_eles, extra_fval, exit_info = manager.find_best_start_point()
+            start_x, start_fval, fval_eles, extra_fval, exit_info = (
+                manager.find_best_start_point()
+            )
         else:
             # otherwise, start from x0.
             start_x = x0
-            fval_eles = [ele_interp_sets[ele_idx].get_interp_set(0)[1] for ele_idx in ele_idxs]
+            fval_eles = [
+                ele_interp_sets[ele_idx].get_interp_set(0)[1] for ele_idx in ele_idxs
+            ]
             extra_fval = float(extra_fun[0](x0))
             start_fval = manager.build_fval(fval_eles, extra_fval)
 
@@ -626,7 +659,10 @@ def minimize(
         def update_short_step_count(step_max_ele_norm: float):
             """Updates the count of short steps and very short steps."""
             nonlocal n_short_steps, n_very_short_steps
-            if step_max_ele_norm <= params("general.short_step_thresh") * manager.resolution:
+            if (
+                step_max_ele_norm
+                <= params("general.short_step_thresh") * manager.resolution
+            ):
                 if manager.max_radius > manager.resolution:
                     n_short_steps, n_very_short_steps = 0, 0
                 else:
@@ -661,7 +697,8 @@ def minimize(
                 return ExitInfo(
                     flag=ExitStatus.SUCCESS,
                     msg=(
-                        f"The current objective function value {f_best:.4} " "is already <= ftaget."
+                        f"The current objective function value {f_best:.4} "
+                        "is already <= ftaget."
                     ),
                 )
             return None
@@ -679,7 +716,7 @@ def minimize(
             exit_info: Optional[ExitInfo] = None,
         ) -> Tuple[Optional[ExitInfo], bool]:
             """
-            Trying to launch a restart, and return the updated `exit_info` and a flag
+            Trying to launch a restart, and return the updated ``exit_info`` and a flag
             indicating whether a restart has been initiated successfully.
             """
             nonlocal nit_in_a_run, n_short_steps, n_very_short_steps, n_alt_models, manager, xk, fval_k
@@ -701,7 +738,9 @@ def minimize(
 
                     nit_in_a_run, n_short_steps, n_very_short_steps = 0, 0, 0
                     n_alt_models = [0 for _ in ele_names]
-                    manager.resolution_final *= manager.params("restarts.resolution_final_scale")
+                    manager.resolution_final *= manager.params(
+                        "restarts.resolution_final_scale"
+                    )
                     manager.reset_restart_track_info()
                     xk, fval_k = overall_interp_set.get_opt()
                     return None, True
@@ -738,8 +777,8 @@ def minimize(
                         if not is_dict_input:
                             state_dict.update(
                                 dict(
-                                    funs=list(state_dict['funs'].values()),
-                                    nfev=list(state_dict['nfev'].values()),
+                                    funs=list(state_dict["funs"].values()),
+                                    nfev=list(state_dict["nfev"].values()),
                                 )
                             )
                         state = OptimizeResult(**state_dict)
@@ -799,7 +838,9 @@ def minimize(
             want_improve_geometry = [False for _ in ele_names]
             nit_in_a_run += 1
 
-            xk, fval_k, ele_fvals_k, extra_fval_k = overall_interp_set.get_opt(verbose=True)
+            xk, fval_k, ele_fvals_k, extra_fval_k = overall_interp_set.get_opt(
+                verbose=True
+            )
             grad_k = overall_surrogate.grad_eval(xk)
 
             if disp_level >= 2:
@@ -809,20 +850,27 @@ def minimize(
             # function `callback(state)` by calling `state.manager.update_weights(new_weights)`
             # and `state.manager.update_xforms(new_xforms)`.
             if wrapped_callback():
-                exit_info = ExitInfo(ExitStatus.SUCCESS, "Terminated by user-defined callback. ")
+                exit_info = ExitInfo(
+                    ExitStatus.SUCCESS, "Terminated by user-defined callback. "
+                )
                 break
 
             # Update f_best in case the user has changed the weights or xforms.
             refresh_f_best()
             overall_interp_set.update_fval_with_new_weights_and_xforms(
-                weights=manager.weights, xforms=manager.xforms, extra_fun_eval=manager.extra_fun[0]
+                weights=manager.weights,
+                xforms=manager.xforms,
+                extra_fun_eval=manager.extra_fun[0],
             )
 
             # Detect whether to call a restart
             restart_detected_flag = manager.decide_to_restart_due_to_exploding_coeff()
             if restart_detected_flag:
                 exit_info, continue_flag = check_and_try_to_restart(
-                    ExitInfo(ExitStatus.AUTO_DETECT_RESTART_WARNING, "Auto-detected restart. ")
+                    ExitInfo(
+                        ExitStatus.AUTO_DETECT_RESTART_WARNING,
+                        "Auto-detected restart. ",
+                    )
                 )
                 if exit_info:
                     break
@@ -830,7 +878,9 @@ def minimize(
                     continue
 
             # Update xk, x_best
-            xk, fval_k, ele_fvals_k, extra_fval_k = overall_interp_set.get_opt(verbose=True)
+            xk, fval_k, ele_fvals_k, extra_fval_k = overall_interp_set.get_opt(
+                verbose=True
+            )
             grad_k = overall_surrogate.grad_eval(xk)
             exit_info = update_x_best_in_history(xk, fval_k, ele_fvals_k, extra_fval_k)
             if exit_info:
@@ -847,20 +897,26 @@ def minimize(
                     envelope_radius = manager.max_radius * envelope_factor
 
                     sk = conjugate_gradient_proj_steinmetz(
-                        fun=lambda s: overall_surrogate.fun_eval(xk + s) - surrogate_fvalk,
+                        fun=lambda s: overall_surrogate.fun_eval(xk + s)
+                        - surrogate_fvalk,
                         grad=lambda s: overall_surrogate.grad_eval(xk + s),
-                        hess_prod=lambda s, v: overall_surrogate.hess_operator(xk + s, v),
+                        hess_prod=lambda s, v: overall_surrogate.hess_operator(
+                            xk + s, v
+                        ),
                         coords_mask=coords_mask,
                         n=n,
                         deltas=np.array(manager.radii),
                         envelope_delta=envelope_radius,
                     )
-                elif tr_shape == 'spherical':
+                elif tr_shape == "spherical":
                     # Solve the trust region subproblem using tangential_byrd_omojokun
                     sk = tangential_byrd_omojokun(
-                        fun=lambda s: overall_surrogate.fun_eval(xk + s) - surrogate_fvalk,
+                        fun=lambda s: overall_surrogate.fun_eval(xk + s)
+                        - surrogate_fvalk,
                         grad=lambda s: overall_surrogate.grad_eval(xk + s),
-                        hess_prod=lambda s, v: overall_surrogate.hess_operator(xk + s, v),
+                        hess_prod=lambda s, v: overall_surrogate.hess_operator(
+                            xk + s, v
+                        ),
                         delta=min(manager.radii),
                         n=n,
                     )
@@ -918,7 +974,9 @@ def minimize(
                     )
 
                 for ele_idx in ele_idxs:
-                    manager.set_radius(params("tr_radius.alpha2") * manager.radii[ele_idx], ele_idx)
+                    manager.set_radius(
+                        params("tr_radius.alpha2") * manager.radii[ele_idx], ele_idx
+                    )
 
                 if n_short_steps >= params(
                     "general.max_short_steps"
@@ -928,7 +986,9 @@ def minimize(
                     want_reduce_resolution = True
                 else:
                     try:
-                        idx_to_replaced_eles, dist_new_eles, _ = manager.get_index_to_remove()
+                        idx_to_replaced_eles, dist_new_eles, _ = (
+                            manager.get_index_to_remove()
+                        )
                     except (LA.LinAlgError, ZeroDivisionError):
                         exit_info, continue_flag = check_and_try_to_restart(
                             flag=ExitStatus.LINALG_ERROR,
@@ -984,8 +1044,8 @@ def minimize(
 
                 # Decide which interpolation point to delete
                 try:
-                    idx_to_replaced_eles, _, cached_kkt_info_eles = manager.get_index_to_remove(
-                        x=x_hold, center=xk
+                    idx_to_replaced_eles, _, cached_kkt_info_eles = (
+                        manager.get_index_to_remove(x=x_hold, center=xk)
                     )
                 except (LA.LinAlgError, ZeroDivisionError):
                     exit_info, continue_flag = check_and_try_to_restart(
@@ -1007,7 +1067,8 @@ def minimize(
                 ):
                     exit_info, continue_flag = check_and_try_to_restart(
                         ExitInfo(
-                            flag=ExitStatus.SLOW_WARNING, msg="Maximum slow iterations reached. "
+                            flag=ExitStatus.SLOW_WARNING,
+                            msg="Maximum slow iterations reached. ",
                         )
                     )
                     if exit_info:
@@ -1044,7 +1105,12 @@ def minimize(
 
                 # Update the interpolation set and the surrogate model
                 overall_interp_set.update_point_on_idx(
-                    x_hold, idx_to_replaced_eles, fval_eles, fval, extra_fval, need_update
+                    x_hold,
+                    idx_to_replaced_eles,
+                    fval_eles,
+                    fval,
+                    extra_fval,
+                    need_update,
                 )
                 try:
                     overall_surrogate.update(need_update, cached_kkt_info_eles)
@@ -1067,9 +1133,9 @@ def minimize(
 
                 # Update useful tracking information for the auto detection of restart
                 manager.update_restart_track_info(xk, old_grad, old_hess)
-                old_grad, old_hess = overall_surrogate.grad_eval(xk), overall_surrogate.hess_eval(
+                old_grad, old_hess = overall_surrogate.grad_eval(
                     xk
-                )
+                ), overall_surrogate.hess_eval(xk)
                 grad_k = overall_surrogate.grad_eval(overall_interp_set.get_opt()[0])
 
                 # Print information of current iteration
@@ -1083,10 +1149,8 @@ def minimize(
                         f"    step size:            {s_norm:.12}\n"
                         f"    radii:               "
                     )
-                    if tr_shape == 'structured':
-                        iter_log += (
-                            f"\n      {dict(zip(ele_names, [float(x) for x in manager.radii]))}\n"
-                        )
+                    if tr_shape == "structured":
+                        iter_log += f"\n      {dict(zip(ele_names, [float(x) for x in manager.radii]))}\n"
                     else:
                         iter_log += f"{manager.radii[0]:.2}\n"
                     iter_log += (
@@ -1094,9 +1158,7 @@ def minimize(
                         f"    obj change:           {fval_k:.12}  -->  {fval:.12}\n"
                     )
                     if extra_fun_enabled:
-                        iter_log += (
-                            f"    extra-fun change:     {extra_fval_k:.12}  -->  {extra_fval:.12}\n"
-                        )
+                        iter_log += f"    extra-fun change:     {extra_fval_k:.12}  -->  {extra_fval:.12}\n"
                     iter_log += f"    value of element:     \n      {dict(zip(ele_names, [float(x) for x in fval_eles]))}\n"
                     if weights_xforms_enabled:
                         iter_log += (
@@ -1153,9 +1215,9 @@ def minimize(
                 # Consider reinitializing the surrogate model if the difference of model grad at xk
                 # between current model and the alternative model grows too large.
                 for ele_idx in ele_idxs:
-                    if manager.radii[ele_idx] <= manager.resolution and ratios[ele_idx] < params(
-                        "general.alt_model_check_thresh"
-                    ):
+                    if manager.radii[ele_idx] <= manager.resolution and ratios[
+                        ele_idx
+                    ] < params("general.alt_model_check_thresh"):
                         surrogate = ele_models[ele_idx]
                         n_alt_models[ele_idx] += 1
                         xk_ele = proj_onto_ele(xk, ele_idx)
@@ -1168,9 +1230,14 @@ def minimize(
                                 f"  (element {ele_names[ele_idx]}) Model Grad Norm ="
                                 f" {grad_norm}, Alt Model Grad Norm = {grad_alt_norm}."
                             )
-                        if grad_norm < params("general.alt_model_thresh") * grad_alt_norm:
+                        if (
+                            grad_norm
+                            < params("general.alt_model_thresh") * grad_alt_norm
+                        ):
                             n_alt_models[ele_idx] = 0
-                        if n_alt_models[ele_idx] >= params("general.max_alt_model_steps"):
+                        if n_alt_models[ele_idx] >= params(
+                            "general.max_alt_model_steps"
+                        ):
                             surrogate.reinit()
                             n_alt_models[ele_idx] = 0
                             if disp_level >= 2:
@@ -1182,7 +1249,9 @@ def minimize(
                         n_alt_models[ele_idx] = 0
 
                 try:
-                    idx_to_replaced_eles, dist_new_eles, _ = manager.get_index_to_remove()
+                    idx_to_replaced_eles, dist_new_eles, _ = (
+                        manager.get_index_to_remove()
+                    )
                 except (LA.LinAlgError, ZeroDivisionError) as e:
                     exit_info, continue_flag = check_and_try_to_restart(
                         ExitInfo(
@@ -1217,7 +1286,7 @@ def minimize(
             # Reduce the trust region resolution
             if want_reduce_resolution:
                 if disp_level >= 2:
-                    print(f"  Reduce resolution from {manager.resolution:.3}", end='')
+                    print(f"  Reduce resolution from {manager.resolution:.3}", end="")
                 reach_minimum_resolution_flag = manager.reduce_resolution()
                 if disp_level >= 2:
                     print(f" to {manager.resolution:.3}.")
@@ -1225,7 +1294,8 @@ def minimize(
             # Has reduced the trust region resolution to the minimum?
             if reach_minimum_resolution_flag:
                 exit_info = ExitInfo(
-                    flag=ExitStatus.SUCCESS, msg="The resolution has reached its minimum. "
+                    flag=ExitStatus.SUCCESS,
+                    msg="The resolution has reached its minimum. ",
                 )
             exit_info, continue_flag = check_and_try_to_restart(exit_info)
             if exit_info:
@@ -1235,8 +1305,12 @@ def minimize(
 
             # Improve the geometry of the interpolation set if necessary.
             if n_want_GI > 0:
-                xk, fval_k, ele_fvals_k, extra_fval_k = overall_interp_set.get_opt(verbose=True)
-                exit_info = update_x_best_in_history(xk, fval_k, ele_fvals_k, extra_fval_k)
+                xk, fval_k, ele_fvals_k, extra_fval_k = overall_interp_set.get_opt(
+                    verbose=True
+                )
+                exit_info = update_x_best_in_history(
+                    xk, fval_k, ele_fvals_k, extra_fval_k
+                )
                 if exit_info:
                     break
                 try:
@@ -1292,7 +1366,9 @@ def minimize(
                     break
 
                 try:
-                    overall_surrogate.update(want_improve_geometry, cached_kkt_info_eles)
+                    overall_surrogate.update(
+                        want_improve_geometry, cached_kkt_info_eles
+                    )
                 except SurrogateLinAlgError as e:
                     exit_info, continue_flag = check_and_try_to_restart(
                         ExitInfo(
@@ -1348,7 +1424,10 @@ def minimize(
         )
         if not is_dict_input:
             result.update(
-                dict(funs=list(result['funs'].values()), nfev=list(result['nfev'].values()))
+                dict(
+                    funs=list(result["funs"].values()),
+                    nfev=list(result["nfev"].values()),
+                )
             )
         if debug or return_internals:
             result.update(
@@ -1360,22 +1439,26 @@ def minimize(
             )
         if exit_info.exception:
             # If there is an exception, add it to the result.
-            result.update(dict(exception=exit_info.exception, traceback=exit_info.traceback))
+            result.update(
+                dict(exception=exit_info.exception, traceback=exit_info.traceback)
+            )
         return OptimizeResult(**result)
 
     except Exception as e:
         tr_e = traceback.format_exc()
         flag = (
-            ExitStatus.INVALID_EVAL_ERROR if isinstance(e, ValueError) else ExitStatus.UNKNOWN_ERROR
+            ExitStatus.INVALID_EVAL_ERROR
+            if isinstance(e, ValueError)
+            else ExitStatus.UNKNOWN_ERROR
         )
         exit_info = ExitInfo(flag, str(e), e, tr_e)
-        if 'disp_level' in vars() and disp_level >= 1:
+        if "disp_level" in vars() and disp_level >= 1:
             print(TERMINATION_MSG.format(msg=exit_info.message()))
 
         try:
             res_jac = (
                 overall_surrogate.grad_eval(x_best)
-                if ('x_best' in vars() and 'overall_surrogate' in vars())
+                if ("x_best" in vars() and "overall_surrogate" in vars())
                 else None
             )
         except:
@@ -1384,7 +1467,7 @@ def minimize(
         try:
             res_hess = (
                 overall_surrogate.hess_eval(x_best)
-                if ('x_best' in vars() and 'overall_surrogate' in vars())
+                if ("x_best" in vars() and "overall_surrogate" in vars())
                 else None
             )
         except:
@@ -1392,15 +1475,17 @@ def minimize(
 
         try:
             result = dict(
-                x=x_best if 'x_best' in vars() else None,
-                fun=f_best if 'f_best' in vars() else None,
+                x=x_best if "x_best" in vars() else None,
+                fun=f_best if "f_best" in vars() else None,
                 funs=(
                     dict(zip(ele_names, ele_fs_best))
-                    if ('ele_names' in vars() and 'ele_fs_best' in vars())
+                    if ("ele_names" in vars() and "ele_fs_best" in vars())
                     else None
                 ),
                 extra_fun=(
-                    extra_f_best if ('x_best' in vars() and 'extra_f_best' in vars()) else None
+                    extra_f_best
+                    if ("x_best" in vars() and "extra_f_best" in vars())
+                    else None
                 ),
                 jac=res_jac,
                 hess=res_hess,
@@ -1408,27 +1493,27 @@ def minimize(
                 message=exit_info.message(),
                 exception=exit_info.exception,
                 traceback=exit_info.traceback,
-                nit=nit + 1 if 'nit' in vars() else None,
-                nrun=manager.nrun + 1 if 'manager' in vars() else None,
+                nit=nit + 1 if "nit" in vars() else None,
+                nrun=manager.nrun + 1 if "manager" in vars() else None,
                 nfev=(
                     dict(zip(ele_names, manager.nfev))
-                    if ('ele_names' in vars() and 'manager' in vars())
+                    if ("ele_names" in vars() and "manager" in vars())
                     else None
                 ),
-                avg_nfev=np.mean(manager.nfev) if 'manager' in vars() else None,
-                max_nfev=max(manager.nfev) if 'manager' in vars() else None,
+                avg_nfev=np.mean(manager.nfev) if "manager" in vars() else None,
+                max_nfev=max(manager.nfev) if "manager" in vars() else None,
             )
             if not is_dict_input:
                 result.update(
                     dict(
                         funs=(
-                            list(result['funs'].values())
-                            if isinstance(result['funs'], dict)
+                            list(result["funs"].values())
+                            if isinstance(result["funs"], dict)
                             else None
                         ),
                         nfev=(
-                            list(result['nfev'].values())
-                            if isinstance(result['nfev'], dict)
+                            list(result["nfev"].values())
+                            if isinstance(result["nfev"], dict)
                             else None
                         ),
                     )
@@ -1436,9 +1521,15 @@ def minimize(
             if debug or return_internals:
                 result.update(
                     dict(
-                        manager=manager if 'manager' in vars() else None,
-                        interp_set=overall_interp_set if 'overall_interp_set' in vars() else None,
-                        model=overall_surrogate if 'overall_surrogate' in vars() else None,
+                        manager=manager if "manager" in vars() else None,
+                        interp_set=(
+                            overall_interp_set
+                            if "overall_interp_set" in vars()
+                            else None
+                        ),
+                        model=(
+                            overall_surrogate if "overall_surrogate" in vars() else None
+                        ),
                     )
                 )
             return OptimizeResult(**result)
@@ -1484,10 +1575,18 @@ def _get_result_of_a_bad_run(
     )
     if not is_dict_input:
         result.update(
-            dict(nfev=list(result['nfev'].values()) if isinstance(result['nfev'], dict) else None)
+            dict(
+                nfev=(
+                    list(result["nfev"].values())
+                    if isinstance(result["nfev"], dict)
+                    else None
+                )
+            )
         )
     if return_internals and manager:
-        result.update(dict(manager=manager, interp_set=manager.interp_set, model=manager.model))
+        result.update(
+            dict(manager=manager, interp_set=manager.interp_set, model=manager.model)
+        )
     if exit_info.exception:
         result.update(
             dict(
@@ -1500,7 +1599,7 @@ def _get_result_of_a_bad_run(
 
 def _build_coords_mask(coords: List[np.ndarray], n: int):
     q = len(coords)
-    result = np.zeros((q, n), dtype=np.bool)
+    result = np.zeros((q, n), dtype=bool)
     for i in range(q):
         result[i][coords[i]] = np.True_
     return result

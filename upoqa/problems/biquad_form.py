@@ -21,8 +21,8 @@ from .utils import *
 class BlockDiagBiquadForm(PSProblem):
     r"""Block diagonal biquadratic form optimization problem.
 
-    The objective function consists of `r` local functions, each defined on
-    an `n`-dimensional block with `overlap` overlapping dimensions between
+    The objective function consists of ``r`` local functions, each defined on
+    an ``n``-dimensional block with ``overlap`` overlapping dimensions between
     consecutive blocks. Each local function has the form:
 
     .. math::
@@ -59,11 +59,21 @@ class BlockDiagBiquadForm(PSProblem):
     """
 
     def __init__(
-        self, n, r, overlap=0, center=None, x0=None, mat_gen=None, noise_wrapper=None, reg=1.0
+        self,
+        n,
+        r,
+        overlap=0,
+        center=None,
+        x0=None,
+        mat_gen=None,
+        noise_wrapper=None,
+        reg=1.0,
     ) -> None:
         if mat_gen is None:
             min_and_max_eig = (0.1, 10)
-            mat_gen = lambda k, _: rand_matrix_gen(k, min_and_max_eig[0], min_and_max_eig[1])
+            mat_gen = lambda k, _: rand_matrix_gen(
+                k, min_and_max_eig[0], min_and_max_eig[1]
+            )
         if noise_wrapper is None:
             noise_wrapper = lambda x, _: x
         self.dim = (n - overlap) * (r - 1) + n
@@ -78,7 +88,11 @@ class BlockDiagBiquadForm(PSProblem):
             else np.random.randn(self.dim)
         )
         self.gammas = [np.random.randn(n) / np.sqrt(n) for _ in range(r)]
-        self.x0 = np.zeros(self.dim) if x0 is None else np.atleast_1d(np.asarray(x0).squeeze())
+        self.x0 = (
+            np.zeros(self.dim)
+            if x0 is None
+            else np.atleast_1d(np.asarray(x0).squeeze())
+        )
         self.reg = reg
 
         def sub_fun_gen(i, center):

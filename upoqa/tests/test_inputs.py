@@ -20,7 +20,7 @@ import numpy as np
 import upoqa
 from scipy.optimize import minimize as sp_minimize
 import numpy.linalg as LA
-from problems import PSProblem
+from upoqa.problems import PSProblem
 
 
 ######################## Test Problem 1 ########################
@@ -32,8 +32,8 @@ def f2(x):  # f2(y,z)
     return x[0] ** 2 + x[1] ** 2 - (x[0] + 1) * x[1]  # y^2 + z^2 - (y+1)z
 
 
-fun1 = {'xy_part': f1, 'yz_part': f2}
-coords1 = {'xy_part': [0, 1], 'yz_part': [1, 2]}
+fun1 = {"xy_part": f1, "yz_part": f2}
+coords1 = {"xy_part": [0, 1], "yz_part": [1, 2]}
 x0_1 = [0, 0, 0]
 dim = 3
 prob1 = PSProblem(fun1, coords=coords1, dim=dim)
@@ -169,34 +169,34 @@ def norm2(x):
 #     return x[0] ** 2 + x[1] ** 2 - (x[0] + 1) * x[1]   # y^2 + z^2 - (y+1)z
 
 fun2 = {
-    'xy_part': g1,
-    'yz_part': g2,
-    'x_penalty': norm2,
-    'y_penalty': norm2,
-    'z_penalty': norm2,
+    "xy_part": g1,
+    "yz_part": g2,
+    "x_penalty": norm2,
+    "y_penalty": norm2,
+    "z_penalty": norm2,
 }
 coords2 = {
-    'xy_part': [0, 1],
-    'yz_part': [1, 2],
-    'x_penalty': [0],
-    'y_penalty': [1],
-    'z_penalty': [2],
+    "xy_part": [0, 1],
+    "yz_part": [1, 2],
+    "x_penalty": [0],
+    "y_penalty": [1],
+    "z_penalty": [2],
 }
 xforms2 = {
-    'xy_part': [xform1, xform1_grad, xform1_hess],
-    'yz_part': [xform2, xform2_grad, xform2_hess],
+    "xy_part": [xform1, xform1_grad, xform1_hess],
+    "yz_part": [xform2, xform2_grad, xform2_hess],
 }
 weights2 = {
-    'xy_part': 1.0,
-    'yz_part': 1.0,
-    'x_penalty': reg,
-    'y_penalty': reg,
-    'z_penalty': reg,
+    "xy_part": 1.0,
+    "yz_part": 1.0,
+    "x_penalty": reg,
+    "y_penalty": reg,
+    "z_penalty": reg,
 }
 x0_2 = [0, 0, 0]
 prob2 = PSProblem(fun2, coords=coords2, weights=weights2, xforms=xforms2, dim=3)
 
-correct_res2 = sp_minimize(obj, x0_2, method='L-BFGS-B')
+correct_res2 = sp_minimize(obj, x0_2, method="L-BFGS-B")
 xopt2 = np.array([0.23691907573189747, -1.0248519445077102, 3.3235559784457394])
 fopt2 = 0.6071670615869595
 
@@ -255,7 +255,7 @@ def test_partial_list3():
 
 def test_missing_input1():
     prob2.clear()
-    weights3 = {'x_penalty': reg, 'y_penalty': reg, 'z_penalty': reg}
+    weights3 = {"x_penalty": reg, "y_penalty": reg, "z_penalty": reg}
     res = upoqa.minimize(
         prob2.fun,
         x0=x0_2,

@@ -35,7 +35,7 @@ def get_violation_ratio(
     ----------
     s : ndarray, shape (n,)
         Trial point.
-    coords : ndarray or list of ndarray, shape (ele_num, n)
+    coords : ndarray, shape (ele_num, n) or list of ndarray
         List of index arrays, one for each element, or a mask array
         of which each line is a mask vector indicating the indices.
     radii : ndarray, shape (ele_num,)
@@ -62,8 +62,8 @@ def _shrink(
     """
     Perform one shrinking step for Steinmetz projection.
 
-    The current iterate `s` is scaled along the subspace defined by
-    `shrink_coord_mask` so that the new iterate becomes feasible, or
+    The current iterate ``s`` is scaled along the subspace defined by
+    ``shrink_coord_mask`` so that the new iterate becomes feasible, or
     a new element is pulled into the shrinking set.
 
     Parameters
@@ -71,8 +71,8 @@ def _shrink(
     s : ndarray, shape (n,)
         Current iterate.
     coords_mask : ndarray, shape (ele_num, n)
-        Boolean mask; `coords_mask[i]` indicates the variables belonging to
-        element `i`.
+        Boolean mask; ``coords_mask[i]`` indicates the variables belonging to
+        element ``i``.
     shrink_group : ndarray, shape (ele_num,)
         Mask indicating which elements are already in the shrinking set.
     negligible_group : ndarray, shape (ele_num,)
@@ -96,8 +96,8 @@ def _shrink(
             continue
         coord = coords_mask[idx]
         s_inter, s_diff = s[coord & shrink_coord_mask], s[coord & (~shrink_coord_mask)]
-        inter_norm_pow = np.einsum('i,i->', s_inter, s_inter)
-        diff_norm_pow = np.einsum('i,i->', s_diff, s_diff)
+        inter_norm_pow = np.einsum("i,i->", s_inter, s_inter)
+        diff_norm_pow = np.einsum("i,i->", s_diff, s_diff)
         radius_pow = radii[idx] ** 2
         if inter_norm_pow + diff_norm_pow <= radius_pow:
             negligible_group[idx] = np.True_
@@ -118,10 +118,14 @@ def _shrink(
 
 
 def steinmetz_comb_proj(
-    s: np.ndarray, coords_mask: np.ndarray, radii: np.ndarray, pretol: float = 1e-8, preit: int = 4
+    s: np.ndarray,
+    coords_mask: np.ndarray,
+    radii: np.ndarray,
+    pretol: float = 1e-8,
+    preit: int = 4,
 ):
     """
-    Combined averaged + Steinmetz projection onto the Steinmetz solid.
+    Combined averaged and Steinmetz projection onto the intersection of cylinders.
 
     First applies a small number of averaged-projection iterations, then
     switches to the Steinmetz shrinking procedure.
@@ -131,7 +135,7 @@ def steinmetz_comb_proj(
     s : ndarray, shape (n,)
         Point to project.
     coords_mask : ndarray, shape (ele_num, n)
-        Boolean mask; `coords_mask[i]` indicates the variables belonging to
+        Boolean mask; ``coords_mask[i]`` indicates the variables belonging to
     radii : ndarray, shape (ele_num,)
         Trust-region radii.
     pretol : float
@@ -155,7 +159,7 @@ def steinmetz_comb_proj(
     max_violation = violation[max_vio_idx]
     if max_violation <= 1.0:
         return sk, did_project
-    shrink_group = np.zeros(radii.size, dtype=np.bool)
+    shrink_group = np.zeros(radii.size, dtype=bool)
     shrink_coord_mask = coords_mask[max_vio_idx].copy()
     shrink_group[max_vio_idx] = np.True_
     negligible_group = (violation <= 1) | shrink_group
@@ -163,7 +167,13 @@ def steinmetz_comb_proj(
         if max_violation <= 1.0:
             break
         max_violation = _shrink(
-            sk, coords_mask, shrink_group, negligible_group, shrink_coord_mask, max_violation, radii
+            sk,
+            coords_mask,
+            shrink_group,
+            negligible_group,
+            shrink_coord_mask,
+            max_violation,
+            radii,
         )
         it += 1
     return sk, it >= 1
@@ -171,14 +181,14 @@ def steinmetz_comb_proj(
 
 def steinmetz_proj(s: np.ndarray, coords_mask: np.ndarray, radii: np.ndarray):
     """
-    Fast approximate projection onto the intersection of cylinders
-    (Steinmetz solid) using the shrinking strategy.
+    Approximate projection onto the intersection of cylinders (which forms a 
+    Steinmetz solid in the special case of two cylinders) using a shrinking strategy.
 
     Parameters
     ----------
     s : ndarray, shape (n,)
         Point to project.
-    coords_mask : list of 1D array
+    coords_mask : ndarray, shape (ele_num, n)
         Boolean masks for each element's variables.
     radii : ndarray, shape (ele_num,)
         Trust-region radii.
@@ -197,7 +207,7 @@ def steinmetz_proj(s: np.ndarray, coords_mask: np.ndarray, radii: np.ndarray):
     max_violation = violation[max_vio_idx]
     if max_violation <= 1.0:
         return sk, False
-    shrink_group = np.zeros(radii.size, dtype=np.bool)
+    shrink_group = np.zeros(radii.size, dtype=bool)
     shrink_coord_mask = coords_mask[max_vio_idx].copy()
     shrink_group[max_vio_idx] = np.True_
     negligible_group = (violation <= 1) | shrink_group
@@ -205,7 +215,13 @@ def steinmetz_proj(s: np.ndarray, coords_mask: np.ndarray, radii: np.ndarray):
         if max_violation <= 1.0:
             break
         max_violation = _shrink(
-            sk, coords_mask, shrink_group, negligible_group, shrink_coord_mask, max_violation, radii
+            sk,
+            coords_mask,
+            shrink_group,
+            negligible_group,
+            shrink_coord_mask,
+            max_violation,
+            radii,
         )
         it += 1
     return sk, it >= 1
@@ -265,7 +281,9 @@ def average_proj(
             vio = np.sqrt(sk_pow[coord].sum()) / radii[i]
             max_vio = max(max_vio, vio)
             if vio > 1.0:
-                s_avg[coord] -= sk[coord] * (vio - 1) / vio  # * (1 / vio) = * (1 - (vio - 1) / vio)
+                s_avg[coord] -= (
+                    sk[coord] * (vio - 1) / vio
+                )  # * (1 / vio) = * (1 - (vio - 1) / vio)
                 proj_ele_num += 1
             else:
                 act_eles[i] = False
@@ -328,7 +346,7 @@ def dykstra_proj(
         for i in range(ele_num):
             coord = coords[i]
             sk_sub_y = sk[coord] - y[i]
-            vio = np.sqrt(np.einsum('i,i->', sk_sub_y, sk_sub_y)) / radii[i]
+            vio = np.sqrt(np.einsum("i,i->", sk_sub_y, sk_sub_y)) / radii[i]
             # Update increment
             prev_y = y[i].copy()
             if vio > 1:
@@ -343,7 +361,7 @@ def dykstra_proj(
 
             # Stop condition
             y_diff = prev_y - y[i]
-            cI += np.einsum('i,i->', y_diff, y_diff)
+            cI += np.einsum("i,i->", y_diff, y_diff)
         if not do_proj:
             break
         did_project = True

@@ -21,8 +21,8 @@ from .utils import *
 class BlockDiagQuadForm(PSProblem):
     """Block diagonal quadratic form optimization problem.
 
-    The objective function consists of `r` local functions, each defined on
-    an `n`-dimensional block with `overlap` overlapping dimensions between
+    The objective function consists of ``r`` local functions, each defined on
+    an ``n``-dimensional block with ``overlap`` overlapping dimensions between
     consecutive blocks. Each local function has the form:
 
     .. math::
@@ -67,7 +67,9 @@ class BlockDiagQuadForm(PSProblem):
         """
         if mat_gen is None:
             min_and_max_eig = (0.1, 10)
-            mat_gen = lambda n, _: rand_matrix_gen(n, min_and_max_eig[0], min_and_max_eig[1])
+            mat_gen = lambda n, _: rand_matrix_gen(
+                n, min_and_max_eig[0], min_and_max_eig[1]
+            )
 
         if noise_wrapper is None:
             noise_wrapper = lambda x, _: x
@@ -84,7 +86,11 @@ class BlockDiagQuadForm(PSProblem):
             if center is not None
             else np.random.randn(self.dim)
         )
-        self.x0 = np.zeros(self.dim) if x0 is None else np.atleast_1d(np.asarray(x0).squeeze())
+        self.x0 = (
+            np.zeros(self.dim)
+            if x0 is None
+            else np.atleast_1d(np.asarray(x0).squeeze())
+        )
 
         def sub_fun_gen(i, center):
             def _fun(x):

@@ -28,13 +28,13 @@ class structtype:
 
     def __str__(self):
         pprint(vars(self))
-        return ''
+        return ""
 
     pass
 
     def __repr__(self):
         pprint(vars(self))
-        return ''
+        return ""
 
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -54,11 +54,11 @@ class CUTEst_problem:
 
     def getglobs(self):
         try:
-            eval('self.' + 'e_globs(self)')
+            eval("self." + "e_globs(self)")
         except:
             pass
         try:
-            eval('self.' + 'g_globs(self)')
+            eval("self." + "g_globs(self)")
         except:
             pass
 
@@ -107,7 +107,7 @@ class CUTEst_problem:
             self.getglobs()
             return self.evalgrsum(False, self.congrps, x, 1)
         else:
-            print('ERROR: no constraint groups in ' + self.name + '!')
+            print("ERROR: no constraint groups in " + self.name + "!")
 
     def cJHx(self, x):  # input = ( x )
         x = x.reshape(-1, 1)
@@ -115,7 +115,7 @@ class CUTEst_problem:
             self.getglobs()
             return self.evalgrsum(False, self.congrps, x, 3)
         else:
-            print('ERROR: no constraint groups in ' + self.name + '!')
+            print("ERROR: no constraint groups in " + self.name + "!")
 
     def cJxv(self, x, v):  # input = ( x, v )
         x = x.reshape(-1, 1)
@@ -124,7 +124,7 @@ class CUTEst_problem:
             self.getglobs()
             return self.evalHJv("Jv", self.congrps, x, v, [])
         else:
-            print('ERROR: no constraint groups in ' + self.name + '!')
+            print("ERROR: no constraint groups in " + self.name + "!")
 
     def cJtxv(self, x, v):  # input = ( x, v )
         x = x.reshape(-1, 1)
@@ -133,7 +133,7 @@ class CUTEst_problem:
             self.getglobs()
             return self.evalHJv("Jtv", self.congrps, x, v, [])
         else:
-            print('ERROR: no constraint groups in ' + self.name + '!')
+            print("ERROR: no constraint groups in " + self.name + "!")
 
     def cIx(self, x, clist):  # input = ( x, clist )
         x = x.reshape(-1, 1)
@@ -142,7 +142,7 @@ class CUTEst_problem:
             self.getglobs()
             return self.evalgrsum(False, iclist, x, 1)
         else:
-            print('ERROR: empty list of constraints for ' + self.name + '!')
+            print("ERROR: empty list of constraints for " + self.name + "!")
 
     def cIJx(self, x, clist):  # input = ( x , clist )
         x = x.reshape(-1, 1)
@@ -151,7 +151,7 @@ class CUTEst_problem:
             self.getglobs()
             return self.evalgrsum(False, iclist, x, 2)
         else:
-            print('ERROR: empty list of constraints for ' + self.name + '!')
+            print("ERROR: empty list of constraints for " + self.name + "!")
 
     def cIJHx(self, x, clist):  # input = ( x, clist )
         x = x.reshape(-1, 1)
@@ -160,7 +160,7 @@ class CUTEst_problem:
             self.getglobs()
             return self.evalgrsum(False, iclist, x, 3)
         else:
-            print('ERROR: empty list of constraints for ' + self.name + '!')
+            print("ERROR: empty list of constraints for " + self.name + "!")
 
     def cIJxv(self, x, v, clist):  # input = ( x, v, clist )
         x = x.reshape(-1, 1)
@@ -170,7 +170,7 @@ class CUTEst_problem:
             self.getglobs()
             return self.evalHJv("Jv", iclist, x, v, [])
         else:
-            print('ERROR: empty list of constraints for ' + self.name + '!')
+            print("ERROR: empty list of constraints for " + self.name + "!")
 
     def cIJtxv(self, x, v, clist):  # input = ( x, v, clist )
         x = x.reshape(-1, 1)
@@ -180,7 +180,7 @@ class CUTEst_problem:
             self.getglobs()
             return self.evalHJv("Jvt", iclist, x, v, [])
         else:
-            print('ERROR: empty list of constraints for ' + self.name + '!')
+            print("ERROR: empty list of constraints for " + self.name + "!")
 
     def Lxy(self, x, y):  # input = ( x, y )
         x = x.reshape(-1, 1)
@@ -408,7 +408,7 @@ class CUTEst_problem:
                     xiel = x[np.array(irange)]  #  the elemental variable's values
 
                     if (
-                        hasattr(self, 'grelw')
+                        hasattr(self, "grelw")
                         and ig <= len(self.grelw)
                         and not self.grelw[ig] is None
                     ):
@@ -420,7 +420,7 @@ class CUTEst_problem:
                     # Only the value is requested.
 
                     if nout == 1:
-                        fiel = eval('self.' + efname + '( self, 1, xiel, iel )')
+                        fiel = eval("self." + efname + "( self, 1, xiel, iel )")
                         if has_weights:
                             fin += wiel * fiel
                         else:
@@ -429,7 +429,7 @@ class CUTEst_problem:
                     #  The value and its gradient are requested.
 
                     elif nout == 2:
-                        fiel, giel = eval('self.' + efname + '( self, 2, xiel, iel)')
+                        fiel, giel = eval("self." + efname + "( self, 2, xiel, iel)")
                         if has_weights:
                             fin += wiel * fiel
                             for ir in range(len(irange)):
@@ -442,7 +442,7 @@ class CUTEst_problem:
                                 gin[ii] += giel[ir]
 
                     elif nout == 3:
-                        fiel, giel, Hiel = eval('self.' + efname + '( self, 3, xiel, iel )')
+                        fiel, giel, Hiel = eval("self." + efname + "( self, 3, xiel, iel )")
                         if has_weights:
                             fin += wiel * fiel
                             for ir in range(len(irange)):
@@ -474,19 +474,19 @@ class CUTEst_problem:
                 egname = self.grftype[ig]
             else:
                 egname = "TRIVIAL"
-            if egname != 'TRIVIAL' and egname is not None:
+            if egname != "TRIVIAL" and egname is not None:
                 if isobj:
                     if nargout == 1:
-                        fx += eval('self.' + egname + '( self, 1, fin, ig )') / gsc
+                        fx += eval("self." + egname + "( self, 1, fin, ig )") / gsc
                     elif nargout == 2:
-                        [fa, grada] = eval('self.' + egname + '( self, 2, fin, ig )')
+                        [fa, grada] = eval("self." + egname + "( self, 2, fin, ig )")
                         fx += fa / gsc
                         if derlvl >= 1:
                             gx += grada * gin / gsc
                         else:
                             gx = np.nan * np.ones((n, 1))
                     elif nargout == 3:
-                        [fa, grada, Hessa] = eval('self.' + egname + '( self, 3, fin, ig )')
+                        [fa, grada, Hessa] = eval("self." + egname + "( self, 3, fin, ig )")
                         fx += fa / gsc
                         if derlvl >= 1:
                             gx += grada * gin / gsc
@@ -501,10 +501,10 @@ class CUTEst_problem:
                 else:
                     ic = ic + 1
                     if nargout == 1:
-                        fa = eval('self.' + egname + '( self, 1, fin, ig )')
+                        fa = eval("self." + egname + "( self, 1, fin, ig )")
                         cx[ic] = fa / gsc
                     elif nargout == 2:
-                        fa, grada = eval('self.' + egname + '( self, 2, fin, ig )')
+                        fa, grada = eval("self." + egname + "( self, 2, fin, ig )")
                         cx[ic] = fa / gsc
                         if derlvl >= 1:
                             sgin = lil_matrix(gin)
@@ -512,7 +512,7 @@ class CUTEst_problem:
                         else:
                             Jx[ic, :] = np.nan * np.ones((1, n))
                     elif nargout == 3:
-                        fa, grada, Hessa = eval('self.' + egname + '( self, 3, fin, ig )')
+                        fa, grada, Hessa = eval("self." + egname + "( self, 3, fin, ig )")
                         cx[ic] = fa / gsc
                         if derlvl >= 1:
                             sgin = lil_matrix(gin)
@@ -737,7 +737,7 @@ class CUTEst_problem:
                     xiel = x[np.array(irange)]  #  the elemental variable's values
 
                     if (
-                        hasattr(self, 'grelw')
+                        hasattr(self, "grelw")
                         and ig <= len(self.grelw)
                         and not self.grelw[ig] is None
                     ):
@@ -749,7 +749,7 @@ class CUTEst_problem:
                     #  The group is an objective group
 
                     if mode == "Hv" or mode == "HIv":
-                        fiel, giel, Hiel = eval('self.' + efname + '( self, 3, xiel, iel )')
+                        fiel, giel, Hiel = eval("self." + efname + "( self, 3, xiel, iel )")
                         if has_weights:
                             fin += wiel * fiel
                             for ir in range(len(irange)):
@@ -771,7 +771,7 @@ class CUTEst_problem:
 
                     elif derlvl >= 1:
 
-                        fiel, giel = eval('self.' + efname + '( self, 2, xiel, iel)')
+                        fiel, giel = eval("self." + efname + "( self, 2, xiel, iel)")
                         if has_weights:
                             fin = fin + wiel * fiel
                             for ir in range(len(irange)):
@@ -800,7 +800,7 @@ class CUTEst_problem:
                 if egname == "TRIVIAL":
                     HJv += Hinv / gsc
                 else:
-                    fa, grada, Hessa = eval('self.' + egname + '( self, 3, fin, ig )')
+                    fa, grada, Hessa = eval("self." + egname + "( self, 3, fin, ig )")
                     sgin = lil_matrix(gin)
                     HJv += ((Hessa * sgin) * (sgin.transpose().dot(v)) + grada * Hinv) / gsc
             elif mode == "HIv":
@@ -808,7 +808,7 @@ class CUTEst_problem:
                     ic += 1
                     HJv += y[ic] * Hinv / gsc
                 else:
-                    fa, grada, Hessa = eval('self.' + egname + '( self, 3, fin, ig )')
+                    fa, grada, Hessa = eval("self." + egname + "( self, 3, fin, ig )")
                     sgin = lil_matrix(gin)
                     ic += 1
                     HJv += y[ic] * ((Hessa * sgin) * (sgin.transpose().dot(v)) + grada * Hinv) / gsc
@@ -948,11 +948,11 @@ def s2mpj_nlx(self, name, List, getxnames=None, xlowdef=None, xuppdef=None, x0de
         if hasattr(self, "xupper"):
             thelen = len(self.xupper)
             if iv <= thelen:
-                self.xupper = np.append(self.xupper, np.full((iv - thelen + 1, 1), float('Inf')), 0)
+                self.xupper = np.append(self.xupper, np.full((iv - thelen + 1, 1), float("Inf")), 0)
             if not xuppdef is None:
                 self.xupper[iv]
         try:
-            self.xtype = arrset(self.xtype, iv, 'r')
+            self.xtype = arrset(self.xtype, iv, "r")
         except:
             pass
         thelen = len(self.x0)
@@ -1115,21 +1115,21 @@ def s2mpjlib_select(classif, *args):
         print(" by replacing by a dot each character in the classification string for which")
         print(" all possible values are acceptable (the dot is a wildcard character).")
         print(" For instance")
-        print("    s2mpjlib_select( \"C-CSU..-..-2-0\" ) ")
+        print('    s2mpjlib_select( "C-CSU..-..-2-0" ) ')
         print(" lists all CUTEst unconstrained " "sum-of-squares" " problems in two continuous")
         print(" variables, while ")
         print("    s2mpjlib_select( " "C-C....-..-V-V" " ) ")
         print(" lists all CUTEst problems with variable number of continuous variables and")
         print(" variable number of constraints.")
-        print(" The classification strings \"unconstrained\", \"bound-constrained\", ")
-        print(" \"fixed-variables\", \"general-constraints\", \"variable-n\" and ")
-        print(" \"variable-m\" are also allowed.")
+        print(' The classification strings "unconstrained", "bound-constrained", ')
+        print(' "fixed-variables", "general-constraints", "variable-n" and ')
+        print(' "variable-m" are also allowed.')
         print(" NOTE: any regular expression may be used as the first argument of select ")
         print("       to specify the problem class, so that, for instance, the previous ")
-        print("       selection can also be achieved by s2mpjlib_select( \"C-C.*V-V\" ) ")
+        print('       selection can also be achieved by s2mpjlib_select( "C-C.*V-V" ) ')
         print(" Writing the list of selected problems to a file is obtained by specifying")
         print(" the name of the file as a second argument of select, as in ")
-        print("    s2mpjlib_select( \"C-C....-..-V-V\", filename )")
+        print('    s2mpjlib_select( "C-C....-..-V-V", filename )')
 
     else:
 
@@ -1158,7 +1158,7 @@ def s2mpjlib_select(classif, *args):
             lenclm1 = len(classif) - 1
             if classif[lenclm1] == ".":
                 classif = classif[0:lenclm1] + "[V0-9]*"
-        filter_pattern = f'classification = .*{classif}'
+        filter_pattern = f"classification = .*{classif}"
 
         list_of_problems = "./list_of_python_problems"
         python_problems = "./python_problems/"
@@ -1168,19 +1168,19 @@ def s2mpjlib_select(classif, *args):
         else:
             fid = None
 
-        filter_pattern = f'classification = .*{classif}'
-        with open(list_of_problems, 'r') as f:
+        filter_pattern = f"classification = .*{classif}"
+        with open(list_of_problems, "r") as f:
             allprobs = f.readlines()
 
         for theprob in allprobs:
             theprob = theprob.strip()
             problem_path = os.path.join(python_problems, theprob)
             if os.path.isfile(problem_path):
-                with open(problem_path, 'r') as prob_file:
+                with open(problem_path, "r") as prob_file:
                     content = prob_file.read()
                 if re.search(filter_pattern, content):
                     if fid:
-                        fid.write(f'{theprob}\n')
+                        fid.write(f"{theprob}\n")
                     else:
                         print(theprob)
 

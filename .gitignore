@@ -11,3 +11,7 @@
 **/tmp*
 **/*.log
 **/*.out
+lint.sh
+/dist/**
+/upoqa.egg-info/**
+docs/build/

@@ -17,18 +17,18 @@
 UPOQA
 =====
 
-UPOQA is a derivative-free model-based optimization method for partially 
-separable problems, whose name is the abbreviation for Unconstrained 
-Partially-Separable Optimization By Quadratic Approximation.
+**UPOQA** is a derivative-free model-based optimization method for **partially 
+separable problems**, whose name is the abbreviation for Unconstrained 
+Partially-separable Optimization by Quadratic Approximation.
 """
 
 from .version import __version__
 from . import utils
-from .upoqa import minimize
+from .solver import minimize
 
 __all__ = [
-    '__version__',
-    'minimize',
-    'utils',
-    'problems',
+    "__version__",
+    "minimize",
+    "utils",
+    "problems",
 ]

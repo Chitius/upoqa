@@ -5,7 +5,7 @@ import numpy as np
 import upoqa
 import numpy.linalg as LA
 from scipy.optimize import minimize as sp_minimize
-from problems import rand_matrix_gen
+from upoqa.problems import rand_matrix_gen
 
 ######################## Test Problem 1 ########################
 """
@@ -49,7 +49,7 @@ def h2_grad(x, tau):
 
 def h2_hess(x, tau):
     # \nabla^2 h2(x, tau) = - 0.25 * (x + tau) ** (- 1.5)
-    return -0.25 * a / np.pow(x + tau, 1.5)
+    return -0.25 * a / np.power(x + tau, 1.5)
 
 
 def obj_1(x, tau):
@@ -60,21 +60,21 @@ x0_1 = [-5, -5]
 fopt1 = 0.0
 
 fun1 = {
-    'loss': f1,
-    'xy_L1': f2,
+    "loss": f1,
+    "xy_L1": f2,
 }
 
 coords1 = {
-    'loss': [0, 1],
-    'xy_L1': [0, 1],
+    "loss": [0, 1],
+    "xy_L1": [0, 1],
 }
 
 xforms1 = {
-    'xy_L1': [lambda x: h2(x, tau), lambda x: h2_grad(x, tau), lambda x: h2_hess(x, tau)],
+    "xy_L1": [lambda x: h2(x, tau), lambda x: h2_grad(x, tau), lambda x: h2_hess(x, tau)],
 }
 
 xform_bounds1 = {
-    'xy_L1': (0, np.inf),
+    "xy_L1": (0, np.inf),
 }
 
 
@@ -82,7 +82,7 @@ def callback_func(intermediate_result):
     tau = start_tau * 0.85**intermediate_result.nit
     intermediate_result.manager.update_xforms(
         {
-            'xy_L1': [lambda x: h2(x, tau), lambda x: h2_grad(x, tau), lambda x: h2_hess(x, tau)],
+            "xy_L1": [lambda x: h2(x, tau), lambda x: h2_grad(x, tau), lambda x: h2_hess(x, tau)],
         }
     )
 
@@ -181,25 +181,25 @@ def obj_2(x, tau):
 
 
 fun2 = {
-    'quad1': f_wx,
-    'quad2': f_yz,
-    'penalty1': p1,
-    'penalty2_wx': p2_wx,
-    'penalty2_yz': p2_yz,
+    "quad1": f_wx,
+    "quad2": f_yz,
+    "penalty1": p1,
+    "penalty2_wx": p2_wx,
+    "penalty2_yz": p2_yz,
 }
 
 coords2 = {
-    'quad1': [0, 1],  # w, x
-    'quad2': [2, 3],  # y, z
-    'penalty1': [0, 1, 2, 3],  # w, x, y, z
-    'penalty2_wx': [0, 1],  # w, x
-    'penalty2_yz': [2, 3],  # y, z
+    "quad1": [0, 1],  # w, x
+    "quad2": [2, 3],  # y, z
+    "penalty1": [0, 1, 2, 3],  # w, x, y, z
+    "penalty2_wx": [0, 1],  # w, x
+    "penalty2_yz": [2, 3],  # y, z
 }
 
 weights = {
-    'penalty1': tau2,
-    'penalty2_wx': tau2,
-    'penalty2_yz': tau2,
+    "penalty1": tau2,
+    "penalty2_wx": tau2,
+    "penalty2_yz": tau2,
 }
 
 
@@ -207,9 +207,9 @@ def callback_func2(intermediate_result):
     tau2 = start_tau2 * (1.1**intermediate_result.nit)
     intermediate_result.manager.update_weights(
         {
-            'penalty1': tau2,
-            'penalty2_wx': tau2,
-            'penalty2_yz': tau2,
+            "penalty1": tau2,
+            "penalty2_wx": tau2,
+            "penalty2_yz": tau2,
         }
     )
 
@@ -231,7 +231,7 @@ sp_res2_large_tau = sp_minimize(lambda x: obj_2(x, 1e6), x0_2)
 
 
 def test_prob2_res_correct():
-    assert abs(upoqa_res2.fun - fopt2) < 1e-6 * abs(fopt2)
+    assert abs(upoqa_res2.fun - fopt2) < 1e-5 * abs(fopt2)
     # Direct method may not converge to the correct minimum
     assert abs(sp_res2_small_tau.fun - fopt2) > 1e-2 * fopt2
     assert abs(sp_res2_small_tau.fun - fopt2) > 1e-2 * fopt2

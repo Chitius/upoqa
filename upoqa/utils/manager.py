@@ -41,10 +41,10 @@ import traceback
 import signal
 
 __all__ = [
-    'UPOQAManager',
-    'MaxEvalNumReached',
-    'ExitInfo',
-    'ExitStatus',
+    "UPOQAManager",
+    "MaxEvalNumReached",
+    "ExitInfo",
+    "ExitStatus",
 ]
 
 
@@ -52,11 +52,15 @@ class ExitStatus:
 
     AUTO_DETECT_RESTART_WARNING = 2  # warning, auto-detected restart criteria
     SLOW_WARNING = 1  # warning, maximum number of slow (successful) iterations reached
-    SUCCESS = 0  # successful finish (rho = resolution_final, or reach maxiter or maxfev)
+    SUCCESS = (
+        0  # successful finish (rho = resolution_final, or reach maxiter or maxfev)
+    )
     INPUT_ERROR = -1  # error, bad inputs
     TR_INCREASE_ERROR = -2  # error, trust region step increased model value
     LINALG_ERROR = -3  # error, linalg error (singular matrix encountered)
-    INVALID_EVAL_ERROR = -4  # error, funtion values with invalid shape or type or NaN encountered
+    INVALID_EVAL_ERROR = (
+        -4
+    )  # error, funtion values with invalid shape or type or NaN encountered
     UNKNOWN_ERROR = -5  # error, raised by unknown error source
 
 
@@ -81,7 +85,8 @@ class ExitInfo:
         Flag that represents the type of the cause of an exit,
         and should be one of the following flags:
 
-            ```
+        .. code-block:: python
+
             ExitStatus.AUTO_DETECT_RESTART_WARNING = 2  # warning, auto-detected restart criteria
             ExitStatus.SLOW_WARNING = 1                 # warning, maximum number of slow (successful) iterations reached
             ExitStatus.SUCCESS = 0                      # successful finish (rho = resolution_final, or reach maxiter or maxfev)
@@ -90,9 +95,13 @@ class ExitInfo:
             ExitStatus.LINALG_ERROR = -3                # error, linalg error (singular matrix encountered)
             ExitStatus.INVALID_EVAL_ERROR = -4          # error, funtion values with invalid shape or type or NaN encountered
             ExitStatus.UNKNOWN_ERROR = -5               # error, raised by unknown error source
-            ```
+
     msg : str
         Message that describes the detailed reason for an exit.
+    exception : Exception, optional
+        The exception that caused the exit.
+    traceback : str, optional
+        The traceback of the exception that caused the exit.
     """
 
     def __init__(
@@ -115,7 +124,7 @@ class ExitInfo:
         -------
         str
             The message that describes the detailed reason for an exit.
-            if `with_stem` is True, the returned message will be prefixed with
+            if ``with_stem`` is True, the returned message will be prefixed with
             "Error" or "Warning".
         """
         if not with_stem:
@@ -153,33 +162,37 @@ class UPOQAManager:
     maxiter : int
         Maximum number of iterations to go before termination.
     maxfev :  list of int
-        Maximum function evaluations per element (list parallel to `ele_names`).
+        Maximum function evaluations per element (list parallel to ``ele_names``).
     proj_onto_ele : callable
         Projection function mapping full-space points to element subspaces:
 
-            ``(full_point: ndarray, element_name: Any) -> element_point: ndarray``
+        .. code-block:: python
 
-        For example, `proj_onto_ele([1.0, 2.0], "f_1")` yields `[1.0,]`, where
-        `"f_1"` denotes a function that depends only on the first variable of `x`.
+            (full_point: ndarray, element_name: Any) -> element_point: ndarray
+
+        For example, ``proj_onto_ele([1.0, 2.0], "f_1")`` yields ``[1.0,]``, where
+        ``"f_1"`` denotes a function that depends only on the first variable of ``x``.
     coords : list of 1D arrays
-        Variable indices for each element's subspace (parallel to `ele_names`).
+        Variable indices for each element's subspace (parallel to ``ele_names``).
     xform_bounds : list of tuples
-        List in which each member is a tuple of the form `(l_val, h_val)`, representing
-        the interval type domain of each transformation function in `xforms`.
-    params : `~upoqa.utils.UPOQAParameterList`
+        List in which each member is a tuple of the form ``(l_val, h_val)``, representing
+        the interval type domain of each transformation function in ``xforms``.
+    params : :class:`~upoqa.utils.manager.UPOQAParameterList`
         Parameter list used for the algorithm.
     ele_names : list
         List containing the names of all elements in order
     disp : int, optional
         Verbosity level:
-            0: silent
-            1: brief
-            2: verbose
-            3: verbose with debug information
+        
+        - ``disp=0``: silent
+        - ``disp=1``: brief
+        - ``disp=2``: verbose
+        - ``disp=3``: verbose with debug information
 
     Attributes
     ----------
-    n
+    n : int
+        Problem dimension
     npts : ndarray, shape (ele_num,)
         Number of interpolation points for each element
     resolution : float
@@ -193,37 +206,45 @@ class UPOQAManager:
     proj_onto_ele : callable
         Projection function mapping full-space points to element subspaces:
 
-            ``(full_point: ndarray, element_name: Any) -> element_point: ndarray``
+        .. code-block:: python
 
-        For example, `proj_onto_ele([1.0, 2.0], "f_1")` yields `[1.0,]`, where
-        `"f_1"` denotes a function that depends only on the first variable of `x`.
-    interp_set : ``~upoqa.utils.OverallInterpSet``
+            (full_point: ndarray, element_name: Any) -> element_point: ndarray
+
+        For example, ``proj_onto_ele([1.0, 2.0], "f_1")`` yields ``[1.0,]``, where
+        ``"f_1"`` denotes a function that depends only on the first variable of ``x``.
+    interp_set : :class:`~upoqa.utils.interp_set.OverallInterpSet`
         The interpolation set used by the algorithm
-    model : ``~upoqa.utils.OverallSurrogate``
+    model : :class:`~upoqa.utils.model.OverallSurrogate`
         The surrogate model used by the algorithm
     ele_models
+        See :attr:`~UPOQAManager.ele_models` property
     xforms
+        See :attr:`~UPOQAManager.xforms` property
     weights
+        See :attr:`~UPOQAManager.weights` property
     extra_fun
-    params : `~upoqa.utils.UPOQAParameterList`
+        See :attr:`~UPOQAManager.extra_fun` property
+    params : :class:`~upoqa.utils.params.UPOQAParameterList`
         Parameter list used for the algorithm
     maxiter : int
         Maximum number of iterations to go before termination
     maxfev : list of int
-        Maximum function evaluations per element (list parallel to `ele_names`).
+        Maximum function evaluations per element (list parallel to ``ele_names``).
     nfev : list of int
         Numbers of element function evaluations performed so far
     nrun : int
         Number of runs (restarts) performed so far
     disp : int
         Verbosity level:
-            0: silent
-            1: brief
-            2: verbose
-            3: verbose with debug information
+        
+        - ``disp=0``: silent
+        - ``disp=1``: brief
+        - ``disp=2``: verbose
+        - ``disp=3``: verbose with debug information
     x_opt
+        See :attr:`~UPOQAManager.x_opt` property
     f_opt
-
+        See :attr:`~UPOQAManager.f_opt` property
     """
 
     def __init__(
@@ -304,7 +325,9 @@ class UPOQAManager:
     @property
     def xforms(
         self,
-    ) -> Optional[List[Optional[List[Callable[[np.ndarray], Union[np.ndarray, float]]]]]]:
+    ) -> Optional[
+        List[Optional[List[Callable[[np.ndarray], Union[np.ndarray, float]]]]]
+    ]:
         r"""Transformations :math:`h_1, \ldots, h_q` applied to element function outputs"""
         return self.model.xforms if self.model is not None else None
 
@@ -314,7 +337,9 @@ class UPOQAManager:
         return self.model.weights if self.model is not None else None
 
     @property
-    def extra_fun(self) -> Optional[List[Callable[[np.ndarray], Union[np.ndarray, list, float]]]]:
+    def extra_fun(
+        self,
+    ) -> Optional[List[Callable[[np.ndarray], Union[np.ndarray, list, float]]]]:
         r"""
         The white-box component :math:`f_0` of the objective function, which is a list of length 3
         containing callables to evaluate the function values, gradients, and Hessians.
@@ -345,7 +370,9 @@ class UPOQAManager:
         for i in range(self.ele_num):
             for j in range(i + 1, self.ele_num):
                 self.ele_adj[i, j] = np.any(
-                    np.isin(self.coords[self.ele_idxs[i]], self.coords[self.ele_idxs[j]])
+                    np.isin(
+                        self.coords[self.ele_idxs[i]], self.coords[self.ele_idxs[j]]
+                    )
                 )
                 self.ele_adj[j, i] = self.ele_adj[i, j]
         # not contain oneself
@@ -385,9 +412,9 @@ class UPOQAManager:
 
     def set_radius(self, radius: float, ele_idx: Optional[int] = None) -> None:
         """
-        Set the trust region radius to `radius`.
+        Set the trust region radius to ``radius``.
 
-        If `ele_idx` is specified, only updates the radius for that element. Otherwise,
+        If ``ele_idx`` is specified, only updates the radius for that element. Otherwise,
         updates all elements' trust region radii. The radius is constrained to be:
         At least the resolution (if below θ₂ * resolution)
         At most θ₆ * resolution
@@ -412,7 +439,7 @@ class UPOQAManager:
 
     def set_resolution(self, resolution: float) -> None:
         """
-        Set the trust region resolution to `resolution`.
+        Set the trust region resolution to ``resolution``.
 
         Parameters
         ----------
@@ -433,12 +460,15 @@ class UPOQAManager:
         self.model.set_xforms(xforms)
 
     def update_weights(
-        self, weights: Union[Dict[Any, Union[int, float]], List[Union[int, float]], np.ndarray]
+        self,
+        weights: Union[
+            Dict[Any, Union[int, float]], List[Union[int, float]], np.ndarray
+        ],
     ) -> None:
         """
         Update model weights, handling both list and dictionary inputs.
 
-        If `weights` is a dictionary, it maps element names to weight values.
+        If ``weights`` is a dictionary, it maps element names to weight values.
         Missing elements retain their current weights.
 
         Parameters
@@ -465,24 +495,25 @@ class UPOQAManager:
             List[Optional[List[Callable[[np.ndarray], Union[np.ndarray, float]]]]],
         ],
     ) -> None:
-        """
+        r"""
         Update transformation functions with input validation.
 
-        Handle both list and dictionary inputs. For dictionary inputs:
-        Validate each value is a list of 3 callables
-          (which are function, gradient and hessian.)
-        Missing elements retain their current transformations
-        Apply bounds wrapping if `xform_bounds` is enabled
+        Handle both list and dictionary inputs. For dictionary inputs: Validate
+        each value is a list of 3 callables, which are function, gradient and
+        hessian. Missing elements retain their current transformations
+
+        Apply bounds wrapping if ``xform_bounds`` is enabled.
 
         Parameters
         ----------
         xforms : list or dict
             New transformation functions. Can be either:
-                1. A dictionary mapping element names to transformation lists
-                2. A list of transformation lists for all elements
+
+            1. A dictionary mapping element names to transformation lists
+            2. A list of transformation lists for all elements
 
             each transformation list should contain exactly 3 callables:
-            `[function, gradient, hessian]`.
+            ``[function, gradient, hessian]``.
         """
         if isinstance(xforms, dict):
             xforms_list = []
@@ -512,7 +543,7 @@ class UPOQAManager:
 
     def shift_center_to(self, x: np.ndarray) -> None:
         """
-        Shift the centers of overall and element models to `x` if movement exceeds
+        Shift the centers of overall and element models to ``x`` if movement exceeds
         threshold, then update the coefficients of the models and the interpolation systems.
 
         Parameters
@@ -540,9 +571,9 @@ class UPOQAManager:
 
         Parameters
         ----------
-        interp_set : ``~upoqa.utils.OverallInterpSet``
+        interp_set : :class:`~upoqa.utils.model.OverallInterpSet`
             The overall interpolation set.
-        model : ``~upoqa.utils.OverallSurrogate``
+        model : :class:`~upoqa.utils.model.OverallSurrogate`
             The overall surrogate model.
         """
         self.interp_set = interp_set
@@ -568,14 +599,16 @@ class UPOQAManager:
             The calculated overall function value.
 
         Raises
-        -------
+        ------
         ValueError
             If NaN values are detected in element contributions or final result.
         """
         fval = extra_fval
         for ele_idx in self.ele_idxs:
             if self.xforms[ele_idx] is not None:
-                fval_ele = self.weights[ele_idx] * self.xforms[ele_idx][0](fval_eles[ele_idx])
+                fval_ele = self.weights[ele_idx] * self.xforms[ele_idx][0](
+                    fval_eles[ele_idx]
+                )
             else:
                 fval_ele = self.weights[ele_idx] * fval_eles[ele_idx]
             if self.params("debug.check_nan_fval") and np.any(np.isnan(fval_ele)):
@@ -597,19 +630,19 @@ class UPOQAManager:
     ]:
         """
         Select the interpolation points to be deleted for each element based on possibly
-        provided new point `x`.
+        provided new point ``x``.
 
         Parameters
         ----------
         x : ndarray, shape (n,), optional
             The new candidate point to be added to the elemental interpolation sets.
 
-            If None, for each `ele_idx`-th element, selects the farthest point in
-            the elemental interpolation set from `self.proj_onto_ele(center, ele_idx)`.
+            If None, for each ``ele_idx``-th element, selects the farthest point in
+            the elemental interpolation set from ``self.proj_onto_ele(center, ele_idx)``.
 
-            If provided, for each `ele_idx`-th element, calculates sigma values (the
+            If provided, for each ``ele_idx``-th element, calculates sigma values (the
             denominator of the update formula of the interpolation system) by replacing
-            each existing interpolation point with `self.proj_onto_ele(x, ele_idx)` and
+            each existing interpolation point with ``self.proj_onto_ele(x, ele_idx)`` and
             selects the one with the maximum (sigma * distance_to_center ** 4) metric.
         center : ndarray, shape (n,), optional
             Center point used for distance calculations. If None, uses the optimal
@@ -620,15 +653,15 @@ class UPOQAManager:
         list of int
             List of indices of points to be removed from each elemental interpolation set.
         list of float
-            List of distances between the center point (`self.proj_onto_ele(center, ele_idx)`
-            for `ele_idx`-th element) and the points to be removed, for each elemental
+            List of distances between the center point (``self.proj_onto_ele(center, ele_idx)``
+            for ``ele_idx``-th element) and the points to be removed, for each elemental
             interpolation set.
         list
             List of cached outputs of
 
                 ``ele_model.get_determinant_ratio(self.proj_onto_ele(x, ele_idx))``
 
-            for each element model `ele_model` if `x` is provided, else None for each
+            for each element model ``ele_model`` if ``x`` is provided, else None for each
             element.
         """
         knew_dict = []
@@ -683,8 +716,8 @@ class UPOQAManager:
             List of computed geometry-improving step vectors for each elemental interpolation
             set. Return None for elements where geometry improvement is not needed.
         list
-            List of cached outputs of `ele_model.get_determinant_ratio(x_GI)` for each
-            element model `ele_model`, where `x_GI` denotes the geometry-improving point
+            List of cached outputs of ``ele_model.get_determinant_ratio(x_GI)`` for each
+            element model ``ele_model``, where ``x_GI`` denotes the geometry-improving point
             for the current element. Return None for elements where geometry improvement
             is not needed.
 
@@ -696,14 +729,17 @@ class UPOQAManager:
         2. A step along lines connecting interpolation points
 
         The step with better geometry improvement (larger absolute sigma value) is selected.
-        If both steps result in zero determinant ratio, raises a `~upoqa.utils.SurrogateLinAlgError`.
+        If both steps result in zero determinant ratio, raises a 
+        :class:`~upoqa.utils.manager.SurrogateLinAlgError`.
         """
         start_x = self.interp_set.x_opt
         step_eles = []
         cached_kkt_info_eles = []
         for ele_idx in self.ele_idxs:
             interp_set = self.ele_interp_sets[ele_idx]
-            GI_radius = max(self.params("tr_radius.alpha3") * self.radii[ele_idx], self.resolution)
+            GI_radius = max(
+                self.params("tr_radius.alpha3") * self.radii[ele_idx], self.resolution
+            )
             if want_GI[ele_idx]:
                 worst_idx = idx_eles[ele_idx]
                 model = self.ele_models[ele_idx]
@@ -733,7 +769,9 @@ class UPOQAManager:
                 step_alt = spider_geometry(
                     f_lag, g_lag, lambda v: lag.hess_operator(v).dot(v), xpt, GI_radius
                 )
-                cached_kkt_info_alt = model.get_determinant_ratio(start_x_ele + step_alt)
+                cached_kkt_info_alt = model.get_determinant_ratio(
+                    start_x_ele + step_alt
+                )
                 sigma_alt = cached_kkt_info_alt[3][worst_idx]
 
                 if sigma_alt == 0.0 and sigma == 0.0:
@@ -767,7 +805,9 @@ class UPOQAManager:
 
         return step_eles, cached_kkt_info_eles
 
-    def wrap_xforms_with_bounds(self, xforms: List[List[callable]]) -> List[List[callable]]:
+    def wrap_xforms_with_bounds(
+        self, xforms: List[List[callable]]
+    ) -> List[List[callable]]:
         """
         Wrap transformation functions with bounds checking for each element.
 
@@ -786,7 +826,8 @@ class UPOQAManager:
         """
 
         def generate_wrapped_xforms(
-            func: Optional[Callable[[np.ndarray], Union[np.ndarray, float]]], ele_idx: int
+            func: Optional[Callable[[np.ndarray], Union[np.ndarray, float]]],
+            ele_idx: int,
         ):
             if func is None:
                 return None
@@ -844,7 +885,8 @@ class UPOQAManager:
         elif score == 2:
             # *= max(0.5 ** 0.5, min(1.0, 1.414 * tr_vio)), in [0.5 ** 0.5, 1.0] * radius
             self.radii[ele_idx] *= max(
-                self.params("tr_radius.theta5"), min(1.0, self.params("tr_radius.theta3") * tr_vio)
+                self.params("tr_radius.theta5"),
+                min(1.0, self.params("tr_radius.theta3") * tr_vio),
             )
         elif score == 3:
             # *= min(1.414, max(1.0, 2.0 * tr_vio)), in [1, 1.414] * radius
@@ -901,7 +943,7 @@ class UPOQAManager:
             (xform) is the identity.
         spherical_step_radius : float, default=1.0
             The ratio of the norm of the trust region step to the radius. This is only used
-            when `use_spherical_tr` is True.
+            when ``use_spherical_tr=True``.
         use_spherical_tr : bool, default=False
             Whether the spherical trust region is enabled. If enabled, the truncated
             conjugate gradient method is used to solve the trust region subproblem.
@@ -933,7 +975,9 @@ class UPOQAManager:
             # rho in [-1, 0], alpha in [mu, 1]
             return (mu - (2 - mu) * rho) / (1 - rho)
 
-        alpha_1, alpha_2 = get_criterion_alpha(mu1p, rho), get_criterion_alpha(mu2p, rho)
+        alpha_1, alpha_2 = get_criterion_alpha(mu1p, rho), get_criterion_alpha(
+            mu2p, rho
+        )
         ele_num = self.ele_num
 
         tau_global_score = -1
@@ -949,7 +993,9 @@ class UPOQAManager:
         for ele_idx in self.ele_idxs:
 
             if use_spherical_tr:
-                tau_scores[ele_idx] = tau_global_score + 1 if tau_global_score > 0 else 0
+                tau_scores[ele_idx] = (
+                    tau_global_score + 1 if tau_global_score > 0 else 0
+                )
                 continue
 
             ratio_ele = ratios[ele_idx]
@@ -1004,9 +1050,13 @@ class UPOQAManager:
 
         for ele_idx in self.ele_idxs:
             if use_spherical_tr:
-                self._update_single_radius(spherical_step_radius, tau_scores[ele_idx], ele_idx)
+                self._update_single_radius(
+                    spherical_step_radius, tau_scores[ele_idx], ele_idx
+                )
             else:
-                self._update_single_radius(tr_vios[ele_idx], tau_scores[ele_idx], ele_idx)
+                self._update_single_radius(
+                    tr_vios[ele_idx], tau_scores[ele_idx], ele_idx
+                )
 
     def get_reduction_ratio(
         self,
@@ -1025,16 +1075,16 @@ class UPOQAManager:
         Parameters
         ----------
         fval : float
-            Objective function value at the trial point `xk + sk`, where `sk` is the
+            Objective function value at the trial point ``xk + sk``, where ``sk`` is the
             trust-region step.
         old_fval : float
-            Objective function value at the iterate `xk`.
+            Objective function value at the iterate ``xk``.
         decrease : float
             Decrease of the overall model.
         fval_eles : list of float
-            Objective function values of each element at the trial point `xk + sk`.
+            Objective function values of each element at the trial point ``xk + sk``.
         old_fval_eles : list of float
-            Objective function values of each element at the iterate `xk`.
+            Objective function values of each element at the iterate ``xk``.
         decrease_eles : list of float
             Decrease of each element model.
         rreg : float, optional
@@ -1044,14 +1094,15 @@ class UPOQAManager:
         Returns
         -------
         ratio : float
-            The reduction ratio for the objective function. Return `-1` if the denominator
+            The reduction ratio for the objective function. Return ``-1`` if the denominator
             (predicted decrease) is invalid (positive or too close to zero).
         ratios : list of float
-            The reduction ratios for each element function. Return `-1` if the denominator
+            The reduction ratios for each element function. Return ``-1`` if the denominator
             (predicted decrease) is invalid (positive or too close to zero).
-        exit_info : ``~upoqa.utils.ExitInfo`` or None
-            An ``~upoqa.utils.ExitInfo`` object with an `ExitStatus.TR_INCREASE_ERROR` flag if the
-            denominator is invalid, None otherwise.
+        exit_info : :class:`~upoqa.utils.manager.ExitInfo` or None
+            An :class:`~upoqa.utils.manager.ExitInfo` object with an 
+            :attr:`ExitStatus.TR_INCREASE_ERROR` flag if the denominator is invalid, None 
+            otherwise.
         """
         rreg = rreg or np.finfo(np.float64).eps * np.max([1.0, fval, old_fval])
 
@@ -1090,7 +1141,7 @@ class UPOQAManager:
         Returns
         -------
         bool
-            True if resolution has already reached its minimum value (`radius_final`),
+            True if resolution has already reached its minimum value (``radius_final``),
             False otherwise.
         """
         if self.resolution <= self.resolution_final:
@@ -1145,11 +1196,11 @@ class UPOQAManager:
         xk : ndarray
             The current iterate of the optimization process
         x_hold : ndarray
-            The trial point `xk + sk`, where `sk` is the trust-region step.
+            The trial point ``xk + sk``, where ``sk`` is the trust-region step.
         old_fval_eles : list of float
-            Objective function values of each element at the iterate `xk`.
+            Objective function values of each element at the iterate ``xk``.
         fval_eles : list of float
-            Objective function values of each element at the trial point `xk + sk`.
+            Objective function values of each element at the trial point ``xk + sk``.
 
         Returns
         -------
@@ -1163,7 +1214,7 @@ class UPOQAManager:
             Decrease of the weighted and transformed value of each element function.
         fval_wx_eles : list of float
             Weighted and transformed values of each element function at the trial
-            point `xk + sk`.
+            point ``xk + sk``.
         """
         new_fval_wx_eles = [None for _ in self.ele_names]
         decrease_eles = [None for _ in self.ele_names]
@@ -1181,7 +1232,9 @@ class UPOQAManager:
                 old_wx_fval = self.weights[ele_idx] * self.xforms[ele_idx][0](
                     old_fval_eles[ele_idx]
                 )
-                new_wx_fval = self.weights[ele_idx] * self.xforms[ele_idx][0](fval_eles[ele_idx])
+                new_wx_fval = self.weights[ele_idx] * self.xforms[ele_idx][0](
+                    fval_eles[ele_idx]
+                )
             else:
                 old_wx_mval = self.weights[ele_idx] * old_mval
                 new_wx_mval = self.weights[ele_idx] * new_mval
@@ -1217,18 +1270,21 @@ class UPOQAManager:
         xk : ndarray
             The current iterate of the optimization process.
         old_grad : ndarray, shape (n,)
-            Gradient from previous iteration (`self.model.model_grad`).
+            Gradient from previous iteration (``self.model.model_grad``).
         old_hess : ndarray, shape (n, n)
-            Hessian from previous iteration (`self.model.model_hess`).
+            Hessian from previous iteration (``self.model.model_hess``).
 
         Notes
         -----
         Maintains three circular buffers tracking:
-        1. Trust region radius history (`restart_auto_detect_delta`)
-        2. Gradient change norms (`restart_auto_detect_chg_grad`)
-        3. Hessian change norms (`restart_auto_detect_chg_hess`)
+        
+        1. Trust region radius history (``restart_auto_detect_delta``)
+        2. Gradient change norms (``restart_auto_detect_chg_grad``)
+        3. Hessian change norms (``restart_auto_detect_chg_hess``)
         """
-        if not self.params("restarts.use_restarts") or not self.params("restarts.auto_detect"):
+        if not self.params("restarts.use_restarts") or not self.params(
+            "restarts.auto_detect"
+        ):
             return
         norm_chg_grad = LA.norm(self.model.grad_eval(xk) - old_grad)
         norm_chg_hess = LA.norm(self.model.hess_eval(xk) - old_hess)
@@ -1244,12 +1300,16 @@ class UPOQAManager:
                 np.delete(self.restart_auto_detect_chg_hess, [0]), norm_chg_hess
             )
         else:
-            idx = np.argmax(self.restart_auto_detect_delta < 0.0)  # Find first empty slot
+            idx = np.argmax(
+                self.restart_auto_detect_delta < 0.0
+            )  # Find first empty slot
             self.restart_auto_detect_delta[idx] = self.average_radius
             self.restart_auto_detect_chg_grad[idx] = norm_chg_grad
             self.restart_auto_detect_chg_hess[idx] = norm_chg_hess
             # Check if all slots are now filled
-            self.restart_auto_detect_ready = idx >= len(self.restart_auto_detect_delta) - 1
+            self.restart_auto_detect_ready = (
+                idx >= len(self.restart_auto_detect_delta) - 1
+            )
 
     def decide_to_restart_due_to_exploding_coeff(self) -> bool:
         """
@@ -1263,13 +1323,15 @@ class UPOQAManager:
         Notes
         -----
         The decision is based on three criteria:
+        
         1. Trust region radius history analysis (flat/down/up trends)
         2. Gradient coefficient growth rate (log-linear regression slope)
         3. Hessian coefficient growth rate (log-linear regression slope)
 
         A restart is triggered when:
-        No radius increases observed (only flat/decreasing)
-        Both gradient and Hessian coefficients show significant increasing trends
+        
+        - No radius increases observed (only flat/decreasing)
+        - Both gradient and Hessian coefficients show significant increasing trends
         Correlation coefficients exceed minimum thresholds
         """
         if (
@@ -1279,13 +1341,18 @@ class UPOQAManager:
         ):
             return False
         iters_delta_flat = np.where(
-            np.abs(self.restart_auto_detect_delta[1:] - self.restart_auto_detect_delta[:-1]) < 1e-15
+            np.abs(
+                self.restart_auto_detect_delta[1:] - self.restart_auto_detect_delta[:-1]
+            )
+            < 1e-15
         )[0]
         iters_delta_down = np.where(
-            self.restart_auto_detect_delta[1:] - self.restart_auto_detect_delta[:-1] < -1e-15
+            self.restart_auto_detect_delta[1:] - self.restart_auto_detect_delta[:-1]
+            < -1e-15
         )[0]
         iters_delta_up = np.where(
-            self.restart_auto_detect_delta[1:] - self.restart_auto_detect_delta[:-1] > 1e-15
+            self.restart_auto_detect_delta[1:] - self.restart_auto_detect_delta[:-1]
+            > 1e-15
         )[0]
         if self.disp >= 3:
             print(
@@ -1316,7 +1383,9 @@ class UPOQAManager:
             # increasing trend, with at least some positive correlation
             return min(slope, slope2) > self.params(
                 "restarts.auto_detect.min_chg_model_slope"
-            ) and min(r_value, r_value2) > self.params("restarts.auto_detect.min_correl")
+            ) and min(r_value, r_value2) > self.params(
+                "restarts.auto_detect.min_correl"
+            )
         return False
 
     def check_slow_iteration(self) -> Tuple[bool, bool]:
@@ -1328,9 +1397,9 @@ class UPOQAManager:
         bool
             True if current iteration shows insufficient progress (slow iteration),
             False otherwise. Progress is measured by comparing the current function value
-            with the value from `history_for_slow` iterations ago.
+            with the value from ``history_for_slow`` iterations ago.
         bool
-            True if maximum allowed consecutive slow iterations (`max_slow_iters`) has been
+            True if maximum allowed consecutive slow iterations (``max_slow_iters``) has been
             reached, indicating potential need for restart/termination, False otherwise.
         """
         self.history_fvals.append(self.interp_set.f_opt)
@@ -1369,9 +1438,9 @@ class UPOQAManager:
 
         Returns
         -------
-        exit_info : ``~upoqa.utils.ExitInfo`` or None
-            None if restart is permitted, otherwise an ``~upoqa.utils.ExitInfo`` object
-            containing the reason for preventing restart.
+        exit_info : :class:`~upoqa.utils.manager.ExitInfo` or None
+            None if restart is permitted, otherwise an :class:`~upoqa.utils.manager.ExitInfo` 
+            object containing the reason for preventing restart.
         """
         _, f_opt = self.interp_set.get_opt()
         if f_opt < self.last_run_f_opt:
@@ -1404,7 +1473,9 @@ class UPOQAManager:
 
         if not ready_to_restart:
             # last outputs are (exit_flag, exit_str, return_to_new_tr_iteration)
-            exit_info = ExitInfo(ExitStatus.SUCCESS, "Objective has been called MAXFUN times.")
+            exit_info = ExitInfo(
+                ExitStatus.SUCCESS, "Objective has been called MAXFUN times."
+            )
             if self.nrun - self.last_successful_run >= self.params(
                 "restarts.max_unsuccessful_restarts"
             ):
@@ -1426,9 +1497,11 @@ class UPOQAManager:
         self,
         idx_to_replaced_eles: List[int],
         tr_vios: np.ndarray,
-        cached_kkt_info_eles: List[Tuple[np.ndarray, float, np.ndarray, np.ndarray, np.ndarray]],
+        cached_kkt_info_eles: List[
+            Tuple[np.ndarray, float, np.ndarray, np.ndarray, np.ndarray]
+        ],
     ) -> Tuple[List[bool], Optional[ExitInfo]]:
-        """
+        r"""
         Determine whether each elemental model and interpolation set need to be updated
         based on the trust region step sizes in each elemental subspace and the given
         intermediate quantities about the determinant when updating the KKT matrix for
@@ -1437,7 +1510,7 @@ class UPOQAManager:
         The decision is based on a scoring strategy, which is largely empirical. Updates
         that significantly degrade the numerical stability and the poisedness of the
         interpolation set are rejected, while others are accepted. The threshold is
-        controlled by the parameter `general.filter_element_point_thresh`.
+        controlled by the parameter ``general.filter_element_point_thresh``.
 
         Parameters
         ----------
@@ -1454,21 +1527,22 @@ class UPOQAManager:
 
                 ``ele_model.get_determinant_ratio(self.proj_onto_ele(xk + sk, ele_idx))``
 
-            for each element model `ele_model`, where `xk` denotes the current iterate,
-            `sk ` denotes the trust-region step.
+            for each element model ``ele_model``, where ``xk`` denotes the current
+            iterate, ``sk`` denotes the trust-region step.
 
         Returns
         -------
         flags : list of bool
             A list indicating whether each elemental model and interpolation set need to
             be updated.
-        exit_info : ``~upoqa.utils.ExitInfo`` or None
-            Return None if any update is accepted. Otherwise, return an ``~upoqa.utils.ExitInfo``
-            object with an `ExitStatus.LINALG_ERROR` flag and terminate the algorithm.
+        exit_info : :class:`~upoqa.utils.manager.ExitInfo` or None
+            Return None if any update is accepted. Otherwise, return an 
+            :class:`~upoqa.utils.manager.ExitInfo` object with an 
+            :attr:`ExitStatus.LINALG_ERROR` flag and terminate the algorithm.
         """
         exit_info = None
         need_update = [True for _ in self.ele_idxs]
-        if not self.params('general.filter_element_point'):
+        if not self.params("general.filter_element_point"):
             return need_update, exit_info
 
         scores = []
@@ -1478,7 +1552,9 @@ class UPOQAManager:
                 cached_kkt_info_eles[ele_idx][1],
                 cached_kkt_info_eles[ele_idx][3][idx_to_replaced],
             )
-            score = sigma * min(1.0, tr_vios[ele_idx] * self.radii[ele_idx] / self.resolution)
+            score = sigma * min(
+                1.0, tr_vios[ele_idx] * self.radii[ele_idx] / self.resolution
+            )
             if beta < -1 / np.finfo(float).eps ** 0.25:
                 score = -np.inf
             elif beta < -np.finfo(float).eps ** 0.5:
@@ -1495,7 +1571,7 @@ class UPOQAManager:
         for ele_idx, score in scores:
             # filter from small to large
             if (out_num < max_out_num) and (
-                score < self.params('general.filter_element_point_thresh')
+                score < self.params("general.filter_element_point_thresh")
             ):
                 need_update[ele_idx] = False
                 out_num += 1
@@ -1528,20 +1604,20 @@ class UPOQAManager:
 
                 ``funs(x: ndarray) -> tuple[list[float], float]``
 
-            Where `x` is the input vector, and the function returns a tuple containing:
+            Where ``x`` is the input vector, and the function returns a tuple containing:
 
                 1. List of element function evaluations (list of floats)
                 2. Extra function evaluation (float)
 
             The element functions should be properly wrapped to be capable of raising an
-            exception ``~upoqa.utils.MaxEvalNumReached`` if the maximum number of evaluations
-            has been reached.
+            exception :class:`~upoqa.utils.manager.MaxEvalNumReached` if the maximum number 
+            of evaluations has been reached.
 
         Returns
         -------
-        exit_info : ``~upoqa.utils.ExitInfo`` or None
-            None if restart succeeds, otherwise an ``~upoqa.utils.ExitInfo`` object containing
-            the reason for the failure.
+        exit_info : :class:`~upoqa.utils.manager.ExitInfo` or None
+            None if restart succeeds, otherwise an :class:`~upoqa.utils.manager.ExitInfo` 
+            object containing the reason for the failure.
         """
         # A successful run is one where we reduced fopt
         x_opt, _ = self.interp_set.get_opt()
@@ -1573,14 +1649,18 @@ class UPOQAManager:
             interp_set = self.ele_interp_sets[ele_idx]
             Y, _ = interp_set.get_interp_set()
             all_sq_dist = LA.norm(Y - self.proj_onto_ele(x_opt, ele_idx), axis=1) ** 2
-            closest_points.append(np.argsort(all_sq_dist)[: self.params("restarts.num_geom_steps")])
+            closest_points.append(
+                np.argsort(all_sq_dist)[: self.params("restarts.num_geom_steps")]
+            )
             upper_limit = min(upper_limit, interp_set.npt)
 
         def _get_score(ele_scores: np.ndarray) -> float:
             # \Pi_i si / \sum_i si, negative if any si < 0
             has_negative = np.any(ele_scores < -np.finfo(float).eps)
             np.clip(ele_scores, np.finfo(float).eps, np.inf, out=ele_scores)
-            return np.prod(ele_scores) / np.sum(ele_scores) * (-1 if has_negative else 1)
+            return (
+                np.prod(ele_scores) / np.sum(ele_scores) * (-1 if has_negative else 1)
+            )
 
         stay_iter, i = 0, 0
         self.interp_set.clear_with_only_one_left()
@@ -1589,7 +1669,9 @@ class UPOQAManager:
             un_updated_eles = []
 
             # generate random steps with norm ≈ self.resolution
-            trial_points = np.random.randn(self.params("restarts.random_trial_num"), n) / np.sqrt(
+            trial_points = np.random.randn(
+                self.params("restarts.random_trial_num"), n
+            ) / np.sqrt(
                 n
             )  # the expectation of the norm is 1
             trial_points *= self.resolution
@@ -1606,7 +1688,9 @@ class UPOQAManager:
                     )[3]
             for j in range(trial_points.shape[0]):
                 merge_score[j] = _get_score(
-                    np.asarray([determinant_score[ele_idx][j] for ele_idx in self.ele_idxs])
+                    np.asarray(
+                        [determinant_score[ele_idx][j] for ele_idx in self.ele_idxs]
+                    )
                 )
 
             if np.max(merge_score) < 0 and stay_iter < 10:
@@ -1620,7 +1704,8 @@ class UPOQAManager:
             x_new = trial_points[winner_idx]
 
             winner_sigmas = {
-                ele_idx: determinant_score[ele_idx][winner_idx] for ele_idx in self.ele_idxs
+                ele_idx: determinant_score[ele_idx][winner_idx]
+                for ele_idx in self.ele_idxs
             }
             if self.disp >= 3:
                 print(
@@ -1677,7 +1762,9 @@ class UPOQAManager:
             # For those who fail to update, we reinit their surrogate models.
             for ele_idx in un_updated_eles:
                 if self.disp >= 3:
-                    print(f"  Reinit surrogate model (element {self.ele_names[ele_idx]}).")
+                    print(
+                        f"  Reinit surrogate model (element {self.ele_names[ele_idx]})."
+                    )
                 self.ele_models[ele_idx].reinit()
 
             i += 1
@@ -1695,11 +1782,11 @@ class UPOQAManager:
         Constraint Satisfaction Problem (CSP) using the Minimum Remaining Values (MRV)
         heuristic. In this CSP:
 
-        A *state* is a complete point `x`.
+        A *state* is a complete point ``x``.
 
-        The *constraints* require that for any element index `ele_idx`, the
-            projection `self.proj_onto_ele(x, ele_idx)` must lie within the
-            `ele_idx`-th interpolation set.
+        The *constraints* require that for any element index ``ele_idx``, the
+            projection ``self.proj_onto_ele(x, ele_idx)`` must lie within the
+            ``ele_idx``-th interpolation set.
         """
         trial_point_num = 0
         best_x, best_fval, best_fval_eles, best_extra_fval = None, np.inf, [], np.inf
@@ -1715,7 +1802,7 @@ class UPOQAManager:
             pbar = tqdm(
                 total=self.params("init.search_opt_x0_max_trials"),
                 desc="Searching for better x0...",
-                bar_format='{desc}{postfix}',
+                bar_format="{desc}{postfix}",
                 # leave=False,
                 mininterval=0.2,
             )
@@ -1724,7 +1811,9 @@ class UPOQAManager:
 
         def update_progress():
             if pbar is not None:
-                pbar.set_postfix_str(f"point num = {trial_point_num}, best fun = {best_fval}")
+                pbar.set_postfix_str(
+                    f"point num = {trial_point_num}, best fun = {best_fval}"
+                )
                 pbar.refresh()
 
         def _proj_onto_ele_rela_coord(
@@ -1749,7 +1838,9 @@ class UPOQAManager:
                 if i in neighbours[next_model_i]:
                     ele_idx = self.ele_idxs[i]
                     x_ele = self.proj_onto_ele(x, ele_idx)
-                    local_rela_coord = _proj_onto_ele_rela_coord(curr_coord, self.coords[ele_idx])
+                    local_rela_coord = _proj_onto_ele_rela_coord(
+                        curr_coord, self.coords[ele_idx]
+                    )
                     x_ele_used = x_ele[local_rela_coord]
                     new_remain_selection_on_i = []
                     Y, _ = self.ele_interp_sets[ele_idx].get_interp_set()
@@ -1779,13 +1870,15 @@ class UPOQAManager:
                 for ele_idx in self.ele_idxs:
                     point_idx = selected_point_idx[ele_idx]
                     # assert np.array_equal(self.proj_onto_ele(x, ele_idx), self.ele_interp_sets[ele_idx].get_interp_set(idx = point_idx)[0])
-                    fval_eles.append(self.ele_interp_sets[ele_idx].get_interp_set(idx=point_idx)[1])
+                    fval_eles.append(
+                        self.ele_interp_sets[ele_idx].get_interp_set(idx=point_idx)[1]
+                    )
                 try:
                     extra_fval = float(self.extra_fun[0](x))
                 except Exception as e:
                     return ExitInfo(
                         ExitStatus.INVALID_EVAL_ERROR,
-                        '(When searching the optimal starting point) ' + str(e),
+                        "(When searching the optimal starting point) " + str(e),
                         exception=e,
                         traceback=traceback.format_exc(),
                     )
@@ -1802,21 +1895,27 @@ class UPOQAManager:
                     update_progress()
                 return None
 
-            remain_selection_num = np.array([len(x[1]) for x in remain_selection], dtype=np.int32)
+            remain_selection_num = np.array(
+                [len(x[1]) for x in remain_selection], dtype=np.int32
+            )
             next_model_raw_i = remain_selection_num.argmin(axis=0)
-            next_model_i, remain_selection_point_idx = remain_selection[next_model_raw_i]
+            next_model_i, remain_selection_point_idx = remain_selection[
+                next_model_raw_i
+            ]
             next_ele_idx = self.ele_idxs[next_model_i]
             next_coord = self.coords[next_ele_idx]
             new_coord = np.unique(np.hstack((curr_coord, next_coord)))
             remain_selection = (
-                remain_selection[0:next_model_raw_i] + remain_selection[next_model_raw_i + 1 :]
+                remain_selection[0:next_model_raw_i]
+                + remain_selection[next_model_raw_i + 1 :]
             )
             new_selected_point_idx = deepcopy(selected_point_idx)
             next_interp_set, next_interp_set_fval = self.ele_interp_sets[
                 next_ele_idx
             ].get_interp_set()
             rs_point_idx_and_local_fval = [
-                (y_idx, next_interp_set_fval[y_idx]) for y_idx in remain_selection_point_idx
+                (y_idx, next_interp_set_fval[y_idx])
+                for y_idx in remain_selection_point_idx
             ]
             rs_point_idx_and_local_fval.sort(key=lambda x: x[1])
             for y_idx, _ in rs_point_idx_and_local_fval:
@@ -1824,7 +1923,9 @@ class UPOQAManager:
                 new_x = x.copy()
                 new_x[next_coord] = y
                 new_selected_point_idx[next_ele_idx] = y_idx
-                new_rs = _get_new_remain_selection(new_x, new_coord, next_model_i, remain_selection)
+                new_rs = _get_new_remain_selection(
+                    new_x, new_coord, next_model_i, remain_selection
+                )
                 exit_info = _dfs(new_x, new_selected_point_idx, new_coord, new_rs)
                 if exit_info:
                     return exit_info
@@ -1839,7 +1940,9 @@ class UPOQAManager:
         )
         if pbar is not None:
             pbar.set_description_str(f"Searching for better x0... done")
-            pbar.set_postfix_str(f"point num = {trial_point_num}, best fun = {best_fval}")
+            pbar.set_postfix_str(
+                f"point num = {trial_point_num}, best fun = {best_fval}"
+            )
             time.sleep(0.3)
             pbar.close()
         return best_x, best_fval, best_fval_eles, best_extra_fval, exit_info

@@ -28,11 +28,13 @@ from functools import reduce
 class ProblemPlot:
     def __init__(self) -> None:
         self._eval_count = 0
-        self.history_fun = None  # example: [[1, 2, 3, 4, ...], [102, 56, 21, 1.9, 0.5, ...]]
+        self.history_fun = (
+            None  # example: [[1, 2, 3, 4, ...], [102, 56, 21, 1.9, 0.5, ...]]
+        )
         self.history_plot_fig = None
         self.history_plot_ax = None
         self.record_history_fun_dict = True
-        self.ax_suffix = ''
+        self.ax_suffix = ""
         self.y_shift = None
         self.default_plt_number = 23333
         self.plot_fig_shape = (14, 8)
@@ -56,7 +58,9 @@ class ProblemPlot:
         self._eval_count = 0
         self.history_fun = None
 
-    def _update_history_fun(self, value: Union[int, float, np.float64, list, np.ndarray]) -> None:
+    def _update_history_fun(
+        self, value: Union[int, float, np.float64, list, np.ndarray]
+    ) -> None:
         if type(value) in [int, float, np.float64]:
             self.history_fun = (
                 np.array([np.ceil(self._eval_count), value]).reshape(2, -1)
@@ -82,7 +86,8 @@ class ProblemPlot:
                         self.history_fun,
                         np.vstack(
                             (
-                                np.ones_like(value.squeeze()) * np.ceil(self._eval_count),
+                                np.ones_like(value.squeeze())
+                                * np.ceil(self._eval_count),
                                 value.squeeze(),
                             )
                         ).reshape(2, -1),
@@ -101,22 +106,22 @@ class ProblemPlot:
             k_min = np.argmin(self.history_fun[-1])
             saved_info = {
                 "optimize": {
-                    'Optimal Objective Value in History': self.history_fun[-1, k_min],
-                    'Number of Evaluations': self._eval_count,
-                    'Theoretical Optimal Objective Value': (
+                    "Optimal Objective Value in History": self.history_fun[-1, k_min],
+                    "Number of Evaluations": self._eval_count,
+                    "Theoretical Optimal Objective Value": (
                         -self.y_shift if self.y_shift is not None else 0.0
                     ),
-                    'History of Objective Function Values': self.history_fun,
+                    "History of Objective Function Values": self.history_fun,
                 },
                 "meta_info": {},
             }
             if info:
-                if 'meta_info' in info:
-                    saved_info['meta_info'].update(info.get('meta_info'))
-                if 'optimize' in info:
-                    saved_info['optimize'].update(info.get('optimize'))
+                if "meta_info" in info:
+                    saved_info["meta_info"].update(info.get("meta_info"))
+                if "optimize" in info:
+                    saved_info["optimize"].update(info.get("optimize"))
             if name:
-                if not path.endswith('/'):
+                if not path.endswith("/"):
                     path = path + "/"
                 path = path + name
             np.save(path, saved_info)
@@ -130,16 +135,16 @@ class ProblemPlot:
     def load_history(self, path: str, name=None) -> Optional[dict]:
         try:
             if name:
-                if not path.endswith('/'):
+                if not path.endswith("/"):
                     path = path + "/"
                 path = path + name
             problem_optimization_info = np.load(path, allow_pickle=True).item()
-            self._eval_count = problem_optimization_info.get('Number of Evaluations', 0)
+            self._eval_count = problem_optimization_info.get("Number of Evaluations", 0)
             self.y_shift = -problem_optimization_info.get(
-                'Theoretical Optimal Objective Value', 0.0
+                "Theoretical Optimal Objective Value", 0.0
             )
             self.history_fun = problem_optimization_info.get(
-                'History of Objective Function Values', None
+                "History of Objective Function Values", None
             )
             return problem_optimization_info
         except Exception as e:
@@ -149,7 +154,9 @@ class ProblemPlot:
             return None
 
     def _get_disp_fun_history_data(
-        self, x_shift: Union[int, float] = 0.0, upper_truncation: Union[int, float] = 1e8
+        self,
+        x_shift: Union[int, float] = 0.0,
+        upper_truncation: Union[int, float] = 1e8,
     ):
         plot_data = self.history_fun[-1].squeeze()
         if self.y_shift is not None:
@@ -161,7 +168,7 @@ class ProblemPlot:
         title_suffix: str = "",
         clear: bool = False,
         label: str = "Unassigned",
-        fmt: str = '-',
+        fmt: str = "-",
         alpha: float = 1.0,
         x_shift: Union[int, float] = 0.0,
         show_fig: bool = True,
@@ -171,30 +178,30 @@ class ProblemPlot:
             self.history_plot_ax = None
             self.history_plot_fig = None
         if self.history_plot_fig is None or self.history_plot_ax is None:
-            plt.style.use('default')
+            plt.style.use("default")
             self.history_plot_fig, self.history_plot_ax = plt.subplots()
             self.history_plot_fig.set_size_inches(*self.plot_fig_shape)
-            self.history_plot_ax.set_xlabel('Number of Evaluations')
+            self.history_plot_ax.set_xlabel("Number of Evaluations")
             if self.y_shift is not None:
                 self.history_plot_ax.set_ylabel(
-                    f'Objective Relative Error (Optimal Value = {-self.y_shift:.3f})'
+                    f"Objective Relative Error (Optimal Value = {-self.y_shift:.3f})"
                 )
             else:
-                self.history_plot_ax.set_ylabel('Objective Value')
+                self.history_plot_ax.set_ylabel("Objective Value")
 
             suffix = " ".join([title_suffix.strip(), self.ax_suffix.strip()])
             if len(suffix) > 0:
                 suffix = "\n" + suffix
 
             if self.y_shift is None:
-                plt.title('Objective Value vs Number of Evaluations' + suffix)
+                plt.title("Objective Value vs Number of Evaluations" + suffix)
             else:
                 # if y_shift is set, then we are plotting relative error
-                plt.title('Objective Relative Error vs Number of Evaluations' + suffix)
+                plt.title("Objective Relative Error vs Number of Evaluations" + suffix)
 
             self.history_plot_ax.grid(True)
 
-        self.history_plot_ax.set_yscale('log')
+        self.history_plot_ax.set_yscale("log")
         eval_data, plot_data = self._get_disp_fun_history_data(x_shift)
         (line,) = self.history_plot_ax.plot(
             eval_data,
@@ -218,7 +225,9 @@ def default_noise_wrapper(x: np.ndarray, *args, **kwargs) -> np.ndarray:
 class PSProblem(ProblemPlot):
     def __init__(
         self,
-        elements: Dict[Any, Callable[[np.ndarray], Union[np.ndarray, list, float]]] = dict(),
+        elements: Dict[
+            Any, Callable[[np.ndarray], Union[np.ndarray, list, float]]
+        ] = dict(),
         coords: Dict[Any, Union[List, np.ndarray]] = dict(),
         weights: Dict[Any, Union[int, float]] = dict(),
         xforms: Dict[Any, List[callable]] = dict(),
@@ -378,20 +387,26 @@ class PSProblem(ProblemPlot):
         if x.size == len(self.coords[ele_name]):
             res = self.noise_wrapper(self.elements[ele_name](x), ele_name)
         elif x.size == self.dim:
-            res = self.noise_wrapper(self.elements[ele_name](x[self.coords[ele_name]]), ele_name)
+            res = self.noise_wrapper(
+                self.elements[ele_name](x[self.coords[ele_name]]), ele_name
+            )
         else:
             raise ValueError("Input dimension does not match the problem dimension.")
         self.inc_count(1, ele_name)
         self._update_history_fun_dict({ele_name: res})
         return res
 
-    def fun_eval(self, x: np.ndarray, ele_name: Any = None, incre_nfev: bool = True) -> float:
+    def fun_eval(
+        self, x: np.ndarray, ele_name: Any = None, incre_nfev: bool = True
+    ) -> float:
         if self._debug_model_incre_nfev is not None:
             incre_nfev = bool(self._debug_model_incre_nfev)  # override incre_nfev
 
         if ele_name is None:
             x = np.atleast_1d(np.asarray(x).squeeze())
-            assert x.size == self.dim, "Input dimension does not match the problem dimension."
+            assert (
+                x.size == self.dim
+            ), "Input dimension does not match the problem dimension."
             res_nf, res = 0.0, 0.0
             for ele_name, ele in self.elements.items():
                 xform = self.xforms.get(ele_name, self.default_xform)
@@ -409,7 +424,9 @@ class PSProblem(ProblemPlot):
                     if self.noise_wrapper is None:
                         res += self.weights.get(ele_name, 1) * ele_val
                     else:
-                        res += self.weights.get(ele_name, 1) * self.noise_wrapper(ele_val, ele_name)
+                        res += self.weights.get(ele_name, 1) * self.noise_wrapper(
+                            ele_val, ele_name
+                        )
 
             if incre_nfev:
                 self.inc_count(1)
@@ -426,7 +443,9 @@ class PSProblem(ProblemPlot):
             elif x.size == self.dim:
                 ele_val = self.elements[ele_name](x[self.coords[ele_name]])
             else:
-                raise ValueError("Input dimension does not match the problem dimension.")
+                raise ValueError(
+                    "Input dimension does not match the problem dimension."
+                )
 
             if xform is not None:
                 res_nf = self.weights.get(ele_name, 1) * xform[0](ele_val)
@@ -441,24 +460,34 @@ class PSProblem(ProblemPlot):
                 if self.noise_wrapper is None:
                     res = res_nf
                 else:
-                    res = self.weights.get(ele_name, 1) * self.noise_wrapper(ele_val, ele_name)
+                    res = self.weights.get(ele_name, 1) * self.noise_wrapper(
+                        ele_val, ele_name
+                    )
 
             if incre_nfev:
                 self.inc_count(1, ele_name)
                 if self.record_history_fun_dict:
-                    self._update_history_fun_dict({ele_name: res_nf})  # record noise-free value
+                    self._update_history_fun_dict(
+                        {ele_name: res_nf}
+                    )  # record noise-free value
 
             return res  # return noisy value
 
     def spy(self, x: Optional[np.ndarray] = None) -> AxesImage:
-        if hasattr(self, 'hess_eval'):
+        if hasattr(self, "hess_eval"):
             if x is None:
-                x = self.x0 if hasattr(self, 'x0') and self.x0 is not None else np.zeros(self.dim)
+                x = (
+                    self.x0
+                    if hasattr(self, "x0") and self.x0 is not None
+                    else np.zeros(self.dim)
+                )
             return plt.spy(self.hess_eval(x).toarray())
         else:
             raise NotImplementedError("spy() method is not available for this problem.")
 
-    def _update_history_fun_dict(self, values: Dict[Any, Union[int, float, np.float64]]) -> None:
+    def _update_history_fun_dict(
+        self, values: Dict[Any, Union[int, float, np.float64]]
+    ) -> None:
         for ele_name, value in values.items():
             # save [[element function evaluation count], [obj wst evaluation count], [obj avg evaluation count], [element function value]]
             self.history_fun_dict[ele_name] = (
@@ -486,11 +515,17 @@ class PSProblem(ProblemPlot):
                 )
             )
 
-    def _update_history_fun(self, value: Union[int, float, np.float64, list, np.ndarray]) -> None:
+    def _update_history_fun(
+        self, value: Union[int, float, np.float64, list, np.ndarray]
+    ) -> None:
         if type(value) in [int, float, np.float64]:
             self.history_fun = (
                 np.array(
-                    [np.ceil(self._eval_count["wst"]), np.ceil(self._eval_count["avg"]), value]
+                    [
+                        np.ceil(self._eval_count["wst"]),
+                        np.ceil(self._eval_count["avg"]),
+                        value,
+                    ]
                 ).reshape(3, -1)
                 if self.history_fun is None
                 else np.hstack(
@@ -510,8 +545,10 @@ class PSProblem(ProblemPlot):
             self.history_fun = (
                 np.vstack(
                     (
-                        np.ones_like(value.squeeze()) * np.ceil(self._eval_count["wst"]),
-                        np.ones_like(value.squeeze()) * np.ceil(self._eval_count["avg"]),
+                        np.ones_like(value.squeeze())
+                        * np.ceil(self._eval_count["wst"]),
+                        np.ones_like(value.squeeze())
+                        * np.ceil(self._eval_count["avg"]),
                         value.squeeze(),
                     )
                 ).reshape(3, -1)
@@ -521,8 +558,10 @@ class PSProblem(ProblemPlot):
                         self.history_fun,
                         np.vstack(
                             (
-                                np.ones_like(value.squeeze()) * np.ceil(self._eval_count["wst"]),
-                                np.ones_like(value.squeeze()) * np.ceil(self._eval_count["avg"]),
+                                np.ones_like(value.squeeze())
+                                * np.ceil(self._eval_count["wst"]),
+                                np.ones_like(value.squeeze())
+                                * np.ceil(self._eval_count["avg"]),
                                 value.squeeze(),
                             )
                         ).reshape(3, -1),
@@ -536,26 +575,26 @@ class PSProblem(ProblemPlot):
             k_min = np.argmin(self.history_fun[-1])
             saved_info = {
                 "optimize": {
-                    'Optimal Objective Value in History': self.history_fun[-1, k_min],
-                    'Number of Elemental Evaluations': (
+                    "Optimal Objective Value in History": self.history_fun[-1, k_min],
+                    "Number of Elemental Evaluations": (
                         self.eval_count_dict if self.history_fun_dict else dict()
                     ),
-                    'Number of Evaluations': self._eval_count,  # set to be max(self.eval_count_dict.values())
-                    'History of Element Function Values': self.history_fun_dict,
-                    'History of Objective Function Values': self.history_fun,
-                    'Theoretical Optimal Objective Value': (
+                    "Number of Evaluations": self._eval_count,  # set to be max(self.eval_count_dict.values())
+                    "History of Element Function Values": self.history_fun_dict,
+                    "History of Objective Function Values": self.history_fun,
+                    "Theoretical Optimal Objective Value": (
                         -self.y_shift if self.y_shift is not None else 0.0
                     ),
                 },
                 "meta_info": {},
             }
             if info:
-                if 'meta_info' in info:
-                    saved_info['meta_info'].update(info.get('meta_info'))
-                if 'optimize' in info:
-                    saved_info['optimize'].update(info.get('optimize'))
+                if "meta_info" in info:
+                    saved_info["meta_info"].update(info.get("meta_info"))
+                if "optimize" in info:
+                    saved_info["optimize"].update(info.get("optimize"))
             if name:
-                if not path.endswith('/'):
+                if not path.endswith("/"):
                     path = path + "/"
                 path = path + name
             np.save(path, saved_info)
@@ -569,22 +608,24 @@ class PSProblem(ProblemPlot):
     def load_history(self, path: str, name: str = None) -> Optional[dict]:
         try:
             if name:
-                if not path.endswith('/'):
+                if not path.endswith("/"):
                     path = path + "/"
                 path = path + name
             problem_optimization_info = np.load(path, allow_pickle=True).item()
-            self._eval_count = problem_optimization_info["optimize"].get('Number of Evaluations', 0)
+            self._eval_count = problem_optimization_info["optimize"].get(
+                "Number of Evaluations", 0
+            )
             self.eval_count_dict = problem_optimization_info["optimize"].get(
-                'Number of Elemental Evaluations', dict()
+                "Number of Elemental Evaluations", dict()
             )
             self.y_shift = -problem_optimization_info["optimize"].get(
-                'Theoretical Optimal Objective Value', 0.0
+                "Theoretical Optimal Objective Value", 0.0
             )
             self.history_fun = problem_optimization_info["optimize"].get(
-                'History of Objective Function Values', None
+                "History of Objective Function Values", None
             )
             self.history_fun_dict = problem_optimization_info["optimize"].get(
-                'History of Element Function Values', dict()
+                "History of Element Function Values", dict()
             )
             return problem_optimization_info
         except Exception as e:
@@ -617,10 +658,14 @@ class PSProblem(ProblemPlot):
             self.noise_wrapper = cached_noise_wrapper
 
     def _get_disp_fun_history_data(
-        self, x_shift: Union[int, float] = 0.0, upper_truncation: Union[int, float] = 1e8
+        self,
+        x_shift: Union[int, float] = 0.0,
+        upper_truncation: Union[int, float] = 1e8,
     ):
         plot_data = self.history_fun[-1].squeeze()
         if self.y_shift is not None:
             plot_data = (plot_data + self.y_shift) / abs(self.y_shift)
-        eval_data = self.history_fun[0] if self.nfev_mode == "wst" else self.history_fun[1]
+        eval_data = (
+            self.history_fun[0] if self.nfev_mode == "wst" else self.history_fun[1]
+        )
         return (eval_data + x_shift), np.minimum(plot_data, upper_truncation)

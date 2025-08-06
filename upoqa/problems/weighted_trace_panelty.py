@@ -47,7 +47,7 @@ class WeightedTracePenaltyProb(PSProblem):
     lumped_reg : bool, optional
         If True, wrap the regularization coefficient into the element
         function callables. Otherwise, treat the regularization coefficient
-        as part of `weights`.
+        as part of ``weights``.
     eval_diag : bool, optional
         Evaluate diagonal terms. Default: True
     noise_wrapper : callable, optional
@@ -86,7 +86,7 @@ class WeightedTracePenaltyProb(PSProblem):
             dim=n * r,
             weights=self.weights,
             noise_wrapper=noise_wrapper,
-            nfev_mode='wst',
+            nfev_mode="wst",
         )
 
         self.A = A.copy()
@@ -151,7 +151,9 @@ class WeightedTracePenaltyProb(PSProblem):
                 ele_idx = (j, j)
                 self.append(ele_idx, sub_fun_gen(j, j), coord)
             for i in range(j):
-                coord = [x for x in range(n * i, n * i + n)] + [x for x in range(n * j, n * j + n)]
+                coord = [x for x in range(n * i, n * i + n)] + [
+                    x for x in range(n * j, n * j + n)
+                ]
                 ele_idx = (i, j)
                 if not lumped_reg:
                     self.weights[ele_idx] = self.reg
@@ -168,7 +170,9 @@ class WeightedTracePenaltyProb(PSProblem):
             # TODO
         else:
             xopt = eigenvectors.flatten()
-            fopt = sum(self.weights[ele_idx] * eigenvalues[ele_idx] for ele_idx in range(r))
+            fopt = sum(
+                self.weights[ele_idx] * eigenvalues[ele_idx] for ele_idx in range(r)
+            )
         self.sol_info.update(xopt=xopt, fopt=fopt)
         self.y_shift = -fopt
 

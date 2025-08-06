@@ -37,8 +37,8 @@ def f2_hess(x):
     return np.array([[0, 0, 0], [0, 2, -1], [0, -1, 2]])
 
 
-fun = {'xy_part': f1}
-coords = {'xy_part': [0, 1]}
+fun = {"xy_part": f1}
+coords = {"xy_part": [0, 1]}
 x0 = [0, 0, 0]
 dim = 3
 prob = PSProblem(fun, coords=coords, dim=dim)

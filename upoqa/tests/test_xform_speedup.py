@@ -57,25 +57,25 @@ xopt1 = [1.0, 0.0, 0.0]
 fopt1 = 1.0
 
 fun1 = {
-    'f1': f1,
-    'f2': f2,
+    "f1": f1,
+    "f2": f2,
 }
 coords1 = {
-    'f1': [0, 1],
-    'f2': [1, 2],
+    "f1": [0, 1],
+    "f2": [1, 2],
 }
 upoqa_res1 = upoqa.minimize(fun1, x0=x0, coords=coords1, disp=0)
 
 fun2 = {
-    'f1': f1,
-    'g2': g2,
+    "f1": f1,
+    "g2": g2,
 }
 coords2 = {
-    'f1': [0, 1],
-    'g2': [1, 2],
+    "f1": [0, 1],
+    "g2": [1, 2],
 }
 xforms2 = {
-    'g2': [lambda x: np.exp(x), lambda x: np.exp(x), lambda x: np.exp(x)],
+    "g2": [lambda x: np.exp(x), lambda x: np.exp(x), lambda x: np.exp(x)],
 }
 upoqa_res2 = upoqa.minimize(fun2, x0=x0, coords=coords2, xforms=xforms2, disp=0)
 

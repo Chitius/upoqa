@@ -40,16 +40,17 @@ Trust Region Subproblem Solver
 Implement several sub-routines for approximately solving trust-region sub-problems 
 that arise in derivative-free optimization with partially separable structures:
 
-* `cauchy_geometry` / `spider_geometry` : geometry-improving steps along
+* ``cauchy_geometry`` / ``spider_geometry`` : geometry-improving steps along
   Cauchy / straight-line directions.
-* `tangential_byrd_omojokun` : truncated conjugate-gradient step on the
+* ``tangential_byrd_omojokun`` : truncated conjugate-gradient step on the
   tangential space.
-* `conjugate_gradient_proj_steinmetz` : modified projected CG for structured
+* ``conjugate_gradient_proj_steinmetz`` : modified projected CG for structured
   trust-regions using steinmetz projections.
 
-The `cauchy_geometry`, `spider_geometry`, and `tangential_byrd_omojokun` solvers 
-are drawn from the COBYQA library; see the original implementation at 
-https://github.com/cobyqa/cobyqa/blob/main/cobyqa/subsolvers/.
+The ``cauchy_geometry``, ``spider_geometry``, and ``tangential_byrd_omojokun`` solvers 
+are drawn from the `COBYQA <https://github.com/cobyqa/cobyqa/>`_ library; see the 
+original implementation at 
+`here <https://github.com/cobyqa/cobyqa/blob/main/cobyqa/subsolvers/>`_.
 """
 
 import numpy as np
@@ -58,10 +59,10 @@ from typing import Optional, Callable
 from .projection import *
 
 __all__ = [
-    'cauchy_geometry',
-    'spider_geometry',
-    'tangential_byrd_omojokun',
-    'conjugate_gradient_proj_steinmetz',
+    "cauchy_geometry",
+    "spider_geometry",
+    "tangential_byrd_omojokun",
+    "conjugate_gradient_proj_steinmetz",
 ]
 
 float_tiny = np.finfo(float).tiny
@@ -111,7 +112,7 @@ def cauchy_geometry(const, grad, curv, delta):
     -----
     This function is described as the first alternative in Section 6.5 of [1]_.
     It is assumed that the origin is feasible with respect to the bound
-    constraints and that `delta` is finite and positive.
+    constraints and that ``delta`` is finite and positive.
 
     References
     ----------
@@ -160,7 +161,7 @@ def spider_geometry(const, grad, curv, xpt, delta):
         returns :math:`s^{\mathsf{T}} H s`.
     xpt : ndarray, shape (npt, n)
         Points defining the straight lines. The straight lines considered are
-        the ones passing through the origin and the points in `xpt`.
+        the ones passing through the origin and the points in ``xpt``.
     delta : float
         Trust-region radius :math:`\Delta` as shown above.
 
@@ -173,7 +174,7 @@ def spider_geometry(const, grad, curv, xpt, delta):
     -----
     This function is described as the second alternative in Section 6.5 of
     [1]_. It is assumed that the origin is feasible with respect to the bound
-    constraints and that `delta` is finite and positive.
+    constraints and that ``delta`` is finite and positive.
 
     References
     ----------
@@ -209,7 +210,12 @@ def spider_geometry(const, grad, curv, xpt, delta):
             alpha_quad_pos = max(-grad_step / curv_step, 0.0)
         else:
             alpha_quad_pos = np.inf
-        if grad_step >= 0.0 and curv_step > tiny_grad or grad_step <= 0.0 and curv_step < tiny_grad:
+        if (
+            grad_step >= 0.0
+            and curv_step > tiny_grad
+            or grad_step <= 0.0
+            and curv_step < tiny_grad
+        ):
             alpha_quad_neg = min(-grad_step / curv_step, 0.0)
         else:
             alpha_quad_neg = -np.inf
@@ -229,14 +235,18 @@ def spider_geometry(const, grad, curv, xpt, delta):
         q_val_neg = const + alpha_neg * grad_step + alpha_tr_pow_curv
         if alpha_quad_pos < alpha_pos:
             q_val_quad_pos = (
-                const - alpha_quad_pos * grad_step - 0.5 * alpha_quad_pos**2.0 * curv_step
+                const
+                - alpha_quad_pos * grad_step
+                - 0.5 * alpha_quad_pos**2.0 * curv_step
             )
             if abs(q_val_quad_pos) > abs(q_val_pos):
                 alpha_pos = alpha_quad_pos
                 q_val_pos = q_val_quad_pos
         if alpha_quad_neg > alpha_neg:
             q_val_quad_neg = (
-                const - alpha_quad_neg * grad_step - 0.5 * alpha_quad_neg**2.0 * curv_step
+                const
+                - alpha_quad_neg * grad_step
+                - 0.5 * alpha_quad_neg**2.0 * curv_step
             )
             if abs(q_val_quad_neg) > abs(q_val_neg):
                 alpha_neg = alpha_quad_neg
@@ -254,7 +264,7 @@ def spider_geometry(const, grad, curv, xpt, delta):
 
 def _cauchy_geom(const, grad, curv, delta):
     """
-    Same as `bound_constrained_cauchy_step` without the absolute value.
+    Same as ``bound_constrained_cauchy_step`` without the absolute value.
     """
     # Calculate the initial active set.
     fixed_xl = grad > 0.0
@@ -268,7 +278,9 @@ def _cauchy_geom(const, grad, curv, delta):
         working = fixed_xl | fixed_xu
         # Calculate the Cauchy step for the directions in the working set.
         g_norm = LA.norm(grad[working])
-        delta_reduced = np.sqrt(delta**2.0 - np.inner(cauchy_step[~working], cauchy_step[~working]))
+        delta_reduced = np.sqrt(
+            delta**2.0 - np.inner(cauchy_step[~working], cauchy_step[~working])
+        )
         if g_norm > np.finfo(float).tiny * abs(delta_reduced):
             mu = max(delta_reduced / g_norm, 0.0)
             cauchy_step[working] = mu * grad[working]
@@ -309,38 +321,30 @@ def tangential_byrd_omojokun(fun, grad, hess_prod, delta, n, **kwargs):
     Minimize approximately a quadratic function subject to bound constraints in
     a trust region.
 
-    Note that this subsolver has been modified to adapt to the UPOQA solver.
-
     This function solves approximately
 
     .. math::
-
-        \min_{s \in \mathbb{R}^n} \quad g^{\mathsf{T}} s + \frac{1}{2}
-        s^{\mathsf{T}} H s \quad \text{s.t.} \quad
+        \min_{s\in\mathbb{R}^n}\quad f(s) \quad \text{s.t.} \quad
         \lVert s \rVert \le \Delta.
-
+        
     using a variation of the truncated conjugate gradient method.
 
     Parameters
     ----------
     fun : callable
-        Surrogate function operator.
-
-            `fun(x) -> float`
-
-        returns the surrogate function value at x.
+        Overall surrogate model function :math:`f` as shown above.
     grad : callable
-        Gradient operator.
+        Gradient :math:`\nabla f` of the model function:
 
-            `grad(x) -> ndarray, shape (n,)`
+            ``grad(x) -> ndarray, shape (n,)``
 
-        returns the gradient at x.
+        returns the gradient at ``x``.
     hess_prod : callable
-        Product of the Hessian matrix :math:`H` with any vector.
+        Product of the Hessian matrix :math:`\nabla^2 f(x)` with any vector :math:`v`:
 
-            `hess_prod(x, s) -> ndarray, shape (n,)`
+            ``hess_prod(x, v) -> ndarray, shape (n,)``
 
-        returns the product :math:`H(x) s`.
+        returns the product :math:`\nabla^2 f(x) v`.
     delta : float
         Trust-region radius :math:`\Delta` as shown above.
     n : int
@@ -362,10 +366,11 @@ def tangential_byrd_omojokun(fun, grad, hess_prod, delta, n, **kwargs):
 
     Notes
     -----
-    This function implements Algorithm 6.2 of [1]_. It is assumed that the
-    origin is feasible with respect to the bound constraints and that `delta`
-    is finite and positive.
-
+    This function originally implements Algorithm 6.2 of [1]_ and is modified 
+    to adapt to the UPOQA solver. It is assumed that the origin is feasible 
+    with respect to the bound constraints and that ``delta`` is finite and 
+    positive.
+    
     References
     ----------
     .. [1] Tom M. Ragonneau. *Model-Based Derivative-Free Optimization Methods
@@ -500,59 +505,55 @@ def conjugate_gradient_proj_steinmetz(
     The feasible region is the intersection of :math:`q` cylinders
 
     .. math::
-        \mathcal{S} = \bigcap_{i=0}^{q-1}
-        \left\{ x\in\mathbb{R}^{n} : \lVert x[\mathtt{coords_mask}[i]] \rVert_{2}
-        \le \mathtt{deltas}[i] \right\}.
+        \mathcal{S} = \bigcap_{i=1}^{q}
+        \left\{ s\in\mathbb{R}^{n} : \lVert s^{\mathcal{I}_i} \rVert_{2}
+        \le \Delta_i \right\}.
 
-    We approximately solve
+    This function solves approximately
 
     .. math::
-        \min_{s\in\mathcal{S}}\quad f(s)=f_{0}+g^{\top}s+\tfrac{1}{2}s^{\top}Hs,
+        \min_{s\in\mathcal{S}}\quad f(s).
 
     Parameters
     ----------
     fun : callable
-        Surrogate function operator.
-
-            `fun(x) -> float`
-
-        returns the surrogate function value at x.
+        Overall surrogate model function :math:`f` as shown above.
     grad : callable
-        Gradient operator.
+        Gradient :math:`\nabla f` of the model function:
 
-            `grad(x) -> ndarray, shape (n,)`
+            ``grad(x) -> ndarray, shape (n,)``
 
-        returns the gradient at x.
+        returns the gradient at ``x``.
     hess_prod : callable
-        Product of the Hessian matrix :math:`H` with any vector.
+        Product of the Hessian matrix :math:`\nabla^2 f(x)` with any vector :math:`v`:
 
-            `hess_prod(x, s) -> ndarray, shape (n,)`
+            ``hess_prod(x, v) -> ndarray, shape (n,)``
 
-        returns the product :math:`H(x) s`.
-    coords_mask : ndarray
-        Bool mask indicating element index sets defining the partially separable
-        structure.
+        returns the product :math:`\nabla^2 f(x) v`.
+    coords_mask : ndarray, shape (q, n)
+        Bool mask indicating variable indices :math:`\mathcal{I}_i` for each element.
     n : int
         Problem dimension
     deltas : ndarray
-        Element trust-region radii for each element
+        Elemental trust-region radii :math:`\{\Delta_i\}_{i=1}^q` as shown above.
     envelope_delta : float
         A sufficiently large radius ensuring that the structured trust-region
         lies entirely within the ball centered at the origin with this radius.
     maxiter : int, optional
         Maximum number of iterations. Default is None, which sets it to
-        max(20, 3*n) in which 2*n steps are reserved for projection steps.
+        :math:`\max(20, 3n)` in which :math:`2n` steps are reserved for projection
+        steps.
 
     Returns
     -------
     ndarray
-        Approximate solution to the trust-region subproblem
+        Approximate solution to the trust-region subproblem.
 
     Notes
     -----
-    Uses Steinmetz projection (steinmetz_proj) and combined projection
-    (steinmetz_comb_proj) to maintain feasibility with respect to the cylindrical
-    constraints.
+    This method uses Steinmetz projection (:func:`~upoqa.utils.projection.steinmetz_proj`) 
+    and combined projection (:func:`~upoqa.utils.projection.steinmetz_comb_proj`) to 
+    maintain feasibility with respect to the cylindrical constraints.
     """
     s0 = np.zeros(n)
     g = grad(s0)
@@ -602,9 +603,13 @@ def conjugate_gradient_proj_steinmetz(
             # skp1, did_project = dykstra_proj(step + alpha * sd, coords_mask, deltas)
 
             if it % 2 == 0:
-                skp1, did_project = steinmetz_proj(step + alpha * sd, coords_mask, deltas)
+                skp1, did_project = steinmetz_proj(
+                    step + alpha * sd, coords_mask, deltas
+                )
             else:
-                skp1, did_project = steinmetz_comb_proj(step + alpha * sd, coords_mask, deltas)
+                skp1, did_project = steinmetz_comb_proj(
+                    step + alpha * sd, coords_mask, deltas
+                )
 
             if did_project:
                 # line search along skp1 - step
@@ -656,7 +661,7 @@ def get_arrays_tol(*arrays):
     Parameters
     ----------
     *arrays: tuple
-        Set of ndarray` to get the tolerance for.
+        Set of ndarray to get the tolerance for.
 
     Returns
     -------
@@ -671,7 +676,9 @@ def get_arrays_tol(*arrays):
     if len(arrays) == 0:
         raise ValueError("At least one array must be provided.")
     size = max(array.size for array in arrays)
-    weight = max(np.max(np.abs(array[np.isfinite(array)]), initial=1.0) for array in arrays)
+    weight = max(
+        np.max(np.abs(array[np.isfinite(array)]), initial=1.0) for array in arrays
+    )
     return 10.0 * float_eps * max(size, 1.0) * weight
 
 

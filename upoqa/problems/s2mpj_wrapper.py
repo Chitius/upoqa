@@ -19,27 +19,34 @@ sys.path.append("../upoqa/problems/S2MPJ/")
 import importlib
 from .problem_base import PSProblem, default_noise_wrapper
 import numpy as np
-from . import S2MPJ
-from .S2MPJ import s2mpjlib
+try:
+    from . import S2MPJ
+    from .S2MPJ import s2mpjlib
+except ImportError:
+    S2MPJ = None
+    s2mpjlib = None
 
 S2MPJ_dir = "upoqa.problems.S2MPJ.python_problems"
 
-
 def import_s2mpj_problem_class(name: str):
     try:
-        return getattr(importlib.import_module('%s.%s' % (S2MPJ_dir, name)), name)
+        return getattr(importlib.import_module("%s.%s" % (S2MPJ_dir, name)), name)
     except Exception as e:
         raise RuntimeError(f"Could not find problem {name}, error: {e}")
 
 
 class S2MPJPSProblem(PSProblem):
-    def __init__(self, name: str, n: int, noise_wrapper: callable = default_noise_wrapper):
+    def __init__(
+        self, name: str, n: int, noise_wrapper: callable = default_noise_wrapper
+    ):  
         prob = import_s2mpj_problem_class(name)(n)
         self.s2mpj_prob = prob
         if hasattr(prob, "x0"):
             self.x0 = np.array(prob.x0).squeeze()
         dim = prob.n
-        super().__init__(elements=dict(), coords=dict(), dim=dim, noise_wrapper=noise_wrapper)
+        super().__init__(
+            elements=dict(), coords=dict(), dim=dim, noise_wrapper=noise_wrapper
+        )
         self.update_meta_info(dict(name=name))
 
         if hasattr(prob, "A"):
@@ -51,16 +58,18 @@ class S2MPJPSProblem(PSProblem):
         prob.getglobs()
         self._has_grftype = hasattr(prob, "grftype")
         self._has_grelt = hasattr(prob, "grelt")
-        self._has_gconst = hasattr(prob, 'gconst')
-        self._has_A = hasattr(prob, 'A')
-        self._has_gscale = hasattr(prob, 'gscale')
+        self._has_gconst = hasattr(prob, "gconst")
+        self._has_A = hasattr(prob, "A")
+        self._has_gscale = hasattr(prob, "gscale")
         self._has_grelw = hasattr(prob, "grelw")
 
         glist = prob.objgrps
         for iig in range(len(glist)):
             ig = int(glist[iig])
             if self._has_A and ig < sA1:
-                coord = np.where(prob.A[ig, :sA2].toarray().squeeze() != 0.0)[0].tolist()
+                coord = np.where(prob.A[ig, :sA2].toarray().squeeze() != 0.0)[
+                    0
+                ].tolist()
             else:
                 coord = []
 
@@ -85,7 +94,9 @@ class S2MPJPSProblem(PSProblem):
                 return 0.5 * x.T.dot(Htimesx)
 
             self.append(
-                "quadratic_part", prob_quadratic_part, np.array([int(x) for x in range(prob.n)])
+                "quadratic_part",
+                prob_quadratic_part,
+                np.array([int(x) for x in range(prob.n)]),
             )
 
         # self check
@@ -98,7 +109,11 @@ class S2MPJPSProblem(PSProblem):
 
     @property
     def objlower(self):
-        return self.s2mpj_prob.objlower if hasattr(self.s2mpj_prob, "objlower") else -np.inf
+        return (
+            self.s2mpj_prob.objlower
+            if hasattr(self.s2mpj_prob, "objlower")
+            else -np.inf
+        )
 
     def is_unconstrained(self):
         cx = self.s2mpj_prob.cx(np.ones(self.dim))
@@ -139,7 +154,11 @@ class S2MPJPSProblem(PSProblem):
                 gsc = prob.gscale[ig]
 
             #  Evaluate the linear term, if any.
-            if self._has_gconst and ig < len(prob.gconst) and prob.gconst[ig] is not None:
+            if (
+                self._has_gconst
+                and ig < len(prob.gconst)
+                and prob.gconst[ig] is not None
+            ):
                 fin = float(-prob.gconst[ig])
 
             if self._has_A and ig < sA1:
@@ -149,10 +168,16 @@ class S2MPJPSProblem(PSProblem):
                 for iiel in range(len(prob.grelt[ig])):  #  loop on elements
                     iel = prob.grelt[ig][iiel]  #  the element's index
                     efname = prob.elftype[iel]  #  the element's ftype
-                    xiel = x[prob.elvar[iel].astype(int)]  #  the elemental variable's values
+                    xiel = x[
+                        prob.elvar[iel].astype(int)
+                    ]  #  the elemental variable's values
 
                     wiel = 1.0
-                    if self._has_grelw and ig <= len(prob.grelw) and prob.grelw[ig] is not None:
+                    if (
+                        self._has_grelw
+                        and ig <= len(prob.grelw)
+                        and prob.grelw[ig] is not None
+                    ):
                         wiel = prob.grelw[ig][iiel]
 
                     # Only the value is requested.
@@ -160,11 +185,15 @@ class S2MPJPSProblem(PSProblem):
 
             #  Evaluate the group function.
             #  1) the non-TRIVIAL case
-            if self._has_grftype and ig < len(prob.grftype) and prob.grftype[ig] is not None:
+            if (
+                self._has_grftype
+                and ig < len(prob.grftype)
+                and prob.grftype[ig] is not None
+            ):
                 egname = prob.grftype[ig]
             else:
                 egname = "TRIVIAL"
-            if egname != 'TRIVIAL' and egname is not None:
+            if egname != "TRIVIAL" and egname is not None:
                 fx += getattr(prob, egname)(prob, 1, fin, ig) / gsc
             #  2) the TRIVIAL case: the group function is the identity
             else:
