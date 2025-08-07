@@ -237,8 +237,9 @@ def minimize(
           resembles a Steinmetz solid. Allows larger steps in well-modeled 
           directions while restricting poorly-modeled ones. 
         - ``'spherical'``: Traditional spherical trust region. Simpler but less 
-          adaptive to element-wise model accuracy. Recommended if the ``'structured'`` option incurs excessive runtime overhead (typically when the number of 
-          elements is very large).
+          adaptive to element-wise model accuracy. Recommended if the 
+          ``'structured'`` option incurs excessive runtime overhead (typically 
+          when the number of elements is very large).
     callback : callable, optional
         A callback executed at each objective function evaluation. The method
         terminates if a ``StopIteration`` exception is raised by the callback
