@@ -90,7 +90,7 @@ def _shrink(
         Scaled violation (should be <= 1 unless numerical issues).
     """
     max_vio_pow = max_violation**2
-    shrink_ratio, shrink_ratio_idx = 1 / max_vio_pow, None
+    shrink_ratio, shrink_ratio_idx = 1 / max_violation, None
     for idx in range(len(radii)):
         if negligible_group[idx]:
             continue
@@ -105,10 +105,9 @@ def _shrink(
         denominator = radius_pow * max_vio_pow - inter_norm_pow
         if denominator <= 0.0:
             continue
-        ratio = diff_norm_pow / denominator
+        ratio = (diff_norm_pow / denominator) ** 0.5
         if ratio > shrink_ratio:
             shrink_ratio, shrink_ratio_idx = ratio, idx
-    shrink_ratio = np.sqrt(shrink_ratio)
     s[shrink_coord_mask] *= shrink_ratio
     if shrink_ratio_idx is not None:
         shrink_group[shrink_ratio_idx] = np.True_
@@ -136,6 +135,7 @@ def steinmetz_comb_proj(
         Point to project.
     coords_mask : ndarray, shape (ele_num, n)
         Boolean mask; ``coords_mask[i]`` indicates the variables belonging to
+        element ``i``.
     radii : ndarray, shape (ele_num,)
         Trust-region radii.
     pretol : float
@@ -298,7 +298,7 @@ def average_proj(
 
 def dykstra_proj(
     s: np.ndarray,
-    coords: List[np.ndarray],
+    coords_mask: np.ndarray,
     radii: np.ndarray,
     tol: float = 1e-6,
     maxit: Optional[int] = None,
@@ -310,8 +310,9 @@ def dykstra_proj(
     ----------
     s : ndarray, shape (n,)
         Initial point.
-    coords : list of 1D array
-        Index sets for each element.
+    coords_mask : ndarray, shape (ele_num, n)
+        Boolean mask; ``coords_mask[i]`` indicates the variables belonging to
+        element ``i``.
     radii : ndarray, shape (ele_num,)
         Trust-region radii.
     tol : float, default=1e-6
@@ -335,16 +336,16 @@ def dykstra_proj(
     """
     sk = s.copy()
     max_radius = radii.max()
-    ele_num = len(coords)
+    ele_num = len(coords_mask)
     maxit = 10 * s.size if maxit is None else maxit
     did_project = False
-    y = [np.zeros(len(coords[i])) for i in range(ele_num)]
+    y = [np.zeros(coords_mask[i].sum()) for i in range(ele_num)]
 
     for _ in range(maxit):
         do_proj = False
         cI = 0.0
         for i in range(ele_num):
-            coord = coords[i]
+            coord = coords_mask[i]
             sk_sub_y = sk[coord] - y[i]
             vio = np.sqrt(np.einsum("i,i->", sk_sub_y, sk_sub_y)) / radii[i]
             # Update increment

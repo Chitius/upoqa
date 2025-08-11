@@ -214,7 +214,7 @@ class UPOQAParameterList(ParameterList):
         # whether to search for the optimal start point, otherwise we will use x0 as the start point
         self.params["init.search_opt_x0"] = True
         # the maximum number of trial points to be tested when searching for the optimal start point
-        self.params["init.search_opt_x0_max_trials"] = 5e3
+        self.params["init.search_opt_x0_max_trials"] = 100
         # the initialized size of the overall interpolation point set
         self.params["init.overall_interp_set_size"] = 10
 
