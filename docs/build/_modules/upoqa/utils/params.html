@@ -1,0 +1,639 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>upoqa.utils.params &mdash; UPOQA v1.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=d29a5c0e"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            UPOQA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../upoqa.html">upoqa package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../upoqa.utils.html">upoqa.utils package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">UPOQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">upoqa.utils.params</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for upoqa.utils.params</h1><div class="highlight"><pre>
+<span></span><span class="c1"># This file contains modified code from Py-BOBYQA</span>
+<span class="c1"># Original Copyright (c) 2017-2024, Lindon Roberts, Alexander Senier</span>
+<span class="c1"># and David Carlisle</span>
+<span class="c1"># Modifications Copyright (c) 2025, Yichuan Liu and Yingzhou Li</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program. If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Parameters</span>
+<span class="sd">==========</span>
+
+<span class="sd">A container for all parameter values.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Literal</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;UPOQAParameterList&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ParameterList</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class representing a parameter list.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params_changed</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">new_value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Access or update a parameter value.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : str</span>
+<span class="sd">            The name of the parameter.</span>
+<span class="sd">        new_value : float or int or str, optional</span>
+<span class="sd">            The new value to assign to the parameter. If None, the current value</span>
+<span class="sd">            is returned.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float or int or str</span>
+<span class="sd">            The current or updated value of the parameter.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the parameter does not exist or is being updated for a second time.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">new_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params_changed</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="s2">&quot;Trying to update parameter &#39;</span><span class="si">%s</span><span class="s2">&#39; for a second time&quot;</span> <span class="o">%</span> <span class="n">key</span>
+                    <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_value</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">params_changed</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown parameter &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">param_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="c1"># Use the check_* methods below, but switch based on key</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_type</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">type_str</span> <span class="o">==</span> <span class="s2">&quot;int&quot;</span><span class="p">:</span>
+            <span class="n">val_ok</span><span class="p">,</span> <span class="n">converted_val</span> <span class="o">=</span> <span class="n">check_integer</span><span class="p">(</span>
+                <span class="n">value</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="n">upper</span><span class="p">,</span> <span class="n">allow_nonetype</span><span class="o">=</span><span class="n">nonetype_ok</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">type_str</span> <span class="o">==</span> <span class="s2">&quot;float&quot;</span><span class="p">:</span>
+            <span class="n">val_ok</span><span class="p">,</span> <span class="n">converted_val</span> <span class="o">=</span> <span class="n">check_float</span><span class="p">(</span>
+                <span class="n">value</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="n">upper</span><span class="p">,</span> <span class="n">allow_nonetype</span><span class="o">=</span><span class="n">nonetype_ok</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">type_str</span> <span class="o">==</span> <span class="s2">&quot;bool&quot;</span><span class="p">:</span>
+            <span class="n">val_ok</span><span class="p">,</span> <span class="n">converted_val</span> <span class="o">=</span> <span class="n">check_bool</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">allow_nonetype</span><span class="o">=</span><span class="n">nonetype_ok</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">type_str</span> <span class="o">==</span> <span class="s2">&quot;str&quot;</span><span class="p">:</span>
+            <span class="n">val_ok</span><span class="p">,</span> <span class="n">converted_val</span> <span class="o">=</span> <span class="n">check_str</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">allow_nonetype</span><span class="o">=</span><span class="n">nonetype_ok</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Unknown type_str &#39;</span><span class="si">%s</span><span class="s2">&#39; for parameter &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">type_str</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">converted_val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">converted_val</span>
+        <span class="k">return</span> <span class="n">val_ok</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_all_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check the types and boundary conditions of all parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">bad_keys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_param</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]):</span>
+                <span class="n">bad_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">bad_keys</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">bad_keys</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">params_start_with</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a dictionary of all parameters that start with the given prefix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">para</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">):</span>
+                <span class="n">para</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="n">para</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="UPOQAParameterList">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.params.UPOQAParameterList">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UPOQAParameterList</span><span class="p">(</span><span class="n">ParameterList</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameter list for UPOQA.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ele_names : list</span>
+<span class="sd">        List containing the names of all elements in order.</span>
+<span class="sd">    ele_dims : list of int</span>
+<span class="sd">        Elemental dimensions of the problem.</span>
+<span class="sd">    maxfev : list</span>
+<span class="sd">        Maximum number of function evaluations to go before termination for each element.</span>
+<span class="sd">    noise_level : int, default=0</span>
+<span class="sd">        Indicates how noisy the objective function is. Should be 0, 1, or 2.</span>
+<span class="sd">        Default number of interpolation points (``npt``) increases as the ``noise_level``</span>
+<span class="sd">        increases, and when ``noise_level`` &gt; 0, restart mechanism is enabled.</span>
+<span class="sd">    seek_global_minimum : bool, default=False</span>
+<span class="sd">        Whether to seek a global minimum. Defaults to False. If True, restart mechanism</span>
+<span class="sd">        is enabled, but the parameters for restart are different.</span>
+<span class="sd">    debug : bool, default=False</span>
+<span class="sd">        Whether to enable debug mode. Defaults to False. If True, the algorithm will check</span>
+<span class="sd">        for NaN values in the objective function and the surrogate model.</span>
+
+<span class="sd">        Note that NaN check will incur additional runtime costs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">ele_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">ele_dims</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">maxfev</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
+        <span class="n">noise_level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">seek_global_minimum</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">debug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ele_names</span> <span class="o">=</span> <span class="n">ele_names</span>
+
+        <span class="c1">## General</span>
+        <span class="c1"># Number of interpolation points, 2 * n + 1 by default, and slightly increased</span>
+        <span class="c1"># when the objective function is noisy.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;general.npt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># list of npt for each element</span>
+        <span class="k">for</span> <span class="n">ele_dim</span> <span class="ow">in</span> <span class="n">ele_dims</span><span class="p">:</span>
+            <span class="n">max_npt</span> <span class="o">=</span> <span class="p">(</span><span class="n">ele_dim</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">ele_dim</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+            <span class="k">if</span> <span class="n">noise_level</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;general.npt&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="nb">min</span><span class="p">(</span>
+                        <span class="n">max_npt</span><span class="p">,</span>
+                        <span class="nb">max</span><span class="p">(</span>
+                            <span class="mi">2</span> <span class="o">*</span> <span class="n">ele_dim</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                            <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="mf">0.8</span> <span class="o">*</span> <span class="n">ele_dim</span><span class="o">**</span><span class="mf">1.5</span> <span class="o">+</span> <span class="n">ele_dim</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)),</span>
+                        <span class="p">),</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">noise_level</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;general.npt&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">max_npt</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;general.npt&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">ele_dim</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># decide when to shift surrogate model center according to norm(center - xk)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;general.center_shift_threshold&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5.0</span>
+        <span class="c1"># maximum tolerable short steps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;general.max_short_steps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">noise_level</span>
+        <span class="c1"># if the step size is smaller than `general.short_step_thresh` * `resolution`,</span>
+        <span class="c1"># it is considered as a short step.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;general.short_step_thresh&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="c1"># maximum tolerable very short steps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;general.max_very_short_steps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">noise_level</span>
+        <span class="c1"># if all the elemental step sizes are smaller than `general.very_short_step_thresh` * `resolution`,</span>
+        <span class="c1"># it is considered as a very short step.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;general.very_short_step_thresh&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+        <span class="c1"># maximum tolerable steps for switching to an alternative surrogate model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;general.max_alt_model_steps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="c1"># decide whether we want to switch to an alternative model according to norm of grad_k</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;general.alt_model_thresh&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+        <span class="c1"># only when reduction ratio &lt; alt_model_check_thresh, can we consider switching to an alternative model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;general.alt_model_check_thresh&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
+        <span class="c1"># when updating sub-interpolation-set, a new point may be declined if it&#39;s too close to the center</span>
+        <span class="c1"># and provides bad update on the interpolation system.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;general.filter_element_point&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># the threshold on sigma of an acceptable new point.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;general.filter_element_point_thresh&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-5</span>
+        <span class="c1"># the maximum size of the overall interpolation point set will be params[&quot;general.overall_interp_set_size_factor&quot;] * dimension of the problem.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;general.overall_interp_set_size_factor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+
+        <span class="c1">## Initialisation</span>
+        <span class="c1"># whether to search for the optimal start point, otherwise we will use x0 as the start point</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;init.search_opt_x0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># the maximum number of trial points to be tested when searching for the optimal start point</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;init.search_opt_x0_max_trials&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="c1"># the initialized size of the overall interpolation point set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;init.overall_interp_set_size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
+
+        <span class="c1">## Debug</span>
+        <span class="c1"># if NaN detected in the return value of the objective function or the surrogate model,</span>
+        <span class="c1"># raise error and terminate the algorithm immediately.</span>
+        <span class="c1"># Note that NaN check will incur additional runtime costs.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;debug.check_nan_fval&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">debug</span> <span class="k">else</span> <span class="kc">False</span>
+
+        <span class="c1">## Trust Region Radius Management</span>
+        <span class="c1"># eta1 and eta2 are thresholds of reduction ratio when updating radius.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;tr_radius.eta1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;tr_radius.eta2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.7</span>
+        <span class="c1"># theta1 ~ theta6 are factors to be multiplied onto radius when updating radius.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;tr_radius.theta1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.98</span> <span class="k">if</span> <span class="n">noise_level</span> <span class="k">else</span> <span class="mf">0.5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;tr_radius.theta2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.05</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;tr_radius.theta3&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">**</span><span class="mf">0.5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;tr_radius.theta4&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;tr_radius.theta5&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">**</span><span class="mf">0.5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;tr_radius.theta6&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10000.0</span>
+        <span class="c1"># when reduce resolution, new_resolution = alpha1 * old_resolution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;tr_radius.alpha1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.9</span> <span class="k">if</span> <span class="n">noise_level</span> <span class="k">else</span> <span class="mf">0.1</span>
+        <span class="c1"># when reduce resolution or encounter a short step, new_radius = alpha2 * old_radius</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;tr_radius.alpha2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.95</span> <span class="k">if</span> <span class="n">noise_level</span> <span class="k">else</span> <span class="mf">0.5</span>
+        <span class="c1"># when launching a geometry-improvement step, the shrinkage factor for the radius.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;tr_radius.alpha3&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+        <span class="c1">## Slow Progress Thresholds</span>
+        <span class="c1"># whether to terminate the algorithm when the iterations are slow.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;slow.terminate_when_slow&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="kc">True</span> <span class="k">if</span> <span class="n">noise_level</span> <span class="ow">or</span> <span class="n">seek_global_minimum</span> <span class="k">else</span> <span class="kc">False</span>
+        <span class="p">)</span>
+        <span class="c1"># length of timing window for checking slow iteration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;slow.history_for_slow&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="c1"># The iteration is slow if the relative difference between f[k - history_for_slow] and f[k] is &lt; thresh_for_slow.</span>
+        <span class="c1"># (the slow iteration check rule is disabled when thresh_for_slow is negative)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;slow.thresh_for_slow&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-8</span>
+        <span class="c1"># maximum tolerable slow iterations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;slow.max_slow_iters&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">int</span><span class="p">(</span><span class="mi">20</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">ele_dims</span><span class="p">))</span> <span class="k">if</span> <span class="n">seek_global_minimum</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="mi">10</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">ele_dims</span><span class="p">))</span>
+        <span class="p">)</span>
+
+        <span class="c1">## Restarts</span>
+        <span class="c1"># whether to enable restarts, enabled by default when the objective is noisy or we seek a global minimum.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;restarts.use_restarts&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="kc">True</span> <span class="k">if</span> <span class="p">(</span><span class="n">noise_level</span> <span class="ow">or</span> <span class="n">seek_global_minimum</span><span class="p">)</span> <span class="k">else</span> <span class="kc">False</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;restarts.max_unsuccessful_restarts&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;restarts.max_unsuccessful_restarts_total&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mi">20</span> <span class="k">if</span> <span class="n">seek_global_minimum</span> <span class="k">else</span> <span class="nb">max</span><span class="p">(</span><span class="n">maxfev</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;restarts.resolution_final_scale&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mf">1.0</span>  <span class="c1"># how much to decrease resolution_final by after each restart</span>
+        <span class="p">)</span>
+        <span class="c1"># a restart will reset the resolution to be no more than resolution_restart_init_ratio * radius_init</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;restarts.resolution_restart_init_ratio&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="c1"># a restart will reset the resolution to be no more than resolution_restart_rel_ratio * resolution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;restarts.resolution_restart_rel_ratio&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;restarts.random_trial_num&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;restarts.resolution_restart_scale_after_unsuccessful_restart&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mf">1.1</span> <span class="k">if</span> <span class="n">seek_global_minimum</span> <span class="k">else</span> <span class="mf">1.0</span>
+        <span class="p">)</span>
+        <span class="c1"># how many new points are needed to launch a soft restart</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;restarts.num_geom_steps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span> <span class="o">+</span> <span class="mi">5</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">noise_level</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># enable auto detect for restart or not</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;restarts.auto_detect&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;restarts.auto_detect.history&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
+        <span class="c1"># a restart will be called if the norm of the change of model_grad shows greater slope than min_chg_model_slope</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;restarts.auto_detect.min_chg_model_slope&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5e-2</span>
+        <span class="c1"># a restart will be called if the norm of the change of model_hess shows greater slope than min_correl</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;restarts.auto_detect.min_correl&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">params_changed</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="UPOQAParameterList.param_type">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.params.UPOQAParameterList.param_type">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">param_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="c1"># Use the check_* methods below, but switch based on key</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;general.center_shift_threshold&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;general.max_short_steps&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;general.short_step_thresh&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;general.max_very_short_steps&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;general.very_short_step_thresh&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;general.max_alt_model_steps&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;general.alt_model_thresh&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;general.alt_model_check_thresh&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;general.filter_element_point&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;bool&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;general.filter_element_point_thresh&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;general.overall_interp_set_size_factor&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;init.search_opt_x0&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;bool&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;init.search_opt_x0_max_trials&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;init.overall_interp_set_size&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;debug.check_nan_fval&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;bool&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;tr_radius.eta1&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;tr_radius.eta2&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;tr_radius.theta1&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;tr_radius.theta2&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;tr_radius.theta3&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;tr_radius.theta4&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;tr_radius.theta5&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;tr_radius.theta6&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;tr_radius.alpha1&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;tr_radius.alpha2&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;tr_radius.alpha3&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;slow.terminate_when_slow&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;bool&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;slow.history_for_slow&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;slow.thresh_for_slow&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;slow.max_slow_iters&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;restarts.use_restarts&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;bool&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;restarts.max_unsuccessful_restarts&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;restarts.max_unsuccessful_restarts_total&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;restarts.resolution_final_scale&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;restarts.resolution_restart_init_ratio&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;restarts.resolution_restart_rel_ratio&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;restarts.random_trial_num&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;restarts.resolution_restart_scale_after_unsuccessful_restart&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;restarts.num_geom_steps&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;restarts.auto_detect&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;bool&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;restarts.auto_detect.history&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;restarts.auto_detect.min_chg_model_slope&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;restarts.auto_detect.min_correl&quot;</span><span class="p">:</span>
+            <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;ParameterList.param_type() has unknown key: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">key</span>
+        <span class="k">return</span> <span class="n">type_str</span><span class="p">,</span> <span class="n">nonetype_ok</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">new_value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Access or update a parameter value.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : str</span>
+<span class="sd">            The name of the parameter.</span>
+<span class="sd">        new_value : dict or list or float or int or str, optional</span>
+<span class="sd">            The new value to assign to the parameter. If None, the current value</span>
+<span class="sd">            is returned.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict or list or float or int or str</span>
+<span class="sd">            The current or updated value of the parameter.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the parameter does not exist or is being updated for a second time.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;general.npt&quot;</span><span class="p">:</span>
+            <span class="c1"># Only update `general.npt`, not overwrite</span>
+            <span class="k">if</span> <span class="n">new_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;general.npt&quot;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Check the type of `new_value`</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_value</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ele_names</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Invalid length for `general.npt`: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">new_value</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">ele_idx</span><span class="p">,</span> <span class="n">npt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new_value</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;general.npt&quot;</span><span class="p">][</span><span class="n">ele_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">npt</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">ele_idx</span><span class="p">,</span> <span class="n">ele_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ele_names</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">ele_name</span> <span class="ow">in</span> <span class="n">new_value</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;general.npt&quot;</span><span class="p">][</span><span class="n">ele_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_value</span><span class="p">[</span><span class="n">ele_name</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Invalid type for `general.npt`: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">new_value</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">params_changed</span><span class="p">[</span><span class="s2">&quot;general.npt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;general.npt&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">new_value</span><span class="p">)</span>
+
+<div class="viewcode-block" id="UPOQAParameterList.check_all_params">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.params.UPOQAParameterList.check_all_params">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_all_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check the types and boundary conditions of all parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">bad_keys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">key</span> <span class="o">!=</span> <span class="s2">&quot;general.npt&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_param</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">])):</span>
+                <span class="c1"># no check for `general.npt`, whose check is done in `upoqa.utils.preprocess`</span>
+                <span class="n">bad_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">bad_keys</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">bad_keys</span></div>
+</div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">check_integer</span><span class="p">(</span>
+    <span class="n">val</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">lower</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">upper</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">allow_nonetype</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check that val is an integer (or convertible to an integer) and (optionally) that lower &lt;= val &lt;= upper</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">allow_nonetype</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">lower</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">val</span> <span class="o">&gt;=</span> <span class="n">lower</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">val</span> <span class="o">&lt;=</span> <span class="n">upper</span><span class="p">),</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">]:</span>
+                <span class="n">converted_val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>  <span class="c1"># Try converting val to an integer</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">converted_val</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">lower</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">converted_val</span> <span class="o">&gt;=</span> <span class="n">lower</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">converted_val</span> <span class="o">&lt;=</span> <span class="n">upper</span>
+            <span class="p">),</span> <span class="n">converted_val</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">check_float</span><span class="p">(</span>
+    <span class="n">val</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">lower</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">upper</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">allow_nonetype</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check that val is a float (or convertible to a float) and (optionally) that lower &lt;= val &lt;= upper</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">allow_nonetype</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">lower</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">val</span> <span class="o">&gt;=</span> <span class="n">lower</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">val</span> <span class="o">&lt;=</span> <span class="n">upper</span><span class="p">),</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">]:</span>
+                <span class="n">converted_val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>  <span class="c1"># Try converting val to an float</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">converted_val</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">lower</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">converted_val</span> <span class="o">&gt;=</span> <span class="n">lower</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">converted_val</span> <span class="o">&lt;=</span> <span class="n">upper</span>
+            <span class="p">),</span> <span class="n">converted_val</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">check_bool</span><span class="p">(</span><span class="n">val</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">allow_nonetype</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check that val is a bool (or convertible to a bool)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">allow_nonetype</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">converted_val</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>  <span class="c1"># Try converting val to a bool</span>
+            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">converted_val</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">check_str</span><span class="p">(</span><span class="n">val</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">allow_nonetype</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check that val is a str (or convertible to a str)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">allow_nonetype</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">converted_val</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>  <span class="c1"># Try converting val to a str</span>
+            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">converted_val</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Yichuan Liu and Yingzhou Li.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

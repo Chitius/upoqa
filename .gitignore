@@ -14,5 +14,4 @@
 lint.sh
 /dist/**
 /upoqa.egg-info/**
-docs/build/
 **/Untitled-1.ipynb

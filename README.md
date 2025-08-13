@@ -1,4 +1,4 @@
-# UPOQA: Unconstraint Partially-separable Optimization by Quadratic Approximation
+# UPOQA: Unconstrained Partially-separable Optimization by Quadratic Approximation
 
 UPOQA is a derivative-free model-based optimizer designed for unconstrained optimization problems with **partially-separable** structures. This solver leverages quadratic interpolation models within a trust-region framework to efficiently solve complex optimization problems without requiring gradient information.
 

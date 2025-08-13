@@ -41,7 +41,7 @@ for prob_idx in problem_set.valid_problem_idx():
         res, _ = REGISTERED_SOLVERS[solver_label](
             prob,
             maxfev=maxfev,
-            # identifier = "upoqa (ver=1.0.0)",
+            # identifier = "upoqa (ver=1.0.1)",
             disp=1,
             show_fig=0,
             save_fig=1,

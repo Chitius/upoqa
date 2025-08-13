@@ -1,0 +1,702 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>upoqa package &mdash; UPOQA v1.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=d29a5c0e"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="upoqa.utils package" href="upoqa.utils.html" />
+    <link rel="prev" title="UPOQA: Unconstrained Partially-separable Optimization by Quadratic Approximation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            UPOQA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">upoqa package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-upoqa">UPOQA Solver</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#upoqa">UPOQA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#upoqa.minimize"><code class="docutils literal notranslate"><span class="pre">minimize()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#upoqa-utils">UPOQA Utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html">upoqa.utils package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="upoqa.utils.html">upoqa.utils package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">UPOQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">upoqa package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/upoqa.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="upoqa-package">
+<h1>upoqa package<a class="headerlink" href="#upoqa-package" title="Link to this heading"></a></h1>
+<section id="module-upoqa">
+<span id="upoqa-solver"></span><h2>UPOQA Solver<a class="headerlink" href="#module-upoqa" title="Link to this heading"></a></h2>
+<section id="upoqa">
+<h3>UPOQA<a class="headerlink" href="#upoqa" title="Link to this heading"></a></h3>
+<p><strong>UPOQA</strong> is a derivative-free model-based optimization method for <strong>partially
+separable problems</strong>, whose name is the abbreviation for Unconstrained
+Partially-separable Optimization by Quadratic Approximation.</p>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="upoqa.minimize">
+<span class="sig-prename descclassname"><span class="pre">upoqa.</span></span><span class="sig-name descname"><span class="pre">minimize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fun</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxfev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xforms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xform_bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_fun</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius_final</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seek_global_minimum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tr_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'structured'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_internals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/upoqa/solver.html#minimize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#upoqa.minimize" title="Link to this definition"></a></dt>
+<dd><p>Minimize an unconstrained objective function that has a partially-separable
+structure using a derivative-free model-based trust-region method.</p>
+<p>Partial separability means the objective can be expressed as:</p>
+<div class="math notranslate nohighlight">
+\[\min_{x\in\mathbb{R}^n} \quad \sum_{i=1}^q f_i(U_i x),\]</div>
+<p>where <span class="math notranslate nohighlight">\(f_i:\mathbb{R}^{|\mathcal{I}_i|} \to \mathbb{R}\)</span> are black-box
+functions (termed as <em>element function</em> or <em>element</em>) whose gradients and
+Hessians are unavailable, <span class="math notranslate nohighlight">\(U_i:\mathbb{R}^n \to \mathbb{R}^{|\mathcal{I}_i|}\)</span>
+are projection operators, and <span class="math notranslate nohighlight">\(\mathcal{I}_i \subset [i]\)</span> is an index
+set satisfying <span class="math notranslate nohighlight">\(|\mathcal{I}_i| &lt; n\)</span> (element functions depend on small
+subsets of variables).</p>
+<p>The solver also supports a more general objective form:</p>
+<div class="math notranslate nohighlight">
+\[\min_{x\in\mathbb{R}^n} \quad f_0(x) +
+\sum_{i=1}^q w_i h_i\left(f_i(U_i x)\right),\]</div>
+<p>where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(f_0: \mathbb{R}^n \to \mathbb{R}\)</span> is a white-box component with
+computable gradients and Hessians</p></li>
+<li><p><span class="math notranslate nohighlight">\(w_i \in \mathbb{R}\)</span> are element weights</p></li>
+<li><p><span class="math notranslate nohighlight">\(h_i: \mathbb{R}\to\mathbb{R}\)</span> are smooth transformations on the
+outputs of <span class="math notranslate nohighlight">\(f_i\)</span>, with computable gradients/Hessians</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fun</strong> (<em>list</em><em> of </em><em>callables</em><em>, </em><em>dict</em><em> of </em><em>callables</em><em>, or </em><em>callable</em>) – <p>The objective element function(s). Can be:</p>
+<ul>
+<li><p>A dictionary mapping element names to element functions</p></li>
+<li><p>A list containing all element functions</p></li>
+<li><p>A single function (not recommended; treated as a single element without
+exploiting structure)</p></li>
+</ul>
+<p>When using dictionaries, element names can be any hashable type. Dictionary
+input is recommended for better readability, especially when elements have
+different contexts or lack inherent ordering.</p>
+<p>For list input, the solver assigns default names as <code class="docutils literal notranslate"><span class="pre">&quot;fun[0]&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;fun[1]&quot;</span></code>,
+etc.</p>
+</p></li>
+<li><p><strong>x0</strong> (<em>ndarray</em><em>, </em><em>shape</em><em> (</em><em>n</em><em>,</em><em>)</em>) – Initial guess for the optimization variables.</p></li>
+<li><p><strong>coords</strong> (<em>dict</em><em> of </em><em>array_like</em><em> or </em><em>list</em><em> of </em><em>array-like</em><em>, </em><em>optional</em>) – <p>Mapping of element names to variable indices. Each value specifies the
+variables an element depends on.</p>
+<dl class="simple">
+<dt>Example for dictionary input:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">{'f1':</span> <span class="pre">[0,</span> <span class="pre">1],</span> <span class="pre">'f2':</span> <span class="pre">[2,</span> <span class="pre">3]}</span></code> indicates:</p>
+<ul>
+<li><p>Element f1 depends on variables 0 and 1</p></li>
+<li><p>Element f2 depends on variables 2 and 3</p></li>
+</ul>
+</dd>
+<dt>Example for list input:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">[[0,</span> <span class="pre">1],</span> <span class="pre">[2,</span> <span class="pre">3]]</span></code> assigns indices to elements in list order.</p>
+</dd>
+</dl>
+<p>If not provided, all elements default to depending on all variables.</p>
+</p></li>
+<li><p><strong>maxiter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of iterations. Default: <code class="docutils literal notranslate"><span class="pre">1000</span> <span class="pre">*</span> <span class="pre">n</span></code>.</p></li>
+<li><p><strong>maxfev</strong> (<em>int</em><em>, </em><em>dict</em><em> of </em><em>int</em><em> or </em><em>list</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – <p>Maximum function evaluations:</p>
+<ul>
+<li><p>dict: Per-element limits (keys match <code class="docutils literal notranslate"><span class="pre">fun</span></code>)</p></li>
+<li><p>list: Per-element limits (order matches <code class="docutils literal notranslate"><span class="pre">fun</span></code>)</p></li>
+<li><p>int: Uniform limit for all elements</p></li>
+</ul>
+</p></li>
+<li><p><strong>weights</strong> (<em>dict</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – <p>Nonnegative weights <span class="math notranslate nohighlight">\(w_i\)</span> for elements. Formats:</p>
+<ul>
+<li><p>dict: Per-element weights (keys match <code class="docutils literal notranslate"><span class="pre">fun</span></code>)</p></li>
+<li><p>list: Per-element weights (order matches <code class="docutils literal notranslate"><span class="pre">fun</span></code>)</p></li>
+<li><p>scalar: Uniform weight for all elements</p></li>
+</ul>
+</p></li>
+<li><p><strong>xforms</strong> (<em>dict</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – <p>Transformations <span class="math notranslate nohighlight">\(h_i\)</span> for element outputs. Each entry must be a list
+of length 3 containing [function, gradient, Hessian] callables.</p>
+<p>Example for two simple transformations:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">xforms</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;ele1&#39;</span><span class="p">:</span> <span class="p">[</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">2</span><span class="p">],</span>
+    <span class="s1">&#39;ele2&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="p">(</span><span class="mi">3</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Note: Appropriate use of transformations can accelerate convergence speed
+but may introduce instability. For simple cases, consider incorporating
+them directly into element functions.</p>
+</p></li>
+<li><p><strong>xform_bounds</strong> (<em>dict</em><em> of </em><em>tuple</em><em>, </em><em>list</em><em> of </em><em>tuple</em><em>, </em><em>optional</em>) – <p>Bounds for the input domain of transformation functions.</p>
+<p>Each entry must be a tuple of length 2 (lower_bound, upper_bound) defining
+the valid input range for a transformation. When provided, the solver
+automatically performs bound checking on transformation inputs, ensuring
+they remain within specified limits.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">{'log_transform':</span> <span class="pre">(1e-8,</span> <span class="pre">np.inf)}</span></code> prevents log(0) errors.</p>
+<p>Note: Even if element function outputs naturally stay within bounds,
+surrogate model outputs may exceed valid ranges during optimization. If your
+transformation functions cannot gracefully handle out-of-bound inputs, it is
+strongly recommended to provide this parameter to prevent algorithm crashes
+due to invalid transformation evaluations.</p>
+</p></li>
+<li><p><strong>extra_fun</strong> (<em>list</em><em> of </em><em>callables</em><em>, </em><em>optional</em>) – White-box component <span class="math notranslate nohighlight">\(f_0\)</span> of the objective function, which is a list
+of length 3 specified as <code class="docutils literal notranslate"><span class="pre">[function_value,</span> <span class="pre">gradient,</span> <span class="pre">Hessian]</span></code> callables.</p></li>
+<li><p><strong>npt</strong> (<em>int</em><em> or </em><em>dict</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – Number of interpolation points per element. Formats similar to <code class="docutils literal notranslate"><span class="pre">maxfev</span></code>.</p></li>
+<li><p><strong>radius_init</strong> (<em>float</em><em>, </em><em>default=1.0</em>) – Initial trust region radius</p></li>
+<li><p><strong>radius_final</strong> (<em>float</em><em>, </em><em>default=1e-6</em>) – Final (minimum) trust region radius</p></li>
+<li><p><strong>noise_level</strong> (<em>{0</em><em>, </em><em>1</em><em>, </em><em>2}</em><em>, </em><em>default=0</em>) – <p>Estimated noise level in objective function:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">noise_level=0</span></code>: No noise</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">noise_level=1</span></code>: Moderate noise. Restart mechanisms enabled and the
+default interpolation points are set to</p>
+<div class="math notranslate nohighlight">
+\[\max\{\min\{0.8 n_i ^{1.5} + n_i + 1, (n_i + 1)(n_i + 2) / 2\},
+2 n_i + 1\}\]</div>
+<p>where <span class="math notranslate nohighlight">\(n_i\)</span> are the dimension of the <span class="math notranslate nohighlight">\(i\)</span>-th element.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">noise_level=2</span></code>: Significant noise. Restart mechanisms enabled and the default
+interpolation points are set to</p>
+<div class="math notranslate nohighlight">
+\[(n_i + 1)(n_i + 2) / 2\]</div>
+<p>for better noise resilience.</p>
+</li>
+</ul>
+</p></li>
+<li><p><strong>seek_global_minimum</strong> (<em>bool</em><em>, </em><em>default=False</em>) – Whether to enable global optimization restarts. When True, activates
+restart mechanisms with parameters optimized for global search (similar
+to Py-BOBYQA <a class="reference internal" href="#red283ca43706-1" id="id1">[1]</a>).</p></li>
+<li><p><strong>f_target</strong> (<em>float</em><em>, </em><em>optional</em>) – Target on the objective function value. The optimization procedure is
+terminated when the objective function value at the iterate is less
+than or equal to this target.</p></li>
+<li><p><strong>tr_shape</strong> (<em>{'structured'</em><em>, </em><em>'spherical'}</em><em>, </em><em>default='structured'</em>) – <p>Geometry of the trust region:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">'structured'</span></code>: Complex region formed by intersecting cylinders with
+element-specific radii. In simple cases (e.g., two orthogonal cylinders),
+resembles a Steinmetz solid. Allows larger steps in well-modeled
+directions while restricting poorly-modeled ones.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'spherical'</span></code>: Traditional spherical trust region. Simpler but less
+adaptive to element-wise model accuracy. Recommended if the
+<code class="docutils literal notranslate"><span class="pre">'structured'</span></code> option incurs excessive runtime overhead (typically
+when the number of elements is very large).</p></li>
+</ul>
+</p></li>
+<li><p><strong>callback</strong> (<em>callable</em><em>, </em><em>optional</em>) – <p>A callback executed at each objective function evaluation. The method
+terminates if a <code class="docutils literal notranslate"><span class="pre">StopIteration</span></code> exception is raised by the callback
+function. Its signature can be one of the following:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">callback(intermediate_result)</span></code></p>
+</div></blockquote>
+<p>where <code class="docutils literal notranslate"><span class="pre">intermediate_result</span></code> is a keyword parameter that contains an
+instance of <a class="reference internal" href="upoqa.utils.html#upoqa.utils.result.OptimizeResult" title="upoqa.utils.result.OptimizeResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">OptimizeResult</span></code></a>, with attributes
+<code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">fun</span></code> and other useful information, being the point at which the
+objective function is evaluated and the value of the objective function,
+respectively. The name of the parameter must be <code class="docutils literal notranslate"><span class="pre">intermediate_result</span></code>
+for the callback to be passed an instance of
+<a class="reference internal" href="upoqa.utils.html#upoqa.utils.result.OptimizeResult" title="upoqa.utils.result.OptimizeResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">OptimizeResult</span></code></a>.</p>
+<p>Alternatively, the callback function can have the signature:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">callback(xk)</span></code></p>
+</div></blockquote>
+<p>where <code class="docutils literal notranslate"><span class="pre">xk</span></code> is the point at which the objective function is evaluated.
+Introspection is used to determine which of the signatures to invoke.</p>
+</p></li>
+<li><p><strong>disp</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Whether to display progress.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>default=False</em>) – Whether to display detailed progress information.</p></li>
+<li><p><strong>debug</strong> (<em>bool</em><em>, </em><em>default=False</em>) – <p>Enable debugging features:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">debug=1</span></code>: NaN checking in function evaluations</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">debug=2</span></code>: Include solver internals (manager, interp_set, model) in result</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">debug=3</span></code>: Enhanced verbosity when both disp and verbose are True</p></li>
+</ul>
+</p></li>
+<li><p><strong>return_internals</strong> (<em>bool</em><em>, </em><em>default=False</em>) – If True, the returned result will contain the fields <code class="docutils literal notranslate"><span class="pre">manager</span></code>,
+<code class="docutils literal notranslate"><span class="pre">interp_set</span></code> and <code class="docutils literal notranslate"><span class="pre">model</span></code> for debugging purposes even if
+<code class="docutils literal notranslate"><span class="pre">debug=False</span></code>.</p></li>
+<li><p><strong>options</strong> (<em>dict</em>) – Advanced algorithm parameters. See the source code of
+<a class="reference internal" href="upoqa.utils.html#upoqa.utils.params.UPOQAParameterList" title="upoqa.utils.params.UPOQAParameterList"><code class="xref py py-class docutils literal notranslate"><span class="pre">UPOQAParameterList</span></code></a> for available options.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>Result of the optimization procedure, with the following fields:</p>
+<blockquote>
+<div><dl>
+<dt>message<span class="classifier">str</span></dt><dd><p>Description of the cause of the termination.</p>
+</dd>
+<dt>success<span class="classifier">bool</span></dt><dd><p>Whether the optimization procedure terminated successfully.</p>
+</dd>
+<dt>fun<span class="classifier">float</span></dt><dd><p>Value of objective function at the solution.</p>
+</dd>
+<dt>funs<span class="classifier">dict or list</span></dt><dd><p>Values of the element functions evaluated at the solution. The
+type matches the input <code class="docutils literal notranslate"><span class="pre">fun</span></code>:</p>
+<ul class="simple">
+<li><p>If <code class="docutils literal notranslate"><span class="pre">fun</span></code> was a dictionary, return a dictionary mapping element
+names to their function values.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">fun</span></code> was a list, return a list of function values in the
+same order as the input list.</p></li>
+</ul>
+</dd>
+<dt>extra_fun<span class="classifier">float</span></dt><dd><p>Value of extra function (the white-box component <span class="math notranslate nohighlight">\(f_0\)</span>)
+at the solution</p>
+</dd>
+<dt>x<span class="classifier">ndarray</span></dt><dd><p>The solution of the optimization.</p>
+</dd>
+<dt>jac, hess<span class="classifier">ndarray</span></dt><dd><p>Values of objective function’s Jacobian and its Hessian at <code class="docutils literal notranslate"><span class="pre">x</span></code>.
+The Hessian is an approximation.</p>
+</dd>
+<dt>nit<span class="classifier">int</span></dt><dd><p>Number of iterations performed by the optimizer.</p>
+</dd>
+<dt>nfev<span class="classifier">dict or list</span></dt><dd><p>Number of evaluations of element functions.</p>
+<p>The type matches the input <code class="docutils literal notranslate"><span class="pre">fun</span></code>:</p>
+<ul class="simple">
+<li><p>If <code class="docutils literal notranslate"><span class="pre">fun</span></code> was a dictionary, return a dictionary mapping element
+names to their numbers of function evaluations.</p></li>
+<li><p>If <code class="docutils literal notranslate"><span class="pre">fun</span></code> was a list, return a list of evaluation numbers in the
+same order as the input list.</p></li>
+</ul>
+</dd>
+<dt>max_nfev<span class="classifier">int</span></dt><dd><p>Maximum number of evaluations of element functions.</p>
+</dd>
+<dt>avg_nfev<span class="classifier">float</span></dt><dd><p>Average number of evaluations of element functions.</p>
+</dd>
+<dt>nrun<span class="classifier">int</span></dt><dd><p>Number of runs (when enabling restarts).</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>If <code class="docutils literal notranslate"><span class="pre">debug=True</span></code> or <code class="docutils literal notranslate"><span class="pre">return_internals=True</span></code>, the result also has the
+following fields:</p>
+<blockquote>
+<div><dl>
+<dt>manager<span class="classifier"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager" title="upoqa.utils.manager.UPOQAManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">UPOQAManager</span></code></a></span></dt><dd><p>Algorithm manager.</p>
+</dd>
+<dt>interp_set<span class="classifier"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet" title="upoqa.utils.interp_set.OverallInterpSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">OverallInterpSet</span></code></a></span></dt><dd><p>Interpolation point set.</p>
+</dd>
+<dt>model<span class="classifier"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.OverallSurrogate" title="upoqa.utils.model.OverallSurrogate"><code class="xref py py-class docutils literal notranslate"><span class="pre">OverallSurrogate</span></code></a></span></dt><dd><p>Surrogate model.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>If an exception is raised during the optimization that cannot be handled
+by the algorithm, the result will also contain the following fields:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>exception<span class="classifier">Exception</span></dt><dd><p>Exception raised during the optimization that caused the
+termination, if any.</p>
+</dd>
+<dt>traceback<span class="classifier">str</span></dt><dd><p>Traceback of the exception, if any.</p>
+</dd>
+</dl>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="upoqa.utils.html#upoqa.utils.result.OptimizeResult" title="upoqa.utils.result.OptimizeResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">OptimizeResult</span></code></a></p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<div role="list" class="citation-list">
+<div class="citation" id="red283ca43706-1" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>C. Cartis, J. Fiala, B. Marteau, and L. Roberts. Improving the
+flexibility and robustness of model-based derivative-free optimization
+solvers. <em>ACM Trans. Math. Softw.</em> 45, 3 (2019), 1-41.
+<a class="reference external" href="https://doi.org/10.1145/3338517">doi:10.1145/3338517</a>.</p>
+</div>
+</div>
+<p class="rubric">Examples</p>
+<p>Here is a simple example of using the solver to minimize a function with
+two elements. Consider the following problem:</p>
+<div class="math notranslate nohighlight">
+\[\min_{x,y,z\in \mathbb{R}} \quad x^2 + 2y^2 + z^2 + 2xy - (y + 1)z\]</div>
+<p>let’s replace <span class="math notranslate nohighlight">\([x,y,z]\)</span> with <span class="math notranslate nohighlight">\(\mathbf{x} = [x_1,x_2,x_3]\)</span>, and
+rewrite this problem into</p>
+<div class="math notranslate nohighlight">
+\[\min_{\mathbf{x}\in\mathbb{R}^3} \quad f_1(x_1, x_2) + f_2(x_2, x_3),\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{align*}
+    &amp;f_1(x_1, x_2) = x_1^2 + x_2^2 + 2x_1 x_2, \\
+    &amp;f_2(x_2, x_3) = x_2^2 + x_3^2 - (x_2 + 1)x_3,
+\end{align*}\end{split}\]</div>
+<p>then the objective function can be implemented as:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">f1</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>    <span class="c1"># f1(x,y)</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>   <span class="c1"># x^2 + y^2 + 2xy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">f2</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>    <span class="c1"># f2(y,z)</span>
+<span class="gp">... </span>   <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># y^2 + z^2 - (y+1)z</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fun</span> <span class="o">=</span>    <span class="p">{</span><span class="s1">&#39;xy&#39;</span><span class="p">:</span> <span class="n">f1</span><span class="p">,</span>     <span class="s1">&#39;yz&#39;</span><span class="p">:</span> <span class="n">f2</span>     <span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">coords</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;xy&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;yz&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]}</span>
+</pre></div>
+</div>
+<p>The problem can be solved by:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x0</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">fun</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span><span class="p">,</span> <span class="n">disp</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span><span class="o">.</span><span class="n">x</span>
+<span class="go">array([-0.33333332,  0.3333333 ,  0.66666665])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span><span class="o">.</span><span class="n">fun</span>
+<span class="go">np.float64(-0.33333333333333215)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="upoqa-utils">
+<h2>UPOQA Utils<a class="headerlink" href="#upoqa-utils" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="upoqa.utils.html">upoqa.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="upoqa.utils.html#module-upoqa.utils.interp_set">upoqa.utils.interp_set module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#interpolation-set">Interpolation Set</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.InterpSet"><code class="docutils literal notranslate"><span class="pre">InterpSet</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.InterpSet.n"><code class="docutils literal notranslate"><span class="pre">InterpSet.n</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.InterpSet.npt"><code class="docutils literal notranslate"><span class="pre">InterpSet.npt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.InterpSet.interp_set_Y"><code class="docutils literal notranslate"><span class="pre">InterpSet.interp_set_Y</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.InterpSet.interp_set_fval"><code class="docutils literal notranslate"><span class="pre">InterpSet.interp_set_fval</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.InterpSet.x_opt_idx"><code class="docutils literal notranslate"><span class="pre">InterpSet.x_opt_idx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.InterpSet.x_anchor_idx"><code class="docutils literal notranslate"><span class="pre">InterpSet.x_anchor_idx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.InterpSet.x_opt"><code class="docutils literal notranslate"><span class="pre">InterpSet.x_opt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.InterpSet.x_anchor"><code class="docutils literal notranslate"><span class="pre">InterpSet.x_anchor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.InterpSet.f_opt"><code class="docutils literal notranslate"><span class="pre">InterpSet.f_opt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.InterpSet.f_anchor"><code class="docutils literal notranslate"><span class="pre">InterpSet.f_anchor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#id0"><code class="docutils literal notranslate"><span class="pre">InterpSet.f_anchor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#id1"><code class="docutils literal notranslate"><span class="pre">InterpSet.f_opt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.InterpSet.get_anchor"><code class="docutils literal notranslate"><span class="pre">InterpSet.get_anchor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.InterpSet.get_interp_set"><code class="docutils literal notranslate"><span class="pre">InterpSet.get_interp_set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.InterpSet.get_opt"><code class="docutils literal notranslate"><span class="pre">InterpSet.get_opt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.InterpSet.init_interp_set"><code class="docutils literal notranslate"><span class="pre">InterpSet.init_interp_set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.InterpSet.init_interp_set_Y"><code class="docutils literal notranslate"><span class="pre">InterpSet.init_interp_set_Y()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.InterpSet.set_interp_set_fval"><code class="docutils literal notranslate"><span class="pre">InterpSet.set_interp_set_fval()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.InterpSet.update_point_on_idx"><code class="docutils literal notranslate"><span class="pre">InterpSet.update_point_on_idx()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.InterpSet.update_x_opt"><code class="docutils literal notranslate"><span class="pre">InterpSet.update_x_opt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#id2"><code class="docutils literal notranslate"><span class="pre">InterpSet.x_anchor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#id3"><code class="docutils literal notranslate"><span class="pre">InterpSet.x_opt</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.n"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.n</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.ele_interp_sets"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.ele_interp_sets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.proj_onto_ele"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.proj_onto_ele</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.ele_names"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.ele_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.ele_idxs"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.ele_idxs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.npts"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.npts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.interp_set_Y"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.interp_set_Y</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.interp_set_fval"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.interp_set_fval</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.interp_set_fval_eles"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.interp_set_fval_eles</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.interp_set_extra_fval"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.interp_set_extra_fval</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.x_opt_idx"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.x_opt_idx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.enable"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.enable</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.ele_num"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.ele_num</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.set_size"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.set_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.disable"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.disable</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.capacity"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.capacity</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.unallocated_idx"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.unallocated_idx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.allocated_idx"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.allocated_idx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.x_opt"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.x_opt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.f_opt"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.f_opt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#id4"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.allocated_idx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.append"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.append()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#id5"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.capacity</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.clear"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.clear()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.clear_invalid_point"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.clear_invalid_point()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.clear_with_only_one_left"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.clear_with_only_one_left()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.delete_points"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.delete_points()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#id6"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.disable</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#id7"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.ele_num</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#id8"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.f_opt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.get_ele_fvals"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.get_ele_fvals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.get_interp_set"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.get_interp_set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.get_opt"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.get_opt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#id9"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.set_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#id10"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.unallocated_idx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.update_fval_with_new_weights_and_xforms"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.update_fval_with_new_weights_and_xforms()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.update_point_on_idx"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.update_point_on_idx()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.update_x_opt"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.update_x_opt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#id11"><code class="docutils literal notranslate"><span class="pre">OverallInterpSet.x_opt</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="upoqa.utils.html#module-upoqa.utils.manager">upoqa.utils.manager module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#algorithm-manager">Algorithm Manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.ExitInfo"><code class="docutils literal notranslate"><span class="pre">ExitInfo</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.ExitInfo.flag"><code class="docutils literal notranslate"><span class="pre">ExitInfo.flag</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.ExitInfo.msg"><code class="docutils literal notranslate"><span class="pre">ExitInfo.msg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.ExitInfo.exception"><code class="docutils literal notranslate"><span class="pre">ExitInfo.exception</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.ExitInfo.traceback"><code class="docutils literal notranslate"><span class="pre">ExitInfo.traceback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.ExitInfo.message"><code class="docutils literal notranslate"><span class="pre">ExitInfo.message()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.ExitStatus"><code class="docutils literal notranslate"><span class="pre">ExitStatus</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.ExitStatus.AUTO_DETECT_RESTART_WARNING"><code class="docutils literal notranslate"><span class="pre">ExitStatus.AUTO_DETECT_RESTART_WARNING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.ExitStatus.INPUT_ERROR"><code class="docutils literal notranslate"><span class="pre">ExitStatus.INPUT_ERROR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.ExitStatus.INVALID_EVAL_ERROR"><code class="docutils literal notranslate"><span class="pre">ExitStatus.INVALID_EVAL_ERROR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.ExitStatus.LINALG_ERROR"><code class="docutils literal notranslate"><span class="pre">ExitStatus.LINALG_ERROR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.ExitStatus.SLOW_WARNING"><code class="docutils literal notranslate"><span class="pre">ExitStatus.SLOW_WARNING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.ExitStatus.SUCCESS"><code class="docutils literal notranslate"><span class="pre">ExitStatus.SUCCESS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.ExitStatus.TR_INCREASE_ERROR"><code class="docutils literal notranslate"><span class="pre">ExitStatus.TR_INCREASE_ERROR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.ExitStatus.UNKNOWN_ERROR"><code class="docutils literal notranslate"><span class="pre">ExitStatus.UNKNOWN_ERROR</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.MaxEvalNumReached"><code class="docutils literal notranslate"><span class="pre">MaxEvalNumReached</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager"><code class="docutils literal notranslate"><span class="pre">UPOQAManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.n"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.n</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.npts"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.npts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.resolution"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.resolution</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.radii"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.radii</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.ele_names"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.ele_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.ele_num"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.ele_num</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.proj_onto_ele"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.proj_onto_ele</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.interp_set"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.interp_set</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.model"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.ele_models"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.ele_models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.xforms"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.xforms</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.weights"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.weights</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.extra_fun"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.extra_fun</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.params"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.params</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.maxiter"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.maxiter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.maxfev"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.maxfev</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.nfev"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.nfev</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.nrun"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.nrun</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.disp"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.disp</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.x_opt"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.x_opt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.f_opt"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.f_opt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.average_radius"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.average_radius</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.build_fval"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.build_fval()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.calc_detailed_decrease"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.calc_detailed_decrease()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.check_slow_iteration"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.check_slow_iteration()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.couple_with_utils"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.couple_with_utils()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.decide_to_restart_due_to_exploding_coeff"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.decide_to_restart_due_to_exploding_coeff()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.ele_interp_sets"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.ele_interp_sets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#id13"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.ele_models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#id14"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.extra_fun</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#id15"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.f_opt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.find_best_start_point"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.find_best_start_point()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.get_geometry_step"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.get_geometry_step()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.get_index_to_remove"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.get_index_to_remove()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.get_reduction_ratio"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.get_reduction_ratio()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.get_update_requests"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.get_update_requests()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.has_reached_maxfev"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.has_reached_maxfev()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.init_coord_overlap_relation"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.init_coord_overlap_relation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.max_radius"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.max_radius</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#id16"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.n</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#id17"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.npts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.prepare_for_a_restart"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.prepare_for_a_restart()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.reduce_resolution"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.reduce_resolution()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.reset_restart_track_info"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.reset_restart_track_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.set_radius"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.set_radius()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.set_resolution"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.set_resolution()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.set_weights"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.set_weights()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.set_xforms"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.set_xforms()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.shift_center_to"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.shift_center_to()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.soft_restart"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.soft_restart()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.update_radius"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.update_radius()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.update_restart_track_info"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.update_restart_track_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.update_weights"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.update_weights()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.update_xforms"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.update_xforms()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#id19"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.weights</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.manager.UPOQAManager.wrap_xforms_with_bounds"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.wrap_xforms_with_bounds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#id20"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.x_opt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#id21"><code class="docutils literal notranslate"><span class="pre">UPOQAManager.xforms</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="upoqa.utils.html#module-upoqa.utils.model">upoqa.utils.model module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#interpolation-surrogate-model">Interpolation Surrogate Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.OverallSurrogate"><code class="docutils literal notranslate"><span class="pre">OverallSurrogate</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.OverallSurrogate.n"><code class="docutils literal notranslate"><span class="pre">OverallSurrogate.n</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.OverallSurrogate.interp_set"><code class="docutils literal notranslate"><span class="pre">OverallSurrogate.interp_set</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.OverallSurrogate.proj_onto_ele"><code class="docutils literal notranslate"><span class="pre">OverallSurrogate.proj_onto_ele</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.OverallSurrogate.coords"><code class="docutils literal notranslate"><span class="pre">OverallSurrogate.coords</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.OverallSurrogate.ele_models"><code class="docutils literal notranslate"><span class="pre">OverallSurrogate.ele_models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.OverallSurrogate.xforms"><code class="docutils literal notranslate"><span class="pre">OverallSurrogate.xforms</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.OverallSurrogate.weights"><code class="docutils literal notranslate"><span class="pre">OverallSurrogate.weights</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.OverallSurrogate.extra_fun"><code class="docutils literal notranslate"><span class="pre">OverallSurrogate.extra_fun</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.OverallSurrogate.params"><code class="docutils literal notranslate"><span class="pre">OverallSurrogate.params</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.OverallSurrogate.ele_names"><code class="docutils literal notranslate"><span class="pre">OverallSurrogate.ele_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.OverallSurrogate.model_center"><code class="docutils literal notranslate"><span class="pre">OverallSurrogate.model_center</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.OverallSurrogate.fun_eval"><code class="docutils literal notranslate"><span class="pre">OverallSurrogate.fun_eval()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.OverallSurrogate.grad_eval"><code class="docutils literal notranslate"><span class="pre">OverallSurrogate.grad_eval()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.OverallSurrogate.hess_eval"><code class="docutils literal notranslate"><span class="pre">OverallSurrogate.hess_eval()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.OverallSurrogate.hess_operator"><code class="docutils literal notranslate"><span class="pre">OverallSurrogate.hess_operator()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.OverallSurrogate.set_weights"><code class="docutils literal notranslate"><span class="pre">OverallSurrogate.set_weights()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.OverallSurrogate.set_xforms"><code class="docutils literal notranslate"><span class="pre">OverallSurrogate.set_xforms()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.OverallSurrogate.shift_center_to"><code class="docutils literal notranslate"><span class="pre">OverallSurrogate.shift_center_to()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.OverallSurrogate.update"><code class="docutils literal notranslate"><span class="pre">OverallSurrogate.update()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.OverallSurrogate.update_weights"><code class="docutils literal notranslate"><span class="pre">OverallSurrogate.update_weights()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.OverallSurrogate.update_xforms"><code class="docutils literal notranslate"><span class="pre">OverallSurrogate.update_xforms()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.QuadSurrogate"><code class="docutils literal notranslate"><span class="pre">QuadSurrogate</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.QuadSurrogate.n"><code class="docutils literal notranslate"><span class="pre">QuadSurrogate.n</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.QuadSurrogate.interp_set"><code class="docutils literal notranslate"><span class="pre">QuadSurrogate.interp_set</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.QuadSurrogate.npt"><code class="docutils literal notranslate"><span class="pre">QuadSurrogate.npt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.QuadSurrogate.model_center"><code class="docutils literal notranslate"><span class="pre">QuadSurrogate.model_center</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.QuadSurrogate.model_cons"><code class="docutils literal notranslate"><span class="pre">QuadSurrogate.model_cons</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.QuadSurrogate.model_grad"><code class="docutils literal notranslate"><span class="pre">QuadSurrogate.model_grad</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.QuadSurrogate.model_hess_explicit"><code class="docutils literal notranslate"><span class="pre">QuadSurrogate.model_hess_explicit</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.QuadSurrogate.model_hess_implicit"><code class="docutils literal notranslate"><span class="pre">QuadSurrogate.model_hess_implicit</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.QuadSurrogate.alt_grad_eval"><code class="docutils literal notranslate"><span class="pre">QuadSurrogate.alt_grad_eval()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.QuadSurrogate.fun_eval"><code class="docutils literal notranslate"><span class="pre">QuadSurrogate.fun_eval()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.QuadSurrogate.get_determinant_ratio"><code class="docutils literal notranslate"><span class="pre">QuadSurrogate.get_determinant_ratio()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.QuadSurrogate.grad_eval"><code class="docutils literal notranslate"><span class="pre">QuadSurrogate.grad_eval()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.QuadSurrogate.hess_eval"><code class="docutils literal notranslate"><span class="pre">QuadSurrogate.hess_eval()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.QuadSurrogate.hess_operator"><code class="docutils literal notranslate"><span class="pre">QuadSurrogate.hess_operator()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.QuadSurrogate.inv_kkt_matrix_dot"><code class="docutils literal notranslate"><span class="pre">QuadSurrogate.inv_kkt_matrix_dot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.QuadSurrogate.inv_kkt_matrix_partial_dot"><code class="docutils literal notranslate"><span class="pre">QuadSurrogate.inv_kkt_matrix_partial_dot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.QuadSurrogate.model_hess"><code class="docutils literal notranslate"><span class="pre">QuadSurrogate.model_hess</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.QuadSurrogate.reinit"><code class="docutils literal notranslate"><span class="pre">QuadSurrogate.reinit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.QuadSurrogate.reset"><code class="docutils literal notranslate"><span class="pre">QuadSurrogate.reset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.QuadSurrogate.reset_surrogate_coeff"><code class="docutils literal notranslate"><span class="pre">QuadSurrogate.reset_surrogate_coeff()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.QuadSurrogate.shift_center_to"><code class="docutils literal notranslate"><span class="pre">QuadSurrogate.shift_center_to()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.QuadSurrogate.solve_interpolation_KKT"><code class="docutils literal notranslate"><span class="pre">QuadSurrogate.solve_interpolation_KKT()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.QuadSurrogate.update"><code class="docutils literal notranslate"><span class="pre">QuadSurrogate.update()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.SurrogateLinAlgError"><code class="docutils literal notranslate"><span class="pre">SurrogateLinAlgError</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.SurrogateLinAlgError.ele_idx"><code class="docutils literal notranslate"><span class="pre">SurrogateLinAlgError.ele_idx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.model.SurrogateLinAlgError.ele_name"><code class="docutils literal notranslate"><span class="pre">SurrogateLinAlgError.ele_name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="upoqa.utils.html#module-upoqa.utils.params">upoqa.utils.params module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.params.UPOQAParameterList"><code class="docutils literal notranslate"><span class="pre">UPOQAParameterList</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.params.UPOQAParameterList.check_all_params"><code class="docutils literal notranslate"><span class="pre">UPOQAParameterList.check_all_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.params.UPOQAParameterList.param_type"><code class="docutils literal notranslate"><span class="pre">UPOQAParameterList.param_type()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="upoqa.utils.html#module-upoqa.utils.projection">upoqa.utils.projection module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#projection-operator">Projection Operator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.projection.average_proj"><code class="docutils literal notranslate"><span class="pre">average_proj()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.projection.dykstra_proj"><code class="docutils literal notranslate"><span class="pre">dykstra_proj()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.projection.get_violation_ratio"><code class="docutils literal notranslate"><span class="pre">get_violation_ratio()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.projection.steinmetz_comb_proj"><code class="docutils literal notranslate"><span class="pre">steinmetz_comb_proj()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.projection.steinmetz_proj"><code class="docutils literal notranslate"><span class="pre">steinmetz_proj()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="upoqa.utils.html#module-upoqa.utils.result">upoqa.utils.result module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#optimization-result">Optimization Result</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.result.OptimizeResult"><code class="docutils literal notranslate"><span class="pre">OptimizeResult</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.result.OptimizeResult.message"><code class="docutils literal notranslate"><span class="pre">OptimizeResult.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.result.OptimizeResult.success"><code class="docutils literal notranslate"><span class="pre">OptimizeResult.success</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.result.OptimizeResult.exception"><code class="docutils literal notranslate"><span class="pre">OptimizeResult.exception</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.result.OptimizeResult.traceback"><code class="docutils literal notranslate"><span class="pre">OptimizeResult.traceback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.result.OptimizeResult.fun"><code class="docutils literal notranslate"><span class="pre">OptimizeResult.fun</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.result.OptimizeResult.funs"><code class="docutils literal notranslate"><span class="pre">OptimizeResult.funs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.result.OptimizeResult.extra_fun"><code class="docutils literal notranslate"><span class="pre">OptimizeResult.extra_fun</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.result.OptimizeResult.x"><code class="docutils literal notranslate"><span class="pre">OptimizeResult.x</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.result.OptimizeResult.nit"><code class="docutils literal notranslate"><span class="pre">OptimizeResult.nit</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.result.OptimizeResult.nfev"><code class="docutils literal notranslate"><span class="pre">OptimizeResult.nfev</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.result.OptimizeResult.max_nfev"><code class="docutils literal notranslate"><span class="pre">OptimizeResult.max_nfev</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.result.OptimizeResult.avg_nfev"><code class="docutils literal notranslate"><span class="pre">OptimizeResult.avg_nfev</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.result.OptimizeResult.nrun"><code class="docutils literal notranslate"><span class="pre">OptimizeResult.nrun</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.result.OptimizeResult.manager"><code class="docutils literal notranslate"><span class="pre">OptimizeResult.manager</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.result.OptimizeResult.interp_set"><code class="docutils literal notranslate"><span class="pre">OptimizeResult.interp_set</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.result.OptimizeResult.model"><code class="docutils literal notranslate"><span class="pre">OptimizeResult.model</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="upoqa.utils.html#module-upoqa.utils.sub_solver">upoqa.utils.sub_solver module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#trust-region-subproblem-solver">Trust Region Subproblem Solver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.sub_solver.cauchy_geometry"><code class="docutils literal notranslate"><span class="pre">cauchy_geometry()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.sub_solver.conjugate_gradient_proj_steinmetz"><code class="docutils literal notranslate"><span class="pre">conjugate_gradient_proj_steinmetz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.sub_solver.spider_geometry"><code class="docutils literal notranslate"><span class="pre">spider_geometry()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="upoqa.utils.html#upoqa.utils.sub_solver.tangential_byrd_omojokun"><code class="docutils literal notranslate"><span class="pre">tangential_byrd_omojokun()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="UPOQA: Unconstrained Partially-separable Optimization by Quadratic Approximation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="upoqa.utils.html" class="btn btn-neutral float-right" title="upoqa.utils package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Yichuan Liu and Yingzhou Li.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

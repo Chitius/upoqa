@@ -1,0 +1,1033 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>upoqa.utils.interp_set &mdash; UPOQA v1.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=d29a5c0e"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            UPOQA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../upoqa.html">upoqa package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../upoqa.utils.html">upoqa.utils package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">UPOQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">upoqa.utils.interp_set</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for upoqa.utils.interp_set</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2025, Yichuan Liu and Yingzhou Li</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program. If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Interpolation Set</span>
+<span class="sd">=================</span>
+
+<span class="sd">Maintain two classes which represent the elemental and overall interpolation </span>
+<span class="sd">sets respectively.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;InterpSet&quot;</span><span class="p">,</span> <span class="s2">&quot;OverallInterpSet&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="InterpSet">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.interp_set.InterpSet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">InterpSet</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The interpolation set for a quadratic surrogate model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n : int</span>
+<span class="sd">        Problem dimension</span>
+<span class="sd">    npt : int, optional</span>
+<span class="sd">        Number of interpolation points. By default, it is set to ``2 * n + 1``.</span>
+<span class="sd">        If the user provides a custom value, it should fall within the range</span>
+<span class="sd">        ``[2 * n + 1, (n + 1) * (n + 2) / 2]``.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n : int</span>
+<span class="sd">        Problem dimension</span>
+<span class="sd">    npt : int</span>
+<span class="sd">        Number of interpolation points. By default, it is set to ``2 * n + 1``.</span>
+<span class="sd">    interp_set_Y : ndarray, shape (npt, n)</span>
+<span class="sd">        Interpolation points</span>
+<span class="sd">    interp_set_fval : ndarray, shape (npt,)</span>
+<span class="sd">        Objective function values at the interpolation points</span>
+<span class="sd">    x_opt_idx : int</span>
+<span class="sd">        Index of the interpolation point with the lowest objective function value.</span>
+<span class="sd">    x_anchor_idx : int</span>
+<span class="sd">        Index of the interpolation point used as the center for solving the trust region</span>
+<span class="sd">        subproblem.</span>
+<span class="sd">    x_opt</span>
+<span class="sd">        See :attr:`~InterpSet.x_opt` property</span>
+<span class="sd">    x_anchor</span>
+<span class="sd">        See :attr:`~InterpSet.x_anchor` property</span>
+<span class="sd">    f_opt</span>
+<span class="sd">        See :attr:`~InterpSet.f_opt` property</span>
+<span class="sd">    f_anchor</span>
+<span class="sd">        See :attr:`~InterpSet.f_anchor` property</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">npt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">npt</span> <span class="o">=</span> <span class="n">npt</span> <span class="ow">or</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">npt</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">npt</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">npt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">))</span>  <span class="c1"># interpolation set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">npt</span><span class="p">,))</span>  <span class="c1"># obj values</span>
+        <span class="c1"># the point with the lowest obj value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_opt_idx</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># the point that we actually use as a start point for geometry-improving</span>
+        <span class="c1"># and calculating trust region step</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_anchor_idx</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_update_idx</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">just_deleted_point</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_init_step_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="InterpSet.get_opt">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.interp_set.InterpSet.get_opt">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_opt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve the interpolation point with the lowest objective function value</span>
+<span class="sd">        from the interpolation set.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray, shape (n,)</span>
+<span class="sd">            Interpolation point with the lowest objective function value.</span>
+<span class="sd">        float</span>
+<span class="sd">            The lowest objective function value found in the interpolation set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_Y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_opt_idx</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="nb">float</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_opt_idx</span><span class="p">]</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InterpSet.get_anchor">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.interp_set.InterpSet.get_anchor">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_anchor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve the interpolation point used as the center for solving</span>
+<span class="sd">        the trust region subproblem.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray, shape (n,)</span>
+<span class="sd">            Interpolation point serving as the center for the trust region subproblem</span>
+<span class="sd">        float</span>
+<span class="sd">            Value of objective function at the anchor point</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_Y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_anchor_idx</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+            <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_anchor_idx</span><span class="p">]),</span>
+        <span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">x_opt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The interpolation point with the lowest objective function value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_Y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_opt_idx</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">x_anchor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The interpolation point serving as the center for the trust region subproblem</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_Y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_anchor_idx</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">f_opt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The lowest objective function value in the interpolation set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_opt_idx</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">f_anchor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        value of objective function at the anchor point (``self.x_anchor``)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_anchor_idx</span><span class="p">])</span>
+
+<div class="viewcode-block" id="InterpSet.update_x_opt">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.interp_set.InterpSet.update_x_opt">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_x_opt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the optimal interpolation point (``self.x_opt``) based on the current</span>
+<span class="sd">        objective function values in the interpolation set.</span>
+
+<span class="sd">        If ``self.x_anchor`` is None, it will be updated to ``self.x_opt``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_opt_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_anchor_idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_anchor_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_opt_idx</span></div>
+
+
+<div class="viewcode-block" id="InterpSet.get_interp_set">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.interp_set.InterpSet.get_interp_set">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_interp_set</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve the interpolation points or a single point at a specified index.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        idx : int, optional</span>
+<span class="sd">            Index of the interpolation point to retrieve. If not provided, return the</span>
+<span class="sd">            entire interpolation set.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray, shape (npt, n) or ndarray, shape (n,)</span>
+<span class="sd">            The interpolation set if ``idx`` is None, or the interpolation point at</span>
+<span class="sd">            the specified index ``idx``.</span>
+<span class="sd">        ndarray, shape (npt,) or float</span>
+<span class="sd">            Values of objective function for the interpolation set if ``idx`` is None,</span>
+<span class="sd">            or objective function value at the interpolation point with index ``idx``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_Y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_Y</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="InterpSet.update_point_on_idx">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.interp_set.InterpSet.update_point_on_idx">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_point_on_idx</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">fval</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">update_x_anchor</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Replace the interpolation point at index ``idx`` with a new point ``x`` and</span>
+<span class="sd">        update its corresponding function value ``fval``.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : ndarray, shape (n,)</span>
+<span class="sd">            The new point to be added to the interpolation set.</span>
+<span class="sd">        idx : int</span>
+<span class="sd">            The index of the point to be updated.</span>
+<span class="sd">        fval : float</span>
+<span class="sd">            The function value at ``x``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">update_x_anchor</span> <span class="ow">and</span> <span class="n">fval</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_anchor</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_anchor_idx</span> <span class="o">=</span> <span class="n">idx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">just_deleted_point</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_Y</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_Y</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">fval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_update_idx</span> <span class="o">=</span> <span class="n">idx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_x_opt</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="InterpSet.init_interp_set">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.interp_set.InterpSet.init_interp_set">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">init_interp_set</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">fun</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
+        <span class="n">center</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">step_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the interpolation set and computes the corresponding objective </span>
+<span class="sd">        function values.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fun : callable</span>
+<span class="sd">            A callable that takes a point in the interpolation set and returns its</span>
+<span class="sd">            objective function value.</span>
+
+<span class="sd">                ``fun(x: np.ndarray) -&gt; (ndarray | float)``</span>
+
+<span class="sd">            It should internally track its evaluation count and raise </span>
+<span class="sd">            :class:`~upoqa.utils.manager.MaxEvalNumReached` if the maximum number of </span>
+<span class="sd">            evaluations is exceeded, or ``ValueError`` if the function returns an </span>
+<span class="sd">            invalid value.</span>
+<span class="sd">        center: ndarray, shape (n,)</span>
+<span class="sd">            Center point around which the interpolation set is generated.</span>
+<span class="sd">        step_size: float, default=1.0</span>
+<span class="sd">            The step size used to generate interpolation points around the center point.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_anchor_idx</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_opt_idx</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_update_idx</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">just_deleted_point</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_init_step_size</span> <span class="o">=</span> <span class="n">step_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_interp_set_Y</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">step_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_interp_set_fval</span><span class="p">(</span><span class="n">fun</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_x_opt</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_interp_set_fval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fun</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update objective function values for all points in the interpolation set.</span>
+<span class="sd">        If ``run_in_parallel`` is True, the function evaluations will be performed in </span>
+<span class="sd">        parallel.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fun: callable</span>
+<span class="sd">            The objective function used to compute the function values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">npt</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">fun</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interp_set_Y</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+<div class="viewcode-block" id="InterpSet.set_interp_set_fval">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.interp_set.InterpSet.set_interp_set_fval">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_interp_set_fval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fvals</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set objective function values of the interpolation set to the provided values</span>
+<span class="sd">        ``fvals``.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fval : nd.array, shape (npt,)</span>
+<span class="sd">            The user-defined objective function values for the interpolation points.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fvals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">fvals</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,))</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="n">fvals</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">npt</span>
+        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;`fvals` should have the shape (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">npt</span><span class="si">}</span><span class="s2">,) instead of </span><span class="si">{</span><span class="n">fvals</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span> <span class="o">=</span> <span class="n">fvals</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_anchor_idx</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_x_opt</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="InterpSet.init_interp_set_Y">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.interp_set.InterpSet.init_interp_set_Y">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">init_interp_set_Y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">step_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the interpolation set.</span>
+
+<span class="sd">        The center point is set to ``center``, the next ``2n`` points are constructed</span>
+<span class="sd">        as a CFD (central finite difference) stencil, and the remaining points are</span>
+<span class="sd">        generated by combining previous points.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        center : ndarray of shape (n,)</span>
+<span class="sd">            Center point of the interpolation set. Must have size equal to the</span>
+<span class="sd">            problem dimension.</span>
+<span class="sd">        step_size : float, default=1.0</span>
+<span class="sd">            Step size used to generate interpolation points around the center.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        AssertionError</span>
+<span class="sd">            If ``center`` size does not match problem dimension</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+<span class="sd">        .. [1] Tom M. Ragonneau. *Model-Based Derivative-Free Optimization Methods</span>
+<span class="sd">            and Software*. PhD thesis, Department of Applied Mathematics, The Hong</span>
+<span class="sd">            Kong Polytechnic University, Hong Kong, China, 2022. URL:</span>
+<span class="sd">            https://theses.lib.polyu.edu.hk/handle/200/12294.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The interpolation set is constructed as follows:</span>
+<span class="sd">        </span>
+<span class="sd">        - Point 0: ``center``</span>
+<span class="sd">        - Points 1 to n: ``center + step_size * e_i``</span>
+<span class="sd">        - Points n+1 to 2*n: ``center - step_size * e_i``</span>
+<span class="sd">        - Points &gt; 2*n: combinations of previous points</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_step_size</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">step_size</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="n">center</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span>
+        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;`center` should have the size </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">x_opt</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s2"> instead of </span><span class="si">{</span><span class="n">center</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="n">center</span> <span class="o">=</span> <span class="n">center</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,))</span>
+        <span class="n">interp_stencil_set</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">npt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">npt</span><span class="p">):</span>
+            <span class="k">if</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">k</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">:</span>
+                <span class="n">interp_stencil_set</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_step_size</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">&lt;</span> <span class="n">k</span> <span class="o">&lt;=</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">:</span>
+                <span class="n">interp_stencil_set</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">init_step_size</span>
+            <span class="k">elif</span> <span class="n">k</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">:</span>
+                <span class="n">shift</span> <span class="o">=</span> <span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="n">k</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">shift</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="n">j</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">shift</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span>  <span class="c1"># j &lt; self.n</span>
+                <span class="n">interp_stencil_set</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">interp_stencil_set</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span>
+                <span class="n">interp_stencil_set</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">interp_stencil_set</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_Y</span> <span class="o">=</span> <span class="n">interp_stencil_set</span> <span class="o">+</span> <span class="n">center</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_anchor_idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_opt_idx</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="OverallInterpSet">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OverallInterpSet</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The interpolation set for an overall surrogate model of the partially separable form</span>
+<span class="sd">    :math:`m(x) = \sum_i m_i(x)`, where each :math:`m_i` is an element model.</span>
+
+<span class="sd">    Note that this interpolation set does not directly use the stored points to construct</span>
+<span class="sd">    the interpolation system; its primary functionality is to manage the elemental</span>
+<span class="sd">    interpolation sets.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n : int</span>
+<span class="sd">        Problem dimension</span>
+<span class="sd">    set_size : int</span>
+<span class="sd">        The initial number of points in the interpolation set</span>
+<span class="sd">    max_size : int</span>
+<span class="sd">        Maximum number of points that the interpolation set can hold</span>
+<span class="sd">    ele_interp_sets : dict</span>
+<span class="sd">        A dictionary of interpolation sets, one for each elemental surrogate model.</span>
+<span class="sd">    proj_onto_ele : callable</span>
+<span class="sd">        Projection function mapping full-space points to element subspaces:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            (full_point: ndarray, element_name: Any) -&gt; element_point: ndarray</span>
+
+<span class="sd">        For example, ``proj_onto_ele([1.0, 2.0], &quot;f_1&quot;)`` yields ``[1.0,]``, where</span>
+<span class="sd">        ``&quot;f_1&quot;`` denotes a function that depends only on the first variable of ``x``.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n : int</span>
+<span class="sd">        Problem dimension</span>
+<span class="sd">    ele_interp_sets : dict</span>
+<span class="sd">        A dictionary of interpolation sets, one for each element model.</span>
+<span class="sd">    proj_onto_ele : callable</span>
+<span class="sd">        Projection function mapping full-space points to element subspaces:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            (full_point: ndarray, element_name: Any) -&gt; element_point: ndarray</span>
+
+<span class="sd">        For example, ``proj_onto_ele([1.0, 2.0], &quot;f_1&quot;)`` yields ``[1.0,]``, where</span>
+<span class="sd">        ``&quot;f_1&quot;`` denotes a function that depends only on the first variable of ``x``.</span>
+<span class="sd">    ele_names : list</span>
+<span class="sd">        List of names for each element function</span>
+<span class="sd">    ele_idxs : list of int</span>
+<span class="sd">        List of indices corresponding to the element functions</span>
+<span class="sd">    npts : np.ndarray, shape (ele_num,)</span>
+<span class="sd">        Number of points in each elemental interpolation set</span>
+<span class="sd">    interp_set_Y : ndarray, shape (set_size, n)</span>
+<span class="sd">        Interpolation points for the overall surrogate model</span>
+<span class="sd">    interp_set_fval : ndarray, shape (set_size,)</span>
+<span class="sd">        Objective function values at the interpolation points for the overall surrogate model</span>
+<span class="sd">    interp_set_fval_eles : list of list of float</span>
+<span class="sd">        Values of element functions at the interpolation points for the overall surrogate model</span>
+<span class="sd">    interp_set_extra_fval : ndarray</span>
+<span class="sd">        Values of the extra objective function at the interpolation points for the overall</span>
+<span class="sd">        surrogate model. The &quot;extra function&quot; represents the differentiable white-box</span>
+<span class="sd">        component of the objective.</span>
+<span class="sd">    x_opt_idx : int</span>
+<span class="sd">        Index of the point with the lowest objective function value in the overall</span>
+<span class="sd">        interpolation set</span>
+<span class="sd">    enable : np.ndarray, shape (set_size,)</span>
+<span class="sd">        Boolean array indicating whether each point in the interpolation set is enabled</span>
+<span class="sd">        (True) or disabled (False).</span>
+<span class="sd">    ele_num</span>
+<span class="sd">        See :attr:`~OverallInterpSet.ele_num` property</span>
+<span class="sd">    set_size</span>
+<span class="sd">        See :attr:`~OverallInterpSet.set_size` property</span>
+<span class="sd">    disable</span>
+<span class="sd">        See :attr:`~OverallInterpSet.disable` property</span>
+<span class="sd">    capacity</span>
+<span class="sd">        See :attr:`~OverallInterpSet.capacity` property</span>
+<span class="sd">    unallocated_idx</span>
+<span class="sd">        See :attr:`~OverallInterpSet.unallocated_idx` property</span>
+<span class="sd">    allocated_idx</span>
+<span class="sd">        See :attr:`~OverallInterpSet.allocated_idx` property</span>
+<span class="sd">    x_opt</span>
+<span class="sd">        See :attr:`~OverallInterpSet.x_opt` property</span>
+<span class="sd">    f_opt</span>
+<span class="sd">        See :attr:`~OverallInterpSet.f_opt` property</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">set_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">max_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">ele_interp_sets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">InterpSet</span><span class="p">],</span>
+        <span class="n">proj_onto_ele</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+        <span class="n">ele_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ele_interp_sets</span> <span class="o">=</span> <span class="n">ele_interp_sets</span>
+
+        <span class="c1"># Store the names and indices of all element functions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ele_names</span> <span class="o">=</span> <span class="n">ele_names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ele_idxs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ele_names</span><span class="p">)))</span>
+
+        <span class="c1"># Number of points in each elemental interpolation set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">npts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">ele_interp_sets</span><span class="p">[</span><span class="n">ele_idx</span><span class="p">]</span><span class="o">.</span><span class="n">npt</span> <span class="k">for</span> <span class="n">ele_idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ele_idxs</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Initialize the interpolation set with placeholder values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">set_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">set_size</span><span class="p">,))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="c1"># Values of element functions at the interpolation points</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval_eles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="kc">None</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ele_idxs</span><span class="p">]</span>
+        <span class="p">]</span> <span class="o">*</span> <span class="n">set_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_extra_fval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+            <span class="n">set_size</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># Flags indicating whether each point is enabled in the interpolation set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">set_size</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+
+        <span class="c1"># Index of the point with the lowest objective function value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_opt_idx</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># Function to project a point onto the subspace of a specified element function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proj_onto_ele</span> <span class="o">=</span> <span class="n">proj_onto_ele</span>
+        <span class="k">assert</span> <span class="nb">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">proj_onto_ele</span><span class="p">)</span>
+        <span class="c1"># Ensure the maximum size of the interpolation set is at least twice the initial size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_size</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_size</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ele_num</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of elements&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ele_idxs</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of currently enabled points in the interpolation set&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">enable</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">disable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Boolean array indicating which points are disabled in the interpolation set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">enable</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">capacity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Total capacity of the interpolation set, including enabled and disabled</span>
+<span class="sd">        points.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">enable</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unallocated_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Indices of unallocated (disabled) points in the interpolation set&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">enable</span> <span class="o">==</span> <span class="kc">False</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">allocated_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Indices of allocated (enabled) points in the interpolation set&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">enable</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_enlarge_capacity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Double the capacity of the overall interpolation set by appending new points</span>
+<span class="sd">        with placeholder values. This is used to dynamically expand the interpolation set</span>
+<span class="sd">        when the current capacity is insufficient.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">enlarge_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">capacity</span>
+        <span class="c1"># Append new points to the interpolation set with placeholder values</span>
+        <span class="n">appended_interp_set_Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">enlarge_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interp_set_Y</span><span class="p">,</span> <span class="n">appended_interp_set_Y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">appended_interp_set_fval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">enlarge_size</span><span class="p">,))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span><span class="p">,</span> <span class="n">appended_interp_set_fval</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval_eles</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval_eles</span>
+            <span class="o">+</span> <span class="p">[</span>
+                <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ele_idxs</span><span class="p">],</span>
+            <span class="p">]</span>
+            <span class="o">*</span> <span class="n">enlarge_size</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_extra_fval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_extra_fval</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">enlarge_size</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">enable</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">enlarge_size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">))</span>
+
+<div class="viewcode-block" id="OverallInterpSet.append">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.append">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">append</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">fval</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">fval_eles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">extra_fval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a new point and its associated function values to the interpolation set.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : ndarray, shape (n,)</span>
+<span class="sd">            The point to be added to the interpolation set</span>
+<span class="sd">        fval : float</span>
+<span class="sd">            Value of objective function at ``x``</span>
+<span class="sd">        fval_eles : list of float</span>
+<span class="sd">            Values of element functions at ``x``</span>
+<span class="sd">        extra_fval : float, default=0.0</span>
+<span class="sd">            Value of extra objective function at ``x``.</span>
+<span class="sd">            The &quot;extra function&quot; represents the differentiable white-box component</span>
+<span class="sd">            of the objective.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray</span>
+<span class="sd">            The index (or indices) where the point and its values were stored in the</span>
+<span class="sd">            interpolation set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Find indices of unallocated (disabled) points in the interpolation set</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unallocated_idx</span>
+        <span class="c1"># If no unallocated points are available, enlarge the capacity of the interpolation set</span>
+        <span class="k">if</span> <span class="n">ind</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_enlarge_capacity</span><span class="p">()</span>
+            <span class="n">ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unallocated_idx</span>
+        <span class="c1"># Save the point and its function values at the first available index</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="n">ind</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_Y</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">fval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval_eles</span><span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">fval_eles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_extra_fval</span><span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">extra_fval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># Update the index of the point with the lowest objective function value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_x_opt</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">ind</span></div>
+
+
+<div class="viewcode-block" id="OverallInterpSet.get_ele_fvals">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.get_ele_fvals">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_ele_fvals</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="kc">None</span><span class="p">]]],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve the element function values and the extra function value at a specific</span>
+<span class="sd">        index in the interpolation set.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        idx : int</span>
+<span class="sd">            Index of the point in the interpolation set</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of float or None</span>
+<span class="sd">            Values of element functions at the interpolation point of the specified index.</span>
+<span class="sd">            If the point does not exist, return None.</span>
+<span class="sd">        float or None</span>
+<span class="sd">            Value of the extra function at the interpolation point of the specified index.</span>
+<span class="sd">            If the point does not exist, return None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval_eles</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_extra_fval</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="OverallInterpSet.get_opt">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.get_opt">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_opt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
+        <span class="n">Tuple</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+        <span class="n">Tuple</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+        <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+        <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
+    <span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve the interpolation point with the lowest objective function value and</span>
+<span class="sd">        its associated data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        verbose : bool, default=False</span>
+<span class="sd">            If True, return additional information including the element function values</span>
+<span class="sd">            and the extra function value.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        x_opt : ndarray, shape (n,)</span>
+<span class="sd">            Interpolation point with the lowest objective function value</span>
+<span class="sd">        f_opt : float</span>
+<span class="sd">            The lowest objective function value found in the interpolation set</span>
+<span class="sd">        fval_eles : list of float, optional</span>
+<span class="sd">            Values of element functions at the optimal point, if ``verbose=True``.</span>
+<span class="sd">        extra_fval : float, optional</span>
+<span class="sd">            Value of the extra function at the optimal point, if ``verbose=True``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_opt_idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_Y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_opt_idx</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+                <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_opt_idx</span><span class="p">]),</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fvals</span><span class="p">,</span> <span class="n">extra_fval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ele_fvals</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_opt_idx</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_Y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_opt_idx</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+                <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_opt_idx</span><span class="p">]),</span>
+                <span class="n">fvals</span><span class="p">,</span>
+                <span class="n">extra_fval</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">x_opt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Interpolation point with the lowest objective function value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_Y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_opt_idx</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">f_opt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Lowest objective function value in the interpolation set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_opt_idx</span><span class="p">])</span>
+
+<div class="viewcode-block" id="OverallInterpSet.update_x_opt">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.update_x_opt">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_x_opt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the optimal interpolation point (``self.x_opt``) based on the current</span>
+<span class="sd">        objective function values in the interpolation set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_opt_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="OverallInterpSet.update_fval_with_new_weights_and_xforms">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.update_fval_with_new_weights_and_xforms">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_fval_with_new_weights_and_xforms</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">weights</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">xforms</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]]],</span>
+        <span class="n">extra_fun_eval</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update all objective function values in the interpolation set based on new weights</span>
+<span class="sd">        and transformations.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        weights : ndarray, shape (ele_num,)</span>
+<span class="sd">            Weights applied to the element function values</span>
+<span class="sd">        xforms : list of list of callables</span>
+<span class="sd">            A list of transformations applied to the element function values. Each</span>
+<span class="sd">            transformation is a callable function or None if no transformation is applied.</span>
+<span class="sd">        extra_fun_eval : callable</span>
+<span class="sd">            The &quot;extra function&quot; included in the objective function, representing the</span>
+<span class="sd">            differentiable white-box component of the objective:</span>
+
+<span class="sd">                ``extra_fun_eval(x: ndarray) -&gt; float``</span>
+
+<span class="sd">            where ``x`` is a 1-D array with shape (n,).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the optimal point (``x_opt``) changes after the update, otherwise False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">allocated_idx</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">for</span> <span class="n">ele_idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ele_idxs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">xforms</span><span class="p">[</span><span class="n">ele_idx</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">value_ele</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">xforms</span><span class="p">[</span><span class="n">ele_idx</span><span class="p">][</span><span class="mi">0</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval_eles</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="n">ele_idx</span><span class="p">])</span>
+                        <span class="o">*</span> <span class="n">weights</span><span class="p">[</span><span class="n">ele_idx</span><span class="p">]</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">value_ele</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">weights</span><span class="p">[</span><span class="n">ele_idx</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval_eles</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="n">ele_idx</span><span class="p">]</span>
+                    <span class="p">)</span>
+                <span class="n">value</span> <span class="o">+=</span> <span class="n">value_ele</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_extra_fval</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">extra_fun_eval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interp_set_Y</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_extra_fval</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="n">old_x_opt_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_opt_idx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_x_opt</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">old_x_opt_idx</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_opt_idx</span></div>
+
+
+<div class="viewcode-block" id="OverallInterpSet.get_interp_set">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.get_interp_set">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_interp_set</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve the interpolation points or a single point at a specific index.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        idx : int, optional</span>
+<span class="sd">            Index of the interpolation point to retrieve. If None, return the entire</span>
+<span class="sd">            interpolation set.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray, shape (set_size, n) or ndarray, shape (n,)</span>
+<span class="sd">            The interpolation point set if ``idx`` is None, or the interpolation point at</span>
+<span class="sd">            the specified index ``idx``.</span>
+<span class="sd">        ndarray, shape (set_size,) or float</span>
+<span class="sd">            Objective function values at the interpolation points if ``idx`` is None,</span>
+<span class="sd">            or objective function value at the interpolation point with index ``idx``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_Y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_Y</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="OverallInterpSet.delete_points">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.delete_points">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delete_idx</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete specified points from the interpolation set.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        delete_idx : array_like or int</span>
+<span class="sd">            Indices (or a single index) of the points to delete from the interpolation set.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        RuntimeWarning</span>
+<span class="sd">            If attempting to delete a point that does not exist in the interpolation set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">disable</span><span class="p">[</span><span class="n">delete_idx</span><span class="p">]):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;(Overall Interp Set) You&#39;re trying to delete a point that does not exist!&quot;</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">delete_idx</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">delete_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">delete_idx</span><span class="p">,</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">delete_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">delete_idx</span><span class="p">)</span>
+        <span class="n">deleted_num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">delete_idx</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_Y</span><span class="p">[</span><span class="n">delete_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">deleted_num</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span><span class="p">[</span><span class="n">delete_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">delete_idx</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval_eles</span><span class="p">[</span><span class="n">delete_idx</span><span class="p">[</span><span class="n">idx</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ele_idxs</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_extra_fval</span><span class="p">[</span><span class="n">delete_idx</span><span class="p">[</span><span class="n">idx</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable</span><span class="p">[</span><span class="n">delete_idx</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_x_opt</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="OverallInterpSet.clear">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.clear">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clear the entire interpolation set, resetting all points and associated data to</span>
+<span class="sd">        their default values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">set_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_Y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">set_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">set_size</span><span class="p">,))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval_eles</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ele_idxs</span><span class="p">],</span>
+        <span class="p">]</span> <span class="o">*</span> <span class="n">set_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_extra_fval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">set_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">set_size</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_opt_idx</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="OverallInterpSet.clear_invalid_point">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.clear_invalid_point">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_invalid_point</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete the worst points from the interpolation set to ensure the number of</span>
+<span class="sd">        maintained points does not exceed ``self.max_size``.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Points are deleted based on their objective function values, with the worst</span>
+<span class="sd">        (highest) values being removed first.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_size</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_size</span><span class="p">:</span>
+            <span class="n">to_be_deleted_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span><span class="p">,</span>
+            <span class="p">)[</span>
+                <span class="mi">0</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_size</span>
+            <span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">max_size</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_size</span> <span class="p">:]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">delete_points</span><span class="p">(</span><span class="n">to_be_deleted_idx</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OverallInterpSet.clear_with_only_one_left">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.clear_with_only_one_left">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_with_only_one_left</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete all but the optimal point from the interpolation set, leaving only one point.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The optimal point is determined by the lowest objective function value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">to_be_deleted_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">interp_set_fval</span><span class="p">,</span>
+            <span class="p">)[</span>
+                <span class="mi">0</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_size</span>
+            <span class="p">][</span><span class="mi">0</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">delete_points</span><span class="p">(</span><span class="n">to_be_deleted_idx</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OverallInterpSet.update_point_on_idx">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.interp_set.OverallInterpSet.update_point_on_idx">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_point_on_idx</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">idx_eles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">fval_eles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">fval</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">extra_fval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">need_update</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the interpolation set with a new point, including its element function</span>
+<span class="sd">        values and overall objective function value.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : ndarray</span>
+<span class="sd">            New point to be added to the interpolation set</span>
+<span class="sd">        idx_eles : list of int</span>
+<span class="sd">            Point indices in the elemental interpolation sets corresponding to the new point.</span>
+<span class="sd">        fval_eles : list of float</span>
+<span class="sd">            Element function values at the new point</span>
+<span class="sd">        fval : float</span>
+<span class="sd">            Overall objective function value at the new point</span>
+<span class="sd">        extra_fval : float, default=0.0</span>
+<span class="sd">            Extra objective function value at the new point.</span>
+<span class="sd">            The &quot;extra function&quot; represents the differentiable white-box component</span>
+<span class="sd">            of the objective.</span>
+<span class="sd">        need_update : list of bool, optional</span>
+<span class="sd">            List of boolean flags indicating which elemental interpolation sets should</span>
+<span class="sd">            be updated. If None, all elemental sets are updated. Default is None.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            The index of the updated point in the overall interpolation set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">need_update</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">need_update</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ele_idxs</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">ele_idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ele_idxs</span><span class="p">:</span>
+            <span class="n">interp_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ele_interp_sets</span><span class="p">[</span><span class="n">ele_idx</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">need_update</span><span class="p">[</span><span class="n">ele_idx</span><span class="p">]:</span>
+                <span class="n">interp_set</span><span class="o">.</span><span class="n">update_point_on_idx</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">proj_onto_ele</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ele_idx</span><span class="p">),</span>
+                    <span class="n">idx_eles</span><span class="p">[</span><span class="n">ele_idx</span><span class="p">],</span>
+                    <span class="n">fval_eles</span><span class="p">[</span><span class="n">ele_idx</span><span class="p">],</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">fval</span><span class="p">,</span> <span class="n">fval_eles</span><span class="p">,</span> <span class="n">extra_fval</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Yichuan Liu and Yingzhou Li.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

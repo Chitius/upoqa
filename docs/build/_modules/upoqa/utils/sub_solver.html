@@ -1,0 +1,810 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>upoqa.utils.sub_solver &mdash; UPOQA v1.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=d29a5c0e"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            UPOQA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../upoqa.html">upoqa package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../upoqa.utils.html">upoqa.utils package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">UPOQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">upoqa.utils.sub_solver</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for upoqa.utils.sub_solver</h1><div class="highlight"><pre>
+<span></span><span class="c1"># This file contains modified code from COBYQA (https://github.com/cobyqa/cobyqa)</span>
+<span class="c1"># which is licensed under the BSD 3-Clause License:</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2021-2025, Tom M. Ragonneau and Zaikun Zhang</span>
+<span class="c1"># All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Redistribution and use in source and binary forms, with or without</span>
+<span class="c1"># modification, are permitted provided that the following conditions are met:</span>
+<span class="c1">#</span>
+<span class="c1"># 1. Redistributions of source code must retain the above copyright notice, this</span>
+<span class="c1">#    list of conditions and the following disclaimer.</span>
+<span class="c1">#</span>
+<span class="c1"># 2. Redistributions in binary form must reproduce the above copyright notice,</span>
+<span class="c1">#    this list of conditions and the following disclaimer in the documentation</span>
+<span class="c1">#    and/or other materials provided with the distribution.</span>
+<span class="c1">#</span>
+<span class="c1"># 3. Neither the name of the copyright holder nor the names of its</span>
+<span class="c1">#    contributors may be used to endorse or promote products derived from</span>
+<span class="c1">#    this software without specific prior written permission.</span>
+<span class="c1">#</span>
+<span class="c1"># THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</span>
+<span class="c1"># AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</span>
+<span class="c1"># IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</span>
+<span class="c1"># DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</span>
+<span class="c1"># FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</span>
+<span class="c1"># DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</span>
+<span class="c1"># SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</span>
+<span class="c1"># CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</span>
+<span class="c1"># OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</span>
+<span class="c1"># OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="c1">#</span>
+<span class="c1"># The modifications to this file and the overall project are licensed under the</span>
+<span class="c1"># GNU General Public License v3.0 (GPLv3). See the project&#39;s LICENSE file for</span>
+<span class="c1"># the full GPLv3 terms.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Trust Region Subproblem Solver</span>
+<span class="sd">==============================</span>
+
+<span class="sd">Implement several sub-routines for approximately solving trust-region sub-problems </span>
+<span class="sd">that arise in derivative-free optimization with partially separable structures:</span>
+
+<span class="sd">* ``cauchy_geometry`` / ``spider_geometry`` : geometry-improving steps along</span>
+<span class="sd">  Cauchy / straight-line directions.</span>
+<span class="sd">* ``tangential_byrd_omojokun`` : truncated conjugate-gradient step on the</span>
+<span class="sd">  tangential space.</span>
+<span class="sd">* ``conjugate_gradient_proj_steinmetz`` : modified projected CG for structured</span>
+<span class="sd">  trust-regions using steinmetz projections.</span>
+
+<span class="sd">The ``cauchy_geometry``, ``spider_geometry``, and ``tangential_byrd_omojokun`` solvers </span>
+<span class="sd">are drawn from the `COBYQA &lt;https://github.com/cobyqa/cobyqa/&gt;`_ library; see the </span>
+<span class="sd">original implementation at </span>
+<span class="sd">`here &lt;https://github.com/cobyqa/cobyqa/blob/main/cobyqa/subsolvers/&gt;`_.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">LA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.projection</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;cauchy_geometry&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;spider_geometry&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;tangential_byrd_omojokun&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;conjugate_gradient_proj_steinmetz&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">float_tiny</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">tiny</span>
+<span class="n">float_eps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+
+
+<div class="viewcode-block" id="cauchy_geometry">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.sub_solver.cauchy_geometry">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cauchy_geometry</span><span class="p">(</span><span class="n">const</span><span class="p">,</span> <span class="n">grad</span><span class="p">,</span> <span class="n">curv</span><span class="p">,</span> <span class="n">delta</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Maximize approximately the absolute value of a quadratic function subject</span>
+<span class="sd">    to bound constraints in a trust region.</span>
+
+<span class="sd">    This function solves approximately</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \max_{s \in \mathbb{R}^n} \quad \bigg\lvert c + g^{\mathsf{T}} s +</span>
+<span class="sd">        \frac{1}{2} s^{\mathsf{T}} H s \bigg\rvert \quad \text{s.t.} \quad</span>
+<span class="sd">        \left\{ \begin{array}{l}</span>
+<span class="sd">            l \le s \le u,\\</span>
+<span class="sd">            \lVert s \rVert \le \Delta,</span>
+<span class="sd">        \end{array} \right.</span>
+
+<span class="sd">    by maximizing the objective function along the constrained Cauchy</span>
+<span class="sd">    direction.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    const : float</span>
+<span class="sd">        Constant :math:`c` as shown above.</span>
+<span class="sd">    grad : ndarray, shape (n,)</span>
+<span class="sd">        Gradient :math:`g` as shown above.</span>
+<span class="sd">    curv : callable</span>
+<span class="sd">        Curvature of :math:`H` along any vector.</span>
+
+<span class="sd">            ``curv(s) -&gt; float``</span>
+
+<span class="sd">        returns :math:`s^{\mathsf{T}} H s`.</span>
+<span class="sd">    delta : float</span>
+<span class="sd">        Trust-region radius :math:`\Delta` as shown above.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ndarray, shape (n,)</span>
+<span class="sd">        Approximate solution :math:`s`.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function is described as the first alternative in Section 6.5 of [1]_.</span>
+<span class="sd">    It is assumed that the origin is feasible with respect to the bound</span>
+<span class="sd">    constraints and that ``delta`` is finite and positive.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Tom M. Ragonneau. *Model-Based Derivative-Free Optimization Methods</span>
+<span class="sd">       and Software*. PhD thesis, Department of Applied Mathematics, The Hong</span>
+<span class="sd">       Kong Polytechnic University, Hong Kong, China, 2022. URL:</span>
+<span class="sd">       https://theses.lib.polyu.edu.hk/handle/200/12294.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># To maximize the absolute value of a quadratic function, we maximize the</span>
+    <span class="c1"># function itself or its negative, and we choose the solution that provides</span>
+    <span class="c1"># the largest function value.</span>
+    <span class="n">step1</span><span class="p">,</span> <span class="n">q_val1</span> <span class="o">=</span> <span class="n">_cauchy_geom</span><span class="p">(</span><span class="n">const</span><span class="p">,</span> <span class="n">grad</span><span class="p">,</span> <span class="n">curv</span><span class="p">,</span> <span class="n">delta</span><span class="p">)</span>
+    <span class="n">step2</span><span class="p">,</span> <span class="n">q_val2</span> <span class="o">=</span> <span class="n">_cauchy_geom</span><span class="p">(</span><span class="o">-</span><span class="n">const</span><span class="p">,</span> <span class="o">-</span><span class="n">grad</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="o">-</span><span class="n">curv</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">delta</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">step1</span> <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">q_val1</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">q_val2</span><span class="p">)</span> <span class="k">else</span> <span class="n">step2</span></div>
+
+
+
+<div class="viewcode-block" id="spider_geometry">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.sub_solver.spider_geometry">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">spider_geometry</span><span class="p">(</span><span class="n">const</span><span class="p">,</span> <span class="n">grad</span><span class="p">,</span> <span class="n">curv</span><span class="p">,</span> <span class="n">xpt</span><span class="p">,</span> <span class="n">delta</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Maximize approximately the absolute value of a quadratic function subject</span>
+<span class="sd">    to bound constraints in a trust region.</span>
+
+<span class="sd">    This function solves approximately</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \max_{s \in \mathbb{R}^n} \quad \bigg\lvert c + g^{\mathsf{T}} s +</span>
+<span class="sd">        \frac{1}{2} s^{\mathsf{T}} H s \bigg\rvert \quad \text{s.t.} \quad</span>
+<span class="sd">        \left\{ \begin{array}{l}</span>
+<span class="sd">            l \le s \le u,\\</span>
+<span class="sd">            \lVert s \rVert \le \Delta,</span>
+<span class="sd">        \end{array} \right.</span>
+
+<span class="sd">    by maximizing the objective function along given straight lines.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    const : float</span>
+<span class="sd">        Constant :math:`c` as shown above.</span>
+<span class="sd">    grad : ndarray, shape (n,)</span>
+<span class="sd">        Gradient :math:`g` as shown above.</span>
+<span class="sd">    curv : callable</span>
+<span class="sd">        Curvature of :math:`H` along any vector.</span>
+
+<span class="sd">            ``curv(s) -&gt; float``</span>
+
+<span class="sd">        returns :math:`s^{\mathsf{T}} H s`.</span>
+<span class="sd">    xpt : ndarray, shape (npt, n)</span>
+<span class="sd">        Points defining the straight lines. The straight lines considered are</span>
+<span class="sd">        the ones passing through the origin and the points in ``xpt``.</span>
+<span class="sd">    delta : float</span>
+<span class="sd">        Trust-region radius :math:`\Delta` as shown above.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ndarray, shape (n,)</span>
+<span class="sd">        Approximate solution :math:`s`.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function is described as the second alternative in Section 6.5 of</span>
+<span class="sd">    [1]_. It is assumed that the origin is feasible with respect to the bound</span>
+<span class="sd">    constraints and that ``delta`` is finite and positive.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Tom M. Ragonneau. *Model-Based Derivative-Free Optimization Methods</span>
+<span class="sd">       and Software*. PhD thesis, Department of Applied Mathematics, The Hong</span>
+<span class="sd">       Kong Polytechnic University, Hong Kong, China, 2022. URL:</span>
+<span class="sd">       https://theses.lib.polyu.edu.hk/handle/200/12294.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Iterate through the straight lines.</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">grad</span><span class="p">)</span>
+    <span class="n">q_val</span> <span class="o">=</span> <span class="n">const</span>
+    <span class="n">xpt_norms</span> <span class="o">=</span> <span class="n">LA</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">xpt</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">npt</span> <span class="o">=</span> <span class="n">xpt</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">npt</span><span class="p">):</span>
+        <span class="c1"># Set alpha_tr to the step size for the trust-region constraint.</span>
+        <span class="k">if</span> <span class="n">xpt_norms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">float_tiny</span> <span class="o">*</span> <span class="n">delta</span><span class="p">:</span>
+            <span class="n">alpha_tr</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">delta</span> <span class="o">/</span> <span class="n">xpt_norms</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># The current straight line is basically zero.</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># Set alpha_quad_pos and alpha_quad_neg to the step size to the extrema</span>
+        <span class="c1"># of the quadratic function along the positive and negative directions.</span>
+        <span class="n">grad_step</span> <span class="o">=</span> <span class="n">grad</span> <span class="o">@</span> <span class="n">xpt</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">curv_step</span> <span class="o">=</span> <span class="n">curv</span><span class="p">(</span><span class="n">xpt</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+        <span class="n">tiny_grad</span> <span class="o">=</span> <span class="n">float_tiny</span> <span class="o">*</span> <span class="n">grad_step</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">grad_step</span> <span class="o">&gt;=</span> <span class="mf">0.0</span>
+            <span class="ow">and</span> <span class="n">curv_step</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">tiny_grad</span>
+            <span class="ow">or</span> <span class="n">grad_step</span> <span class="o">&lt;=</span> <span class="mf">0.0</span>
+            <span class="ow">and</span> <span class="n">curv_step</span> <span class="o">&gt;</span> <span class="o">-</span><span class="n">tiny_grad</span>
+        <span class="p">):</span>
+            <span class="n">alpha_quad_pos</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="n">grad_step</span> <span class="o">/</span> <span class="n">curv_step</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">alpha_quad_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">grad_step</span> <span class="o">&gt;=</span> <span class="mf">0.0</span>
+            <span class="ow">and</span> <span class="n">curv_step</span> <span class="o">&gt;</span> <span class="n">tiny_grad</span>
+            <span class="ow">or</span> <span class="n">grad_step</span> <span class="o">&lt;=</span> <span class="mf">0.0</span>
+            <span class="ow">and</span> <span class="n">curv_step</span> <span class="o">&lt;</span> <span class="n">tiny_grad</span>
+        <span class="p">):</span>
+            <span class="n">alpha_quad_neg</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="o">-</span><span class="n">grad_step</span> <span class="o">/</span> <span class="n">curv_step</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">alpha_quad_neg</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+
+        <span class="c1"># Select the step that provides the largest value of the objective</span>
+        <span class="c1"># function if it improves the current best. The best positive step is</span>
+        <span class="c1"># either the one that reaches the constraints or the one that reaches</span>
+        <span class="c1"># the extremum of the objective function along the current direction</span>
+        <span class="c1"># (only possible if the resulting step is feasible). We test both, and</span>
+        <span class="c1"># we perform similar calculations along the negative step.</span>
+        <span class="c1"># N.B.: we select the largest possible step among all the ones that</span>
+        <span class="c1"># maximize the objective function. This is to avoid returning the zero</span>
+        <span class="c1"># step in some extreme cases.</span>
+        <span class="n">alpha_pos</span><span class="p">,</span> <span class="n">alpha_neg</span> <span class="o">=</span> <span class="n">alpha_tr</span><span class="p">,</span> <span class="o">-</span><span class="n">alpha_tr</span>
+        <span class="n">alpha_tr_pow_curv</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">alpha_tr</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">curv_step</span>
+        <span class="n">q_val_pos</span> <span class="o">=</span> <span class="n">const</span> <span class="o">+</span> <span class="n">alpha_pos</span> <span class="o">*</span> <span class="n">grad_step</span> <span class="o">+</span> <span class="n">alpha_tr_pow_curv</span>
+        <span class="n">q_val_neg</span> <span class="o">=</span> <span class="n">const</span> <span class="o">+</span> <span class="n">alpha_neg</span> <span class="o">*</span> <span class="n">grad_step</span> <span class="o">+</span> <span class="n">alpha_tr_pow_curv</span>
+        <span class="k">if</span> <span class="n">alpha_quad_pos</span> <span class="o">&lt;</span> <span class="n">alpha_pos</span><span class="p">:</span>
+            <span class="n">q_val_quad_pos</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">const</span>
+                <span class="o">-</span> <span class="n">alpha_quad_pos</span> <span class="o">*</span> <span class="n">grad_step</span>
+                <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">alpha_quad_pos</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">curv_step</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">q_val_quad_pos</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">q_val_pos</span><span class="p">):</span>
+                <span class="n">alpha_pos</span> <span class="o">=</span> <span class="n">alpha_quad_pos</span>
+                <span class="n">q_val_pos</span> <span class="o">=</span> <span class="n">q_val_quad_pos</span>
+        <span class="k">if</span> <span class="n">alpha_quad_neg</span> <span class="o">&gt;</span> <span class="n">alpha_neg</span><span class="p">:</span>
+            <span class="n">q_val_quad_neg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">const</span>
+                <span class="o">-</span> <span class="n">alpha_quad_neg</span> <span class="o">*</span> <span class="n">grad_step</span>
+                <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">alpha_quad_neg</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">curv_step</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">q_val_quad_neg</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">q_val_neg</span><span class="p">):</span>
+                <span class="n">alpha_neg</span> <span class="o">=</span> <span class="n">alpha_quad_neg</span>
+                <span class="n">q_val_neg</span> <span class="o">=</span> <span class="n">q_val_quad_neg</span>
+        <span class="n">abs_q_val_pos</span><span class="p">,</span> <span class="n">abs_q_val_neg</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">q_val_pos</span><span class="p">),</span> <span class="nb">abs</span><span class="p">(</span><span class="n">q_val_neg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">abs_q_val_pos</span> <span class="o">&gt;=</span> <span class="n">abs_q_val_neg</span> <span class="ow">and</span> <span class="n">abs_q_val_pos</span> <span class="o">&gt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">q_val</span><span class="p">):</span>
+            <span class="n">step</span> <span class="o">=</span> <span class="n">alpha_pos</span> <span class="o">*</span> <span class="n">xpt</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="n">q_val</span> <span class="o">=</span> <span class="n">q_val_pos</span>
+        <span class="k">elif</span> <span class="n">abs_q_val_neg</span> <span class="o">&gt;</span> <span class="n">abs_q_val_pos</span> <span class="ow">and</span> <span class="n">abs_q_val_neg</span> <span class="o">&gt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">q_val</span><span class="p">):</span>
+            <span class="n">step</span> <span class="o">=</span> <span class="n">alpha_neg</span> <span class="o">*</span> <span class="n">xpt</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="n">q_val</span> <span class="o">=</span> <span class="n">q_val_neg</span>
+
+    <span class="k">return</span> <span class="n">step</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_cauchy_geom</span><span class="p">(</span><span class="n">const</span><span class="p">,</span> <span class="n">grad</span><span class="p">,</span> <span class="n">curv</span><span class="p">,</span> <span class="n">delta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Same as ``bound_constrained_cauchy_step`` without the absolute value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Calculate the initial active set.</span>
+    <span class="n">fixed_xl</span> <span class="o">=</span> <span class="n">grad</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
+    <span class="n">fixed_xu</span> <span class="o">=</span> <span class="n">grad</span> <span class="o">&lt;</span> <span class="mf">0.0</span>
+
+    <span class="c1"># Calculate the Cauchy step.</span>
+    <span class="n">cauchy_step</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">grad</span><span class="p">)</span>
+    <span class="n">cauchy_step</span><span class="p">[</span><span class="n">fixed_xl</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+    <span class="n">cauchy_step</span><span class="p">[</span><span class="n">fixed_xu</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+    <span class="k">if</span> <span class="n">LA</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">cauchy_step</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">delta</span><span class="p">:</span>
+        <span class="n">working</span> <span class="o">=</span> <span class="n">fixed_xl</span> <span class="o">|</span> <span class="n">fixed_xu</span>
+        <span class="c1"># Calculate the Cauchy step for the directions in the working set.</span>
+        <span class="n">g_norm</span> <span class="o">=</span> <span class="n">LA</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">grad</span><span class="p">[</span><span class="n">working</span><span class="p">])</span>
+        <span class="n">delta_reduced</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+            <span class="n">delta</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">inner</span><span class="p">(</span><span class="n">cauchy_step</span><span class="p">[</span><span class="o">~</span><span class="n">working</span><span class="p">],</span> <span class="n">cauchy_step</span><span class="p">[</span><span class="o">~</span><span class="n">working</span><span class="p">])</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">g_norm</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">tiny</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">delta_reduced</span><span class="p">):</span>
+            <span class="n">mu</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">delta_reduced</span> <span class="o">/</span> <span class="n">g_norm</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+            <span class="n">cauchy_step</span><span class="p">[</span><span class="n">working</span><span class="p">]</span> <span class="o">=</span> <span class="n">mu</span> <span class="o">*</span> <span class="n">grad</span><span class="p">[</span><span class="n">working</span><span class="p">]</span>
+
+    <span class="c1"># Calculate the step that maximizes the quadratic along the Cauchy step.</span>
+    <span class="n">grad_step</span> <span class="o">=</span> <span class="n">grad</span> <span class="o">@</span> <span class="n">cauchy_step</span>
+    <span class="k">if</span> <span class="n">grad_step</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="c1"># Set alpha_tr to the step size for the trust-region constraint.</span>
+        <span class="n">s_norm</span> <span class="o">=</span> <span class="n">LA</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">cauchy_step</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">s_norm</span> <span class="o">&gt;</span> <span class="n">float_tiny</span> <span class="o">*</span> <span class="n">delta</span><span class="p">:</span>
+            <span class="n">alpha_tr</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">delta</span> <span class="o">/</span> <span class="n">s_norm</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># The Cauchy step is basically zero.</span>
+            <span class="n">alpha_tr</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="c1"># Set alpha_quad to the step size for the maximization problem.</span>
+        <span class="n">curv_step</span> <span class="o">=</span> <span class="n">curv</span><span class="p">(</span><span class="n">cauchy_step</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">curv_step</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">float_tiny</span> <span class="o">*</span> <span class="n">grad_step</span><span class="p">:</span>
+            <span class="n">alpha_quad</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="n">grad_step</span> <span class="o">/</span> <span class="n">curv_step</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">alpha_quad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+
+        <span class="c1"># Calculate the solution and the corresponding function value.</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">alpha_tr</span><span class="p">,</span> <span class="n">alpha_quad</span><span class="p">)</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">cauchy_step</span>
+        <span class="n">q_val</span> <span class="o">=</span> <span class="n">const</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">grad_step</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">alpha</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">curv_step</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># This case is never reached in exact arithmetic. It prevents this</span>
+        <span class="c1"># function to return a step that decreases the objective function.</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">grad</span><span class="p">)</span>
+        <span class="n">q_val</span> <span class="o">=</span> <span class="n">const</span>
+
+    <span class="k">return</span> <span class="n">step</span><span class="p">,</span> <span class="n">q_val</span>
+
+
+<div class="viewcode-block" id="tangential_byrd_omojokun">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.sub_solver.tangential_byrd_omojokun">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">tangential_byrd_omojokun</span><span class="p">(</span><span class="n">fun</span><span class="p">,</span> <span class="n">grad</span><span class="p">,</span> <span class="n">hess_prod</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Minimize approximately a quadratic function subject to bound constraints in</span>
+<span class="sd">    a trust region.</span>
+
+<span class="sd">    This function solves approximately</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \min_{s\in\mathbb{R}^n}\quad f(s) \quad \text{s.t.} \quad</span>
+<span class="sd">        \lVert s \rVert \le \Delta.</span>
+<span class="sd">        </span>
+<span class="sd">    using a variation of the truncated conjugate gradient method.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fun : callable</span>
+<span class="sd">        Overall surrogate model function :math:`f` as shown above.</span>
+<span class="sd">    grad : callable</span>
+<span class="sd">        Gradient :math:`\nabla f` of the model function:</span>
+
+<span class="sd">            ``grad(x) -&gt; ndarray, shape (n,)``</span>
+
+<span class="sd">        returns the gradient at ``x``.</span>
+<span class="sd">    hess_prod : callable</span>
+<span class="sd">        Product of the Hessian matrix :math:`\nabla^2 f(x)` with any vector :math:`v`:</span>
+
+<span class="sd">            ``hess_prod(x, v) -&gt; ndarray, shape (n,)``</span>
+
+<span class="sd">        returns the product :math:`\nabla^2 f(x) v`.</span>
+<span class="sd">    delta : float</span>
+<span class="sd">        Trust-region radius :math:`\Delta` as shown above.</span>
+<span class="sd">    n : int</span>
+<span class="sd">        Dimension of the function.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ndarray, shape (n,)</span>
+<span class="sd">        Approximate solution :math:`s`.</span>
+
+<span class="sd">    Other Parameters</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    improve_tcg : bool, optional</span>
+<span class="sd">        If True, a solution generated by the truncated conjugate gradient</span>
+<span class="sd">        method that is on the boundary of the trust region is improved by</span>
+<span class="sd">        moving around the trust-region boundary on the two-dimensional space</span>
+<span class="sd">        spanned by the solution and the gradient of the quadratic function at</span>
+<span class="sd">        the solution (default is True).</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function originally implements Algorithm 6.2 of [1]_ and is modified </span>
+<span class="sd">    to adapt to the UPOQA solver. It is assumed that the origin is feasible </span>
+<span class="sd">    with respect to the bound constraints and that ``delta`` is finite and </span>
+<span class="sd">    positive.</span>
+<span class="sd">    </span>
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Tom M. Ragonneau. *Model-Based Derivative-Free Optimization Methods</span>
+<span class="sd">       and Software*. PhD thesis, Department of Applied Mathematics, The Hong</span>
+<span class="sd">       Kong Polytechnic University, Hong Kong, China, 2022. URL:</span>
+<span class="sd">       https://theses.lib.polyu.edu.hk/handle/200/12294.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Copy the arrays that may be modified by the code below.-</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,)))</span>
+
+    <span class="c1"># Set the initial iterate and the initial search direction.</span>
+    <span class="n">step</span><span class="p">,</span> <span class="n">sd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">g</span><span class="p">),</span> <span class="o">-</span><span class="n">g</span>
+    <span class="c1"># objective value may not be monotonic if xform is enabled in upoqa.</span>
+    <span class="n">best_step</span><span class="p">,</span> <span class="n">best_decrease</span> <span class="o">=</span> <span class="n">step</span><span class="p">,</span> <span class="mf">0.0</span>
+
+    <span class="n">k</span><span class="p">,</span> <span class="n">reduct</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.0</span>
+    <span class="n">boundary_reached</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">while</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+        <span class="c1"># Stop the computations if sd is not a descent direction.</span>
+        <span class="n">g_sd</span> <span class="o">=</span> <span class="n">g</span> <span class="o">@</span> <span class="n">sd</span>
+        <span class="k">if</span> <span class="n">g_sd</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="mf">10.0</span> <span class="o">*</span> <span class="n">float_eps</span> <span class="o">*</span> <span class="n">n</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">LA</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">g</span><span class="p">)):</span>
+            <span class="k">break</span>
+
+        <span class="c1"># Set alpha_tr to the step size for the trust-region constraint.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">alpha_tr</span> <span class="o">=</span> <span class="n">_alpha_tr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">sd</span><span class="p">,</span> <span class="n">delta</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+            <span class="k">break</span>
+
+        <span class="c1"># Stop the computations if a step along sd is expected to give a</span>
+        <span class="c1"># relatively small reduction in the objective function.</span>
+        <span class="k">if</span> <span class="o">-</span><span class="n">alpha_tr</span> <span class="o">*</span> <span class="n">g_sd</span> <span class="o">&lt;=</span> <span class="mf">1e-8</span> <span class="o">*</span> <span class="n">reduct</span><span class="p">:</span>
+            <span class="k">break</span>
+
+        <span class="c1"># Set alpha_quad to the step size for the minimization problem.</span>
+        <span class="n">hess_sd</span> <span class="o">=</span> <span class="n">hess_prod</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">sd</span><span class="p">)</span>
+        <span class="n">curv_sd</span> <span class="o">=</span> <span class="n">sd</span> <span class="o">@</span> <span class="n">hess_sd</span>
+        <span class="k">if</span> <span class="n">curv_sd</span> <span class="o">&gt;</span> <span class="n">float_tiny</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">g_sd</span><span class="p">):</span>
+            <span class="n">alpha_quad</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="n">g_sd</span> <span class="o">/</span> <span class="n">curv_sd</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">alpha_quad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+
+        <span class="c1"># Stop the computations if the reduction in the objective function</span>
+        <span class="c1"># provided by an unconstrained step is small.</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">alpha_tr</span><span class="p">,</span> <span class="n">alpha_quad</span><span class="p">)</span>
+        <span class="k">if</span> <span class="o">-</span><span class="n">alpha</span> <span class="o">*</span> <span class="p">(</span><span class="n">g_sd</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">curv_sd</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">1e-8</span> <span class="o">*</span> <span class="n">reduct</span><span class="p">:</span>
+            <span class="k">break</span>
+
+        <span class="c1"># Update the iterate.</span>
+        <span class="k">if</span> <span class="n">alpha</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">step</span> <span class="o">=</span> <span class="n">step</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">sd</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
+            <span class="n">reduct</span> <span class="o">=</span> <span class="o">-</span><span class="n">fun</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">reduct</span> <span class="o">&gt;</span> <span class="n">best_decrease</span><span class="p">:</span>
+                <span class="n">best_step</span><span class="p">,</span> <span class="n">best_decrease</span> <span class="o">=</span> <span class="n">step</span><span class="p">,</span> <span class="n">reduct</span>
+
+        <span class="k">if</span> <span class="n">alpha</span> <span class="o">&lt;</span> <span class="n">alpha_tr</span><span class="p">:</span>
+            <span class="c1"># The current iteration is a conjugate gradient iteration. Update</span>
+            <span class="c1"># the search direction so that it is conjugate (with respect to H)</span>
+            <span class="c1"># to all the previous search directions.</span>
+            <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">g</span> <span class="o">@</span> <span class="n">hess_sd</span><span class="p">)</span> <span class="o">/</span> <span class="n">curv_sd</span>
+            <span class="n">sd</span> <span class="o">=</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">sd</span> <span class="o">-</span> <span class="n">g</span>
+            <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># The current iterate is on the trust-region boundary. Add all the</span>
+            <span class="c1"># active bounds to the working set to prepare for the improvement</span>
+            <span class="c1"># of the solution, and stop the iterations.</span>
+            <span class="n">boundary_reached</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">break</span>
+
+    <span class="c1"># Attempt to improve the solution on the trust-region boundary.</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;improve_tcg&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">and</span> <span class="n">boundary_reached</span><span class="p">:</span>
+        <span class="c1"># Check whether a substantial reduction in the objective function</span>
+        <span class="c1"># is possible, and set the search direction.</span>
+        <span class="n">step_sq</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
+        <span class="n">g_sq</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+        <span class="n">g_step</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
+        <span class="n">g_sd</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">step_sq</span> <span class="o">*</span> <span class="n">g_sq</span> <span class="o">-</span> <span class="n">g_step</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+        <span class="n">sd</span> <span class="o">=</span> <span class="n">g_step</span> <span class="o">*</span> <span class="n">step</span> <span class="o">-</span> <span class="n">step_sq</span> <span class="o">*</span> <span class="n">g</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">g_sd</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">1e-8</span> <span class="o">*</span> <span class="n">reduct</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">g_sd</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">float_tiny</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">sd</span><span class="p">)):</span>
+            <span class="n">sd</span> <span class="o">/=</span> <span class="o">-</span><span class="n">g_sd</span>
+
+            <span class="c1"># Calculate some curvature information.</span>
+            <span class="n">hess_sd</span> <span class="o">=</span> <span class="n">hess_prod</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">sd</span><span class="p">)</span>
+            <span class="n">curv_sd</span> <span class="o">=</span> <span class="n">sd</span> <span class="o">@</span> <span class="n">hess_sd</span>
+
+            <span class="c1"># For a range of equally spaced values of tan(0.5 * theta),</span>
+            <span class="c1"># calculate the reduction in the objective function that would be</span>
+            <span class="c1"># obtained by accepting the corresponding angle.</span>
+            <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">20</span>
+            <span class="n">t_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">n_samples</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span>
+            <span class="n">sin_values</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">t_samples</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">t_samples</span><span class="o">**</span><span class="mf">2.0</span><span class="p">)</span>
+
+            <span class="n">cos_values</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">t_samples</span><span class="o">**</span><span class="mf">2.0</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">t_samples</span><span class="o">**</span><span class="mf">2.0</span><span class="p">)</span>
+            <span class="n">candidate_steps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">cos_values</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">sin_values</span><span class="p">,</span> <span class="n">sd</span><span class="p">)</span>
+
+            <span class="n">all_reduct</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,))</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span>
+                <span class="n">all_reduct</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">fun</span><span class="p">(</span><span class="n">candidate_steps</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">all_reduct</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">):</span>
+                <span class="c1"># No reduction in the objective function is obtained.</span>
+                <span class="c1"># Accept the angle that provides the largest reduction in the</span>
+                <span class="c1"># objective function, and update the iterate.</span>
+                <span class="n">i_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">all_reduct</span><span class="p">)</span>
+                <span class="n">step</span> <span class="o">=</span> <span class="n">cos_values</span><span class="p">[</span><span class="n">i_max</span><span class="p">]</span> <span class="o">*</span> <span class="n">step</span> <span class="o">+</span> <span class="n">sin_values</span><span class="p">[</span><span class="n">i_max</span><span class="p">]</span> <span class="o">*</span> <span class="n">sd</span>
+                <span class="n">g</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
+                <span class="n">reduct</span> <span class="o">=</span> <span class="n">all_reduct</span><span class="p">[</span><span class="n">i_max</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">reduct</span> <span class="o">&gt;</span> <span class="n">best_decrease</span><span class="p">:</span>
+                    <span class="n">best_step</span><span class="p">,</span> <span class="n">best_decrease</span> <span class="o">=</span> <span class="n">step</span><span class="p">,</span> <span class="n">reduct</span>
+
+    <span class="k">return</span> <span class="n">best_step</span></div>
+
+
+
+<div class="viewcode-block" id="conjugate_gradient_proj_steinmetz">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.sub_solver.conjugate_gradient_proj_steinmetz">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">conjugate_gradient_proj_steinmetz</span><span class="p">(</span>
+    <span class="n">fun</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
+    <span class="n">grad</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+    <span class="n">hess_prod</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+    <span class="n">coords_mask</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">deltas</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">envelope_delta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">maxiter</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Modified projected conjugate gradient method for a quadratic trust-region</span>
+<span class="sd">    sub-problem with a structured trust-region.</span>
+
+<span class="sd">    The feasible region is the intersection of :math:`q` cylinders</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \mathcal{S} = \bigcap_{i=1}^{q}</span>
+<span class="sd">        \left\{ s\in\mathbb{R}^{n} : \lVert s^{\mathcal{I}_i} \rVert_{2}</span>
+<span class="sd">        \le \Delta_i \right\}.</span>
+
+<span class="sd">    This function solves approximately</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \min_{s\in\mathcal{S}}\quad f(s).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fun : callable</span>
+<span class="sd">        Overall surrogate model function :math:`f` as shown above.</span>
+<span class="sd">    grad : callable</span>
+<span class="sd">        Gradient :math:`\nabla f` of the model function:</span>
+
+<span class="sd">            ``grad(x) -&gt; ndarray, shape (n,)``</span>
+
+<span class="sd">        returns the gradient at ``x``.</span>
+<span class="sd">    hess_prod : callable</span>
+<span class="sd">        Product of the Hessian matrix :math:`\nabla^2 f(x)` with any vector :math:`v`:</span>
+
+<span class="sd">            ``hess_prod(x, v) -&gt; ndarray, shape (n,)``</span>
+
+<span class="sd">        returns the product :math:`\nabla^2 f(x) v`.</span>
+<span class="sd">    coords_mask : ndarray, shape (q, n)</span>
+<span class="sd">        Bool mask indicating variable indices :math:`\mathcal{I}_i` for each element.</span>
+<span class="sd">    n : int</span>
+<span class="sd">        Problem dimension</span>
+<span class="sd">    deltas : ndarray</span>
+<span class="sd">        Elemental trust-region radii :math:`\{\Delta_i\}_{i=1}^q` as shown above.</span>
+<span class="sd">    envelope_delta : float</span>
+<span class="sd">        A sufficiently large radius ensuring that the structured trust-region</span>
+<span class="sd">        lies entirely within the ball centered at the origin with this radius.</span>
+<span class="sd">    maxiter : int, optional</span>
+<span class="sd">        Maximum number of iterations. Default is None, which sets it to</span>
+<span class="sd">        :math:`\max(20, 3n)` in which :math:`2n` steps are reserved for projection</span>
+<span class="sd">        steps.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ndarray</span>
+<span class="sd">        Approximate solution to the trust-region subproblem.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This method uses Steinmetz projection (:func:`~upoqa.utils.projection.steinmetz_proj`) </span>
+<span class="sd">    and combined projection (:func:`~upoqa.utils.projection.steinmetz_comb_proj`) to </span>
+<span class="sd">    maintain feasibility with respect to the cylindrical constraints.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">s0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="n">s0</span><span class="p">)</span>
+
+    <span class="c1"># Set the initial iterate and the initial search direction.</span>
+    <span class="n">step</span><span class="p">,</span> <span class="n">sd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="o">-</span><span class="n">g</span>
+    <span class="n">fval0</span> <span class="o">=</span> <span class="n">fun</span><span class="p">(</span><span class="n">s0</span><span class="p">)</span>
+    <span class="n">reduct</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">proj_step</span><span class="p">,</span> <span class="n">max_proj_step</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">maxiter</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="k">if</span> <span class="n">maxiter</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="n">maxiter</span><span class="p">)</span>
+    <span class="n">maxiter</span> <span class="o">+=</span> <span class="n">max_proj_step</span>
+    <span class="n">best_step</span><span class="p">,</span> <span class="n">best_decrease</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">step</span><span class="p">,</span>
+        <span class="mf">0.0</span><span class="p">,</span>
+    <span class="p">)</span>  <span class="c1"># objective value may not be monotonic if xform is enabled.</span>
+
+    <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxiter</span><span class="p">):</span>
+        <span class="c1"># Stop the computations if sd is not a descent direction.</span>
+        <span class="n">g_sd</span> <span class="o">=</span> <span class="n">g</span> <span class="o">@</span> <span class="n">sd</span>
+        <span class="k">if</span> <span class="n">g_sd</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="mf">10.0</span> <span class="o">*</span> <span class="n">float_eps</span> <span class="o">*</span> <span class="n">n</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">LA</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">g</span><span class="p">)):</span>
+            <span class="k">break</span>
+
+        <span class="n">hess_sd</span> <span class="o">=</span> <span class="n">hess_prod</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">sd</span><span class="p">)</span>
+        <span class="n">curv_sd</span> <span class="o">=</span> <span class="n">sd</span> <span class="o">@</span> <span class="n">hess_sd</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Set alpha_quad to the st+ep size for the minimization problem.</span>
+            <span class="k">if</span> <span class="n">curv_sd</span> <span class="o">&gt;</span> <span class="n">float_tiny</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">g_sd</span><span class="p">):</span>
+                <span class="n">alpha_quad</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="n">g_sd</span> <span class="o">/</span> <span class="n">curv_sd</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+                <span class="n">alpha_tr</span> <span class="o">=</span> <span class="n">_alpha_tr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">sd</span><span class="p">,</span> <span class="n">envelope_delta</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">alpha_quad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+                <span class="n">alpha_tr</span> <span class="o">=</span> <span class="n">_alpha_tr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">sd</span><span class="p">,</span> <span class="mf">1e3</span> <span class="o">*</span> <span class="n">envelope_delta</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">alpha_quad</span><span class="p">,</span> <span class="n">alpha_tr</span><span class="p">)</span>
+
+        <span class="c1"># Stop the computations if the reduction in the objective function</span>
+        <span class="c1"># provided by an unconstrained step is small.</span>
+        <span class="k">if</span> <span class="o">-</span><span class="n">alpha</span> <span class="o">*</span> <span class="p">(</span><span class="n">g_sd</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">curv_sd</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">1e-8</span> <span class="o">*</span> <span class="n">reduct</span><span class="p">:</span>
+            <span class="k">break</span>
+
+        <span class="c1"># Update the iterate.</span>
+        <span class="k">if</span> <span class="n">alpha</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="c1"># Though Dykstra&#39;s projection method is an exact projection,</span>
+            <span class="c1"># it shows limited experimental improvements and is slower.</span>
+            <span class="c1"># skp1, did_project = dykstra_proj(step + alpha * sd, coords_mask, deltas)</span>
+
+            <span class="k">if</span> <span class="n">it</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">skp1</span><span class="p">,</span> <span class="n">did_project</span> <span class="o">=</span> <span class="n">steinmetz_proj</span><span class="p">(</span>
+                    <span class="n">step</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">sd</span><span class="p">,</span> <span class="n">coords_mask</span><span class="p">,</span> <span class="n">deltas</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">skp1</span><span class="p">,</span> <span class="n">did_project</span> <span class="o">=</span> <span class="n">steinmetz_comb_proj</span><span class="p">(</span>
+                    <span class="n">step</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">sd</span><span class="p">,</span> <span class="n">coords_mask</span><span class="p">,</span> <span class="n">deltas</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">did_project</span><span class="p">:</span>
+                <span class="c1"># line search along skp1 - step</span>
+                <span class="n">proj_step</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="k">if</span> <span class="n">proj_step</span> <span class="o">&gt;</span> <span class="n">max_proj_step</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+                <span class="n">pj_sd</span> <span class="o">=</span> <span class="n">skp1</span> <span class="o">-</span> <span class="n">step</span>
+                <span class="n">g_pj_sd</span> <span class="o">=</span> <span class="n">g</span> <span class="o">@</span> <span class="n">pj_sd</span>
+                <span class="n">hess_pj_sd</span> <span class="o">=</span> <span class="n">hess_prod</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">pj_sd</span><span class="p">)</span>
+                <span class="n">curv_pj_sd</span> <span class="o">=</span> <span class="n">pj_sd</span> <span class="o">@</span> <span class="n">hess_pj_sd</span>
+                <span class="k">if</span> <span class="n">curv_pj_sd</span> <span class="o">&gt;</span> <span class="n">float_tiny</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">g_pj_sd</span><span class="p">):</span>
+                    <span class="n">alpha_ls</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="n">g_pj_sd</span> <span class="o">/</span> <span class="n">curv_pj_sd</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">alpha_ls</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+                <span class="k">if</span> <span class="o">-</span><span class="n">alpha_ls</span> <span class="o">*</span> <span class="p">(</span><span class="n">g_pj_sd</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">alpha_ls</span> <span class="o">*</span> <span class="n">curv_pj_sd</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">1e-8</span> <span class="o">*</span> <span class="n">reduct</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+                <span class="n">skp1</span> <span class="o">=</span> <span class="n">step</span> <span class="o">+</span> <span class="n">alpha_ls</span> <span class="o">*</span> <span class="n">pj_sd</span>
+
+            <span class="n">reduct</span> <span class="o">=</span> <span class="n">fval0</span> <span class="o">-</span> <span class="n">fun</span><span class="p">(</span><span class="n">skp1</span><span class="p">)</span>
+            <span class="n">step</span> <span class="o">=</span> <span class="n">skp1</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">reduct</span> <span class="o">&gt;</span> <span class="n">best_decrease</span><span class="p">:</span>
+                <span class="n">best_step</span><span class="p">,</span> <span class="n">best_decrease</span> <span class="o">=</span> <span class="n">step</span><span class="p">,</span> <span class="n">reduct</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">break</span>
+
+        <span class="k">if</span> <span class="n">did_project</span><span class="p">:</span>
+            <span class="n">sd</span> <span class="o">=</span> <span class="o">-</span><span class="n">g</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># The current iteration is a conjugate gradient iteration. Update</span>
+            <span class="c1"># the search direction so that it is conjugate (with respect to H)</span>
+            <span class="c1"># to all the previous search directions.</span>
+            <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">g</span> <span class="o">@</span> <span class="n">hess_sd</span><span class="p">)</span> <span class="o">/</span> <span class="n">curv_sd</span>
+            <span class="n">sd</span> <span class="o">=</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">sd</span> <span class="o">-</span> <span class="n">g</span>
+
+    <span class="k">return</span> <span class="n">best_step</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_arrays_tol</span><span class="p">(</span><span class="o">*</span><span class="n">arrays</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a relative tolerance for a set of arrays.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    *arrays: tuple</span>
+<span class="sd">        Set of ndarray to get the tolerance for.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        Relative tolerance for the set of arrays.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If no array is provided.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">arrays</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;At least one array must be provided.&quot;</span><span class="p">)</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">size</span> <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">arrays</span><span class="p">)</span>
+    <span class="n">weight</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">array</span><span class="p">)]),</span> <span class="n">initial</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">arrays</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="mf">10.0</span> <span class="o">*</span> <span class="n">float_eps</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">weight</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_alpha_tr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">sd</span><span class="p">,</span> <span class="n">delta</span><span class="p">):</span>
+    <span class="n">step_sd</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">sd</span><span class="p">)</span>
+    <span class="n">sd_sq</span> <span class="o">=</span> <span class="n">sd</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">sd</span><span class="p">)</span>
+    <span class="n">dist_tr_sq</span> <span class="o">=</span> <span class="n">delta</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">-</span> <span class="n">step</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">step_sd</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">+</span> <span class="n">sd_sq</span> <span class="o">*</span> <span class="n">dist_tr_sq</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">step_sd</span> <span class="o">&lt;=</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="n">sd_sq</span> <span class="o">&gt;</span> <span class="n">float_tiny</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">temp</span> <span class="o">-</span> <span class="n">step_sd</span><span class="p">):</span>
+        <span class="n">alpha_tr</span> <span class="o">=</span> <span class="nb">max</span><span class="p">((</span><span class="n">temp</span> <span class="o">-</span> <span class="n">step_sd</span><span class="p">)</span> <span class="o">/</span> <span class="n">sd_sq</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">abs</span><span class="p">(</span><span class="n">temp</span> <span class="o">+</span> <span class="n">step_sd</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">float_tiny</span> <span class="o">*</span> <span class="n">dist_tr_sq</span><span class="p">:</span>
+        <span class="n">alpha_tr</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">dist_tr_sq</span> <span class="o">/</span> <span class="p">(</span><span class="n">temp</span> <span class="o">+</span> <span class="n">step_sd</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ZeroDivisionError</span>
+    <span class="k">return</span> <span class="n">alpha_tr</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Yichuan Liu and Yingzhou Li.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,329 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>upoqa.utils.result &mdash; UPOQA v1.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=d29a5c0e"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            UPOQA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../upoqa.html">upoqa package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../upoqa.utils.html">upoqa.utils package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">UPOQA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">upoqa.utils.result</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for upoqa.utils.result</h1><div class="highlight"><pre>
+<span></span><span class="c1"># This file contains modified code from SciPy (https://github.com/scipy/scipy)</span>
+<span class="c1"># which is licensed under the BSD 3-Clause License:</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2001-2002 Enthought, Inc. 2003, SciPy Developers.</span>
+<span class="c1"># All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Redistribution and use in source and binary forms, with or without</span>
+<span class="c1"># modification, are permitted provided that the following conditions are met:</span>
+<span class="c1">#</span>
+<span class="c1"># 1. Redistributions of source code must retain the above copyright notice, this</span>
+<span class="c1">#    list of conditions and the following disclaimer.</span>
+<span class="c1">#</span>
+<span class="c1"># 2. Redistributions in binary form must reproduce the above copyright notice,</span>
+<span class="c1">#    this list of conditions and the following disclaimer in the documentation</span>
+<span class="c1">#    and/or other materials provided with the distribution.</span>
+<span class="c1">#</span>
+<span class="c1"># 3. Neither the name of the copyright holder nor the names of its</span>
+<span class="c1">#    contributors may be used to endorse or promote products derived from</span>
+<span class="c1">#    this software without specific prior written permission.</span>
+<span class="c1">#</span>
+<span class="c1"># THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</span>
+<span class="c1"># AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</span>
+<span class="c1"># IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</span>
+<span class="c1"># DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</span>
+<span class="c1"># FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</span>
+<span class="c1"># DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</span>
+<span class="c1"># SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</span>
+<span class="c1"># CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</span>
+<span class="c1"># OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</span>
+<span class="c1"># OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="c1">#</span>
+<span class="c1"># The modifications to this file and the overall project are licensed under the</span>
+<span class="c1"># GNU General Public License v3.0 (GPLv3). See the project&#39;s LICENSE file for</span>
+<span class="c1"># the full GPLv3 terms.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Optimization Result</span>
+<span class="sd">===================</span>
+
+<span class="sd">Adapted from ``scipy.optimize.OptimizeResult`` with minor modifications.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span>
+
+
+<div class="viewcode-block" id="OptimizeResult">
+<a class="viewcode-back" href="../../../upoqa.utils.html#upoqa.utils.result.OptimizeResult">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OptimizeResult</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represent the optimization result.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    message : str</span>
+<span class="sd">        Description of the cause of the termination.</span>
+<span class="sd">    success : bool</span>
+<span class="sd">        Whether the optimization procedure terminated successfully.</span>
+<span class="sd">    exception : Exception, optional</span>
+<span class="sd">        Exception raised during the optimization that caused the termination, if any.</span>
+<span class="sd">    traceback : str, optional</span>
+<span class="sd">        Traceback of the exception, if any.</span>
+<span class="sd">    fun : float</span>
+<span class="sd">        Value of objective function evaluated at the solution.</span>
+<span class="sd">    funs : dict or list</span>
+<span class="sd">        Values of the element functions evaluated at the solution.</span>
+
+<span class="sd">        The type matches the input ``fun``:</span>
+
+<span class="sd">        - If ``fun`` was a dictionary, return a dictionary mapping element names to</span>
+<span class="sd">          their function values.</span>
+<span class="sd">        - If ``fun`` was a list, return a list of function values in the same order</span>
+<span class="sd">          as the input list.</span>
+<span class="sd">    extra_fun : float</span>
+<span class="sd">        Value of the extra function at the solution.</span>
+
+<span class="sd">        The &quot;extra function&quot; represents the differentiable white-box component of the objective.</span>
+<span class="sd">    x : ndarray</span>
+<span class="sd">        The solution of the optimization.</span>
+<span class="sd">    jac, hess : ndarray</span>
+<span class="sd">        Values of objective function&#39;s Jacobian and its Hessian at ``x``.</span>
+<span class="sd">        The Hessian is an approximation.</span>
+<span class="sd">    nit : int</span>
+<span class="sd">        Number of iterations performed by the optimizer</span>
+<span class="sd">    nfev : dict or list</span>
+<span class="sd">        Number of evaluations of element functions.</span>
+
+<span class="sd">        The type matches the input ``fun``:</span>
+
+<span class="sd">        - If ``fun`` was a dictionary, return a dictionary mapping element names to</span>
+<span class="sd">          their numbers of function evaluations.</span>
+<span class="sd">        - If ``fun`` was a list, return a list of evaluation numbers in the same order</span>
+<span class="sd">          as the input list.</span>
+<span class="sd">    max_nfev : int</span>
+<span class="sd">        Maximum number of evaluations of element functions.</span>
+<span class="sd">    avg_nfev : float</span>
+<span class="sd">        Average number of evaluations of element functions.</span>
+<span class="sd">    nrun : int</span>
+<span class="sd">        Number of runs (when enabling restarts).</span>
+<span class="sd">    manager : :class:`~upoqa.utils.manager.UPOQAManager`, optional</span>
+<span class="sd">        Algorithm manager (debugging only).</span>
+<span class="sd">        Included only when ``debug=True`` or ``return_internals=True``.</span>
+<span class="sd">    interp_set : :class:`~upoqa.utils.interp_set.OverallInterpSet`, optional</span>
+<span class="sd">        Interpolation point set (debugging only).</span>
+<span class="sd">        Included only when ``debug=True`` or ``return_internals=True``.</span>
+<span class="sd">    model : :class:`~upoqa.utils.model.OverallSurrogate`, optional</span>
+<span class="sd">        Surrogate model (debugging only).</span>
+<span class="sd">        Included only when ``debug=True`` or ``return_internals=True``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+    <span class="fm">__setattr__</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__setitem__</span>
+    <span class="fm">__delattr__</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="fm">__delitem__</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">order_keys</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;message&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;success&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;exception&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;traceback&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;fun&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;funs&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;extra_fun&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;x&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;jac&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hess&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;nit&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;nfev&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;max_nfev&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;avg_nfev&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;nrun&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;manager&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;interp_set&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;model&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">order_keys</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_order_keys&quot;</span><span class="p">,</span> <span class="n">order_keys</span><span class="p">)</span>
+        <span class="c1"># &#39;slack&#39;, &#39;con&#39; are redundant with residuals</span>
+        <span class="c1"># &#39;crossover_nit&#39; is probably not interesting to most users</span>
+        <span class="n">omit_keys</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;slack&quot;</span><span class="p">,</span> <span class="s2">&quot;con&quot;</span><span class="p">,</span> <span class="s2">&quot;crossover_nit&quot;</span><span class="p">,</span> <span class="s2">&quot;_order_keys&quot;</span><span class="p">}</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">key</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">order_keys</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>  <span class="c1"># item not in list</span>
+                <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">omit_redundant</span><span class="p">(</span><span class="n">items</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">omit_keys</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">yield</span> <span class="n">item</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">item_sorter</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">omit_redundant</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">()),</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">_dict_formatter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sorter</span><span class="o">=</span><span class="n">item_sorter</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;()&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_dict_formatter</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">mplus</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sorter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Pretty printer for dictionaries</span>
+
+<span class="sd">    ``n`` keeps track of the starting indentation;</span>
+<span class="sd">    lines are indented by this much after a line break.</span>
+<span class="sd">    ``mplus`` is additional left padding applied to keys</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">d</span><span class="p">)),</span> <span class="n">Iterable</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span> <span class="o">+</span> <span class="n">mplus</span>  <span class="c1"># width to print keys</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">k</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+                <span class="o">+</span> <span class="s2">&quot;: &quot;</span>  <span class="c1"># right justified, width m</span>
+                <span class="o">+</span> <span class="n">_indenter</span><span class="p">(</span><span class="n">_dict_formatter</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">m</span> <span class="o">+</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sorter</span><span class="p">),</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sorter</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span>  <span class="c1"># +2 for &#39;: &#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># By default, NumPy arrays print with linewidth=76. `n` is</span>
+        <span class="c1"># the indent at which a line begins printing, so it is subtracted</span>
+        <span class="c1"># from the default to avoid exceeding 76 characters total.</span>
+        <span class="c1"># `edgeitems` is the number of elements to include before and after</span>
+        <span class="c1"># ellipses when arrays are not shown in full.</span>
+        <span class="c1"># `threshold` is the maximum number of elements for which an</span>
+        <span class="c1"># array is shown in full.</span>
+        <span class="c1"># These values tend to work well for use with OptimizeResult.</span>
+        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">printoptions</span><span class="p">(</span>
+            <span class="n">linewidth</span><span class="o">=</span><span class="mi">76</span> <span class="o">-</span> <span class="n">n</span><span class="p">,</span>
+            <span class="n">edgeitems</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">threshold</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+            <span class="n">formatter</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;float_kind&quot;</span><span class="p">:</span> <span class="n">_float_formatter_10</span><span class="p">},</span>
+        <span class="p">):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">s</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_indenter</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Ensures that lines after the first are indented by the specified amount</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">split</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">indent</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">n</span>
+    <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">indent</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">split</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_float_formatter_10</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns a string representation of a float with exactly ten characters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isposinf</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;       inf&quot;</span>
+    <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">isneginf</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;      -inf&quot;</span>
+    <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;       nan&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">format_float_scientific</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">pad_left</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Yichuan Liu and Yingzhou Li.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1787,6 +1787,9 @@ class UPOQAManager:
         The *constraints* require that for any element index ``ele_idx``, the
             projection ``self.proj_onto_ele(x, ele_idx)`` must lie within the
             ``ele_idx``-th interpolation set.
+            
+        By default, we search for at most ``self.params("init.search_opt_x0_max_trials")``
+        points.
         """
         trial_point_num = 0
         best_x, best_fval, best_fval_eles, best_extra_fval = None, np.inf, [], np.inf
