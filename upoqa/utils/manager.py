@@ -20,7 +20,7 @@
 Algorithm Manager
 =================
 
-Maintain two classes that command the behaviors of the UPOQA algorithm.
+Maintain the class that commands the behaviors of the UPOQA algorithm.
 """
 
 import numpy as np
