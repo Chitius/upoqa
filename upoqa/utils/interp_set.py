@@ -816,7 +816,7 @@ class OverallInterpSet:
                 self.interp_set_fval,
             )[
                 0 : self.set_size
-            ][0 : self.set_size - 1]
+            ][1 : self.set_size]
             self.delete_points(to_be_deleted_idx)
 
     def update_point_on_idx(

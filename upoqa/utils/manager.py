@@ -1729,26 +1729,30 @@ class UPOQAManager:
                     traceback=traceback.format_exc(),
                 )
 
+            for ele_idx in self.ele_idxs:
+                if winner_sigmas[ele_idx] < -np.finfo(float).eps:
+                    # we do not update an element model if the sigma is bad.
+                    un_updated_eles.append(ele_idx)
+            want_update = [
+                (True if ele_idx not in un_updated_eles else False)
+                for ele_idx in self.ele_idxs
+            ]
+
+            # Elements whose model update is skipped must not have their
+            # interpolation sets changed either, otherwise the KKT factors
+            # (which are not updated) would become inconsistent with the
+            # interpolation set, silently corrupting the model.
             self.interp_set.update_point_on_idx(
                 x_new,
                 [closest_points[ele_idx][i] for ele_idx in self.ele_idxs],
                 fval_eles,
                 fval,
                 extra_fval,
+                need_update=want_update,
             )
 
-            for ele_idx in self.ele_idxs:
-                if winner_sigmas[ele_idx] < -np.finfo(float).eps:
-                    # we do not update an element model if the sigma is bad.
-                    un_updated_eles.append(ele_idx)
-
             try:
-                self.model.update(
-                    want_update=[
-                        (True if ele_idx not in un_updated_eles else False)
-                        for ele_idx in self.ele_idxs
-                    ],
-                )
+                self.model.update(want_update=want_update)
             except SurrogateLinAlgError as e:
                 return ExitInfo(
                     flag=ExitStatus.LINALG_ERROR,
@@ -1758,14 +1762,6 @@ class UPOQAManager:
                 )
 
             x_opt, _ = self.interp_set.get_opt()
-
-            # For those who fail to update, we reinit their surrogate models.
-            for ele_idx in un_updated_eles:
-                if self.disp >= 3:
-                    print(
-                        f"  Reinit surrogate model (element {self.ele_names[ele_idx]})."
-                    )
-                self.ele_models[ele_idx].reinit()
 
             i += 1
             stay_iter = 0

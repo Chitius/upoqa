@@ -1014,7 +1014,6 @@ def minimize(
                 # If the norm of trust region step is big enough
                 n_short_steps, n_very_short_steps = 0, 0
                 try:
-                    old_fval_eles = fval_eles
                     fval_eles, extra_fval = fun_eles_eval(x_hold)
                     fval = manager.build_fval(fval_eles, extra_fval)
                 except MaxEvalNumReached as e:
@@ -1029,7 +1028,7 @@ def minimize(
                 # Calculate decreases of element models, and decreases of the value of
                 # `weight * xform(element model or element obj-func value)`
                 decrease_eles, decrease_wx_m_eles, decrease_wx_f_eles, fval_wx_eles = (
-                    manager.calc_detailed_decrease(xk, x_hold, old_fval_eles, fval_eles)
+                    manager.calc_detailed_decrease(xk, x_hold, ele_fvals_k, fval_eles)
                 )
 
                 # Calculate the reduction ratio
