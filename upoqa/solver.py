@@ -548,10 +548,11 @@ def minimize(
                         f"{e}\n\n{traceback.format_exc()}"
                     )
 
-                if params("debug.check_nan_fval") and np.any(np.isnan(eval_result)):
+                if np.any(~np.isfinite(eval_result)):
                     raise ValueError(
-                        f"(element {ele_names[ele_idx]}) NaN encountered in the return value"
-                        f" of the objective function. \nreturn value = {eval_result}"
+                        f"(element {ele_names[ele_idx]}) Non-finite (NaN or Inf) value "
+                        "encountered in the return value of the objective function. "
+                        f"\nreturn value = {eval_result}"
                     )
 
                 return float(eval_result)
@@ -990,13 +991,15 @@ def minimize(
                         idx_to_replaced_eles, dist_new_eles, _ = (
                             manager.get_index_to_remove()
                         )
-                    except (LA.LinAlgError, ZeroDivisionError):
+                    except (LA.LinAlgError, ZeroDivisionError) as e:
                         exit_info, continue_flag = check_and_try_to_restart(
-                            flag=ExitStatus.LINALG_ERROR,
-                            msg="Singular matrix when choosing point to replace for "
-                            + "geometry-improving procedure (short step). ",
-                            exception=e,
-                            traceback=traceback.format_exc(),
+                            ExitInfo(
+                                flag=ExitStatus.LINALG_ERROR,
+                                msg="Singular matrix when choosing point to replace for "
+                                + "geometry-improving procedure (short step). ",
+                                exception=e,
+                                traceback=traceback.format_exc(),
+                            )
                         )
                         if exit_info:
                             break
@@ -1047,12 +1050,14 @@ def minimize(
                     idx_to_replaced_eles, _, cached_kkt_info_eles = (
                         manager.get_index_to_remove(x=x_hold, center=xk)
                     )
-                except (LA.LinAlgError, ZeroDivisionError):
+                except (LA.LinAlgError, ZeroDivisionError) as e:
                     exit_info, continue_flag = check_and_try_to_restart(
-                        flag=ExitStatus.LINALG_ERROR,
-                        msg="Singular matrix when choosing point to replace. ",
-                        exception=e,
-                        traceback=traceback.format_exc(),
+                        ExitInfo(
+                            flag=ExitStatus.LINALG_ERROR,
+                            msg="Singular matrix when choosing point to replace. ",
+                            exception=e,
+                            traceback=traceback.format_exc(),
+                        )
                     )
                     if exit_info:
                         break

@@ -611,14 +611,17 @@ class UPOQAManager:
                 )
             else:
                 fval_ele = self.weights[ele_idx] * fval_eles[ele_idx]
-            if self.params("debug.check_nan_fval") and np.any(np.isnan(fval_ele)):
+            if np.any(~np.isfinite(fval_ele)):
                 raise ValueError(
-                    f"(element {self.ele_names[ele_idx]}) NaN encountered in the return"
-                    f" value of the surrogate function. \nreturn value = {fval_ele}"
+                    f"(element {self.ele_names[ele_idx]}) Non-finite (NaN or Inf) value "
+                    "encountered in the return value of the surrogate function. "
+                    f"\nreturn value = {fval_ele}"
                 )
             fval += fval_ele
-        if np.isnan(fval):
-            raise ValueError(f"NaN overall surrogate function value encountered.")
+        if not np.isfinite(fval):
+            raise ValueError(
+                "Non-finite (NaN or Inf) overall surrogate function value encountered."
+            )
         return fval
 
     def get_index_to_remove(
@@ -966,7 +969,11 @@ class UPOQAManager:
         else:
             delta_m_neg += decrease_extra_fval
 
-        rho = delta_m_neg / delta_m_pos
+        # If no element model predicts a positive decrease (delta_m_pos <= 0),
+        # the step is treated as the worst case (rho = -1), which tightens the
+        # thresholds below and shrinks the radii. This also guards against a
+        # zero (or negative) denominator.
+        rho = delta_m_neg / delta_m_pos if delta_m_pos > 0 else -1.0
         mu1, mu2 = self.params("tr_radius.eta1"), self.params("tr_radius.eta2")
         eta1, eta2 = -(1 - mu1) * rho, -(1 - mu2) * rho
         mu1p, mu2p = mu1 + eta1, mu2 + eta2

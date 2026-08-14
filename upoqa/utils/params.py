@@ -486,7 +486,7 @@ def check_float(
     else:
         try:
             if val not in [np.inf, -np.inf]:
-                converted_val = int(val)  # Try converting val to an float
+                converted_val = float(val)  # Try converting val to a float
             else:
                 converted_val = val
             return (lower is None or converted_val >= lower) and (
