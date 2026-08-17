@@ -395,11 +395,11 @@ def get_reorganized_inputs_or_exit_info(
     # Check the validness of other inputs
     radius_init, radius_final = float(radius_init), float(radius_final)
     resolution_init, resolution_final = radius_init, radius_final
-    if resolution_init < 0:
+    if resolution_init <= 0:
         return ExitInfo(
             ExitStatus.INPUT_ERROR, "radius_init must be strictly positive."
         )
-    if resolution_final < 0:
+    if resolution_final <= 0:
         return ExitInfo(
             ExitStatus.INPUT_ERROR, "radius_final must be strictly positive."
         )

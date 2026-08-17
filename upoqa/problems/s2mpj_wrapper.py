@@ -159,10 +159,10 @@ class S2MPJPSProblem(PSProblem):
                 and ig < len(prob.gconst)
                 and prob.gconst[ig] is not None
             ):
-                fin = float(-prob.gconst[ig])
+                fin = -np.asarray(prob.gconst[ig]).item()
 
             if self._has_A and ig < sA1:
-                fin += float(prob.A[ig].dot(x[:sA2]))
+                fin += np.asarray(prob.A[ig].dot(x[:sA2])).item()
 
             if self._has_grelt and ig < len(prob.grelt) and prob.grelt[ig] is not None:
                 for iiel in range(len(prob.grelt[ig])):  #  loop on elements
@@ -199,7 +199,7 @@ class S2MPJPSProblem(PSProblem):
             else:
                 fx += fin / gsc
 
-            return float(fx)
+            return float(np.asarray(fx).item())
 
         return _eval_group_iig
 

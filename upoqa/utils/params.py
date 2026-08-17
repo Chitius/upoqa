@@ -347,9 +347,9 @@ class UPOQAParameterList(ParameterList):
         elif key == "slow.terminate_when_slow":
             type_str, nonetype_ok, lower, upper = "bool", False, None, None
         elif key == "slow.history_for_slow":
-            type_str, nonetype_ok, lower, upper = "int", False, 0, None
+            type_str, nonetype_ok, lower, upper = "int", False, 2, None
         elif key == "slow.thresh_for_slow":
-            type_str, nonetype_ok, lower, upper = "float", False, 0, None
+            type_str, nonetype_ok, lower, upper = "float", False, None, None
         elif key == "slow.max_slow_iters":
             type_str, nonetype_ok, lower, upper = "int", False, 0, None
         elif key == "restarts.use_restarts":

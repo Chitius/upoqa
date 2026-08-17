@@ -366,7 +366,7 @@ def dykstra_proj(
         if not do_proj:
             break
         did_project = True
-        if cI < tol * max_radius:
+        if cI < (tol * max_radius) ** 2:
             break
 
     return sk, did_project

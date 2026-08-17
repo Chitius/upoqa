@@ -289,6 +289,7 @@ class UPOQAManager:
         # Restart info monitoring
         self.nrun = 0
         self.last_run_f_opt = np.inf
+        self.last_successful_run = 0
         self.total_unsuccessful_restarts = 0
         self.num_slow_iters = 0
         self.history_fvals = deque(
@@ -1111,7 +1112,9 @@ class UPOQAManager:
             :attr:`ExitStatus.TR_INCREASE_ERROR` flag if the denominator is invalid, None 
             otherwise.
         """
-        rreg = rreg or np.finfo(np.float64).eps * np.max([1.0, fval, old_fval])
+        rreg = rreg or np.finfo(np.float64).eps * np.max(
+            [1.0, abs(fval), abs(old_fval)]
+        )
 
         numerator = old_fval - fval + rreg
         denominator = -decrease - rreg  # should be negative

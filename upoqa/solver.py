@@ -24,7 +24,7 @@ import numpy as np
 import numpy.linalg as LA
 import traceback
 from .utils import *
-from typing import List, Any, Dict, Tuple, Optional, Callable, Union, Literal
+from typing import List, Any, Dict, Tuple, Optional, Callable, Union, Literal, Iterable
 from copy import deepcopy
 import warnings
 

@@ -210,7 +210,7 @@ class QuadSurrogate:
         """
         init_step_size = step_size or self.interp_set.init_step_size
 
-        self._negative_s_idx == 0
+        self._negative_s_idx = 0
         xpt = np.zeros((self.npt, self.n))
         for k in range(self.npt):
             if 1 <= k <= self.n:
