@@ -533,7 +533,24 @@ class QuadSurrogate:
 
         # Update _KKT_B first
         _KKT_B_on_idx = self._KKT_B[idx].copy()
-        Ze_ell = np.hstack((self._KKT_R[0] * self._KKT_R[0, idx], _KKT_B_on_idx))
+        if self._negative_s_idx == 0:
+            Ze_ell_R = self._KKT_R[0] * self._KKT_R[0, idx]
+        else:
+            # With negative signs on the first _negative_s_idx rows of the S
+            # matrix, the Householder pre-rotation leaves nonzeros only in
+            # rows 0 and _negative_s_idx of column idx, and the W vector of
+            # the updating formula reads (NEWUOA update.f, lines 38-44):
+            # W = -Z(KNEW,1)*Z(:,1) + Z(KNEW,IDZ)*Z(:,IDZ).
+            Ze_ell_R = -self._KKT_R[0] * self._KKT_R[0, idx]
+            if self._negative_s_idx < self._KKT_R.shape[0]:
+                # The second term vanishes when all rows carry a negative
+                # sign (S = -I), which is out of NEWUOA's IDZ range but
+                # reachable here via the `sigma < 0` branch below.
+                Ze_ell_R = Ze_ell_R + (
+                    self._KKT_R[self._negative_s_idx]
+                    * self._KKT_R[self._negative_s_idx, idx]
+                )
+        Ze_ell = np.hstack((Ze_ell_R, _KKT_B_on_idx))
         Zw_minus_e_ell = Zw.copy()
         Zw_minus_e_ell[idx] -= 1
         temp_vec1 = (alpha * Zw[self.npt :] - tau * _KKT_B_on_idx) / sigma
@@ -560,10 +577,12 @@ class QuadSurrogate:
             kdz = jdz if beta >= 0.0 else 0
             jdz -= kdz
             tempb = self._KKT_R[jdz, idx] * tau / sigma
-            tmp1 = 1.0 / np.sqrt(abs(beta) * self._KKT_R[jdz, idx] ** 2.0 + tau**2.0)
+            # NEWUOA update.f, lines 74-78: SCALA and the JA-column update
+            # both use ZMAT(KNEW, JA), i.e. row kdz here (not row jdz).
+            tmp1 = 1.0 / np.sqrt(abs(beta) * self._KKT_R[kdz, idx] ** 2.0 + tau**2.0)
             self._KKT_R[kdz] = (
                 tau * self._KKT_R[kdz]
-                - self._KKT_R[jdz, idx] * Zw_minus_e_ell[: self.npt]
+                - self._KKT_R[kdz, idx] * Zw_minus_e_ell[: self.npt]
             )
             self._KKT_R[kdz] *= tmp1
             self._KKT_R[jdz] -= (self._KKT_R[jdz, idx] * beta / sigma) * (

@@ -22,6 +22,7 @@ gradient method.
 """
 
 import numpy as np
+import numpy.linalg as LA
 from typing import List, Optional, Union
 
 
@@ -163,9 +164,20 @@ def steinmetz_comb_proj(
     shrink_coord_mask = coords_mask[max_vio_idx].copy()
     shrink_group[max_vio_idx] = np.True_
     negligible_group = (violation <= 1) | shrink_group
+    # Each _shrink call absorbs at least one new element into the shrink
+    # group, so the loop needs at most ele_num iterations in exact
+    # arithmetic. The cap and the finiteness check turn a non-converging
+    # loop (e.g. one fed with NaN) into a controlled LinAlgError, which the
+    # trust-region solver catches and turns into a restart.
+    max_shrink_iter = radii.size + 5
     while True:
-        if max_violation <= 1.0:
+        if max_violation <= 1.0 + 1e-12:
             break
+        if not np.isfinite(max_violation) or it >= max_shrink_iter:
+            raise LA.LinAlgError(
+                "Steinmetz projection failed to converge "
+                f"(max violation = {max_violation})."
+            )
         max_violation = _shrink(
             sk,
             coords_mask,
@@ -211,9 +223,20 @@ def steinmetz_proj(s: np.ndarray, coords_mask: np.ndarray, radii: np.ndarray):
     shrink_coord_mask = coords_mask[max_vio_idx].copy()
     shrink_group[max_vio_idx] = np.True_
     negligible_group = (violation <= 1) | shrink_group
+    # Each _shrink call absorbs at least one new element into the shrink
+    # group, so the loop needs at most ele_num iterations in exact
+    # arithmetic. The cap and the finiteness check turn a non-converging
+    # loop (e.g. one fed with NaN) into a controlled LinAlgError, which the
+    # trust-region solver catches and turns into a restart.
+    max_shrink_iter = radii.size + 5
     while True:
-        if max_violation <= 1.0:
+        if max_violation <= 1.0 + 1e-12:
             break
+        if not np.isfinite(max_violation) or it >= max_shrink_iter:
+            raise LA.LinAlgError(
+                "Steinmetz projection failed to converge "
+                f"(max violation = {max_violation})."
+            )
         max_violation = _shrink(
             sk,
             coords_mask,
