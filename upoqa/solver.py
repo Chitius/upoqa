@@ -1350,6 +1350,7 @@ def minimize(
                         continue
 
                 break_flag = False
+                gi_updated_eles = []
                 for ele_idx in ele_idxs:
                     interp_set = ele_interp_sets[ele_idx]
                     if want_improve_geometry[ele_idx]:
@@ -1361,6 +1362,7 @@ def minimize(
                                 idx_to_replaced_eles[ele_idx],
                                 ele_fval,
                             )
+                            gi_updated_eles.append(ele_idx)
                         except MaxEvalNumReached:
                             exit_info = ExitInfo(
                                 flag=ExitStatus.SUCCESS,
@@ -1373,6 +1375,25 @@ def minimize(
                             break
 
                 if break_flag:
+                    # The optimization is terminating, but keep the models of
+                    # the elements updated above consistent with their
+                    # interpolation sets.
+                    for ele_idx in gi_updated_eles:
+                        try:
+                            ele_models[ele_idx].update(
+                                cached_kkt_info=(
+                                    cached_kkt_info_eles[ele_idx]
+                                    if cached_kkt_info_eles
+                                    else None
+                                )
+                            )
+                        except (LA.LinAlgError, ZeroDivisionError):
+                            try:
+                                ele_models[ele_idx].rebuild()
+                            except SurrogateLinAlgError:
+                                # The run is terminating anyway; a failed
+                                # rebuild must not turn it into an error.
+                                pass
                     break
 
                 try:

@@ -722,6 +722,108 @@ class QuadSurrogate:
         self.reset_surrogate_coeff()
         self._update_surrogate_coeff()
 
+    def rebuild(
+        self, init_step_size: Optional[float] = None, max_trials: int = 5
+    ) -> None:
+        r"""
+        Rebuild the inverse-KKT factors (``_KKT_R``/``_KKT_B``) from scratch for
+        the *current* interpolation set, and recompute the model coefficients.
+
+        The closed-form initialization used by ``_init_KKT_and_model_coeff`` is
+        only valid for the initial CFD stencil. To rebuild the factors for an
+        arbitrary point set, the interpolation set is temporarily reinitialized
+        as a CFD stencil around the model center, and each stencil point is then
+        morphed into the corresponding actual interpolation point via the
+        standard rank-1 update (whose correctness only depends on the points,
+        not on the function values). No objective function evaluation is
+        performed. If a morphing update is near-singular, the target point is
+        jittered by a tiny amount and retried; every jittered point is restored
+        to its exact position in a final pass, once the set is non-degenerate.
+
+        Parameters
+        ----------
+        init_step_size : float, optional
+            Step size of the temporary CFD stencil. Default: the median distance
+            from the model center to the current interpolation points.
+        max_trials : int, default=5
+            Maximum number of attempts (including jittered retries) per point.
+
+        Raises
+        ------
+        SurrogateLinAlgError
+            If a point cannot be morphed even after jittered retries. In that
+            case the interpolation set and the factors may be left in an
+            intermediate (stencil-morphed) state, and the caller should treat
+            the model as unusable.
+        """
+        iset = self.interp_set
+        npt, n = iset.npt, self.n
+        Y_target = iset.interp_set_Y.copy()
+        f_target = iset.interp_set_fval.copy()
+        x_opt_idx, x_anchor_idx = iset.x_opt_idx, iset.x_anchor_idx
+        center = self.model_center.copy()
+
+        if init_step_size is None:
+            dists = LA.norm(Y_target - center, axis=1)
+            positive_dists = dists[dists > 0.0]
+            init_step_size = (
+                float(np.median(positive_dists)) if positive_dists.size else 1.0
+            )
+        step = max(init_step_size, np.finfo(float).eps)
+        rng = np.random.default_rng(0)  # deterministic, for reproducibility
+
+        # Reinitialize as a fresh CFD stencil with closed-form factors. The
+        # function values play no role in the factor updates; they are placed
+        # positionally so that the final state is exactly consistent.
+        iset.init_interp_set_Y(center, step)
+        iset.set_interp_set_fval(f_target)
+        self.reset_surrogate_coeff()
+        self._KKT_R = np.zeros((npt - n - 1, npt), dtype=np.float64)
+        self._KKT_B = np.zeros((npt + n, n), dtype=np.float64)
+        self.cached_Y_shift = iset.interp_set_Y - center
+        self.cached_x_anchor = iset.get_anchor()[0].copy()
+        self.cached_x_anchor_idx = iset.x_anchor_idx
+        self._negative_s_idx = 0
+        self._init_KKT_and_model_coeff(step)
+
+        # Morph each stencil point into its target point.
+        jittered = []
+        for k in range(npt):
+            target = Y_target[k]
+            if np.array_equal(target, iset.interp_set_Y[k]):
+                continue
+            scale = 0.0
+            for trial in range(max_trials):
+                x_try = (
+                    target
+                    if trial == 0
+                    else target + scale * rng.standard_normal(n)
+                )
+                iset.update_point_on_idx(x_try, k, f_target[k])
+                try:
+                    self.update()
+                    break
+                except (LA.LinAlgError, ZeroDivisionError):
+                    scale = 1e-8 * step * 10.0**trial
+            else:
+                raise SurrogateLinAlgError(
+                    f"Failed to rebuild the KKT factors (point {k})."
+                )
+            if scale > 0.0:
+                jittered.append(k)
+
+        # Restore the exact positions of the jittered points.
+        for k in jittered:
+            iset.update_point_on_idx(Y_target[k], k, f_target[k])
+            self.update()
+
+        # Restore the bookkeeping and recompute the coefficients for the
+        # final state.
+        iset.x_opt_idx, iset.x_anchor_idx = x_opt_idx, x_anchor_idx
+        self.cached_x_anchor = iset.get_anchor()[0].copy()
+        self.cached_x_anchor_idx = x_anchor_idx
+        self._update_surrogate_coeff()
+
     def alt_grad_eval(self, x: np.ndarray) -> np.ndarray:
         """
         Evaluate gradient of a newly-instantiated surrogate model at point ``x``.
@@ -1053,9 +1155,16 @@ class OverallSurrogate:
                         )
                     )
                 except (LA.LinAlgError, ZeroDivisionError) as e:
-                    raise SurrogateLinAlgError(
-                        str(e), ele_name=self.ele_names[ele_idx], ele_idx=ele_idx
-                    )
+                    # The interpolation set of this element has already been
+                    # modified. Rebuild its KKT factors from the current point
+                    # set, so that the model stays consistent with the set
+                    # instead of leaving the two permanently desynced.
+                    try:
+                        ele_surrogate.rebuild()
+                    except SurrogateLinAlgError:
+                        raise SurrogateLinAlgError(
+                            str(e), ele_name=self.ele_names[ele_idx], ele_idx=ele_idx
+                        )
 
     def fun_eval(self, x: np.ndarray) -> float:
         """
