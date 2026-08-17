@@ -1336,13 +1336,18 @@ def minimize(
                     elif continue_flag:
                         continue
                 except SurrogateLinAlgError as e:
-                    exit_info = ExitInfo(
-                        flag=ExitStatus.LINALG_ERROR,
-                        msg=f"(element {e.ele_name}) " + str(e),
-                        exception=e,
-                        traceback=traceback.format_exc(),
+                    exit_info, continue_flag = check_and_try_to_restart(
+                        ExitInfo(
+                            flag=ExitStatus.LINALG_ERROR,
+                            msg=f"(element {e.ele_name}) " + str(e),
+                            exception=e,
+                            traceback=traceback.format_exc(),
+                        )
                     )
-                    break
+                    if exit_info:
+                        break
+                    elif continue_flag:
+                        continue
 
                 break_flag = False
                 for ele_idx in ele_idxs:

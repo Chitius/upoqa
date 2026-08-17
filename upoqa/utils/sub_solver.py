@@ -236,8 +236,8 @@ def spider_geometry(const, grad, curv, xpt, delta):
         if alpha_quad_pos < alpha_pos:
             q_val_quad_pos = (
                 const
-                - alpha_quad_pos * grad_step
-                - 0.5 * alpha_quad_pos**2.0 * curv_step
+                + alpha_quad_pos * grad_step
+                + 0.5 * alpha_quad_pos**2.0 * curv_step
             )
             if abs(q_val_quad_pos) > abs(q_val_pos):
                 alpha_pos = alpha_quad_pos
@@ -245,8 +245,8 @@ def spider_geometry(const, grad, curv, xpt, delta):
         if alpha_quad_neg > alpha_neg:
             q_val_quad_neg = (
                 const
-                - alpha_quad_neg * grad_step
-                - 0.5 * alpha_quad_neg**2.0 * curv_step
+                + alpha_quad_neg * grad_step
+                + 0.5 * alpha_quad_neg**2.0 * curv_step
             )
             if abs(q_val_quad_neg) > abs(q_val_neg):
                 alpha_neg = alpha_quad_neg
@@ -644,12 +644,16 @@ def conjugate_gradient_proj_steinmetz(
 
         if did_project:
             sd = -g
-        else:
+        elif curv_sd > float_tiny * abs(g_sd):
             # The current iteration is a conjugate gradient iteration. Update
             # the search direction so that it is conjugate (with respect to H)
             # to all the previous search directions.
             beta = (g @ hess_sd) / curv_sd
             sd = beta * sd - g
+        else:
+            # The curvature along sd is nonpositive or negligible, so the
+            # conjugacy update is unsafe. Restart with steepest descent.
+            sd = -g
 
     return best_step
 

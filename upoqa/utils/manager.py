@@ -1105,8 +1105,10 @@ class UPOQAManager:
             The reduction ratio for the objective function. Return ``-1`` if the denominator
             (predicted decrease) is invalid (positive or too close to zero).
         ratios : list of float
-            The reduction ratios for each element function. Return ``-1`` if the denominator
-            (predicted decrease) is invalid (positive or too close to zero).
+            The reduction ratios for each element function. An entry is ``-1``
+            if the element model does not predict a decrease but the element
+            function value actually decreases, and ``np.inf`` if neither the
+            model nor the function value decreases.
         exit_info : :class:`~upoqa.utils.manager.ExitInfo` or None
             An :class:`~upoqa.utils.manager.ExitInfo` object with an 
             :attr:`ExitStatus.TR_INCREASE_ERROR` flag if the denominator is invalid, None 
@@ -1136,11 +1138,22 @@ class UPOQAManager:
         ratios = []
         for ele_idx in self.ele_idxs:
             numerator = old_fval_eles[ele_idx] - fval_eles[ele_idx] + rreg
-            denominator = -decrease_eles[ele_idx] - rreg  # should be negative
-            if abs(denominator) > np.finfo(float).tiny * abs(numerator):
+            denominator = -decrease_eles[ele_idx] - rreg  # negative iff the model genuinely predicts a decrease
+            if denominator < 0 and (
+                abs(denominator) > np.finfo(float).tiny * abs(numerator)
+            ):
                 ratios.append(float(numerator / (-denominator)))
+            elif numerator > 0:
+                # The model does not predict a decrease, but the function
+                # value actually decreased (a "pleasant surprise"). Treat it
+                # like a negative ratio, so that the element-wise criterion
+                # expands the radius, consistently for arbitrarily small
+                # predicted increases.
+                ratios.append(-1.0)
             else:
-                ratios.append(-1)
+                # The model does not predict a decrease and the function
+                # value does not decrease either; penalize the element.
+                ratios.append(np.inf)
 
         return ratio, ratios, None
 
