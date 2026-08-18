@@ -42,8 +42,8 @@ version = {attr = "upoqa.__version__"}
 
 [tool.setuptools.packages.find]
 where = ["."] 
-include = ["upoqa"] 
-exclude = [] 
+include = ["upoqa*"] 
+exclude = ["upoqa.problems.S2MPJ*"] 
 namespaces = false 
 
 [tool.setuptools_scm]
