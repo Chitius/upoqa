@@ -9,7 +9,7 @@
 project = 'UPOQA'
 copyright = '2025, Yichuan Liu and Yingzhou Li'
 author = 'Yichuan Liu and Yingzhou Li'
-release = 'v1.0.1'
+release = 'v1.1.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
