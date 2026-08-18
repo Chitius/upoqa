@@ -221,20 +221,22 @@ upoqa_res2 = upoqa.minimize(
     fun2, x0=x0_2, coords=coords2, weights=weights, callback=callback_func2, disp=0, debug=1
 )
 
-# Direct optimization with fixed tau (large value) for comparison
-# get fun: 9.819850000011742, the solution is not the expected one
+# Direct optimization with fixed tau for comparison: a small tau is too weak
+# to enforce the constraints and converges to the wrong minimum, a medium tau
+# keeps an O(1/tau) penalty bias, and a large tau makes the Hessian too stiff
+# (condition number ~ tau) for a direct solve.
 sp_res2_small_tau = sp_minimize(lambda x: obj_2(x, 1e2), x0_2)
-# get fun: 10.196198834623207, near success
 sp_res2_medium_tau = sp_minimize(lambda x: obj_2(x, 1e4), x0_2)
-# get fun: 666668.3710234876, totally fail
-sp_res2_large_tau = sp_minimize(lambda x: obj_2(x, 1e6), x0_2)
+sp_res2_large_tau = sp_minimize(lambda x: obj_2(x, 1e8), x0_2)
 
 
 def test_prob2_res_correct():
     assert abs(upoqa_res2.fun - fopt2) < 1e-5 * abs(fopt2)
-    # Direct method may not converge to the correct minimum
+    # A small fixed tau converges to the wrong minimum.
     assert abs(sp_res2_small_tau.fun - fopt2) > 1e-2 * fopt2
-    assert abs(sp_res2_small_tau.fun - fopt2) > 1e-2 * fopt2
+    # A medium fixed tau cannot reach the same accuracy due to the penalty bias.
+    assert abs(sp_res2_medium_tau.fun - fopt2) > 1e-5 * fopt2
+    # A large fixed tau is too stiff for a direct solve.
     assert abs(sp_res2_large_tau.fun - fopt2) > 1e2 * fopt2
 
 
