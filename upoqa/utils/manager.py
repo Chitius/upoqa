@@ -259,6 +259,7 @@ class UPOQAManager:
         params: UPOQAParameterList,
         ele_names: List[Any],
         disp: int = 0,
+        seed: Optional[int] = None,
     ) -> None:
         self.resolution, self.resolution_init = resolution_init, resolution_init
         self.resolution_final = resolution_final
@@ -295,6 +296,11 @@ class UPOQAManager:
         self.history_fvals = deque(
             [], self.params("slow.history_for_slow")
         )  # Recent objective history
+
+        # Private random generator for the restart procedures. A dedicated
+        # Generator keeps runs reproducible via `seed` and never disturbs the
+        # global numpy random state.
+        self._rng = np.random.default_rng(seed)
 
         # Output control
         self.disp = int(disp)
@@ -1692,8 +1698,8 @@ class UPOQAManager:
             un_updated_eles = []
 
             # generate random steps with norm ≈ self.resolution
-            trial_points = np.random.randn(
-                self.params("restarts.random_trial_num"), n
+            trial_points = self._rng.standard_normal(
+                (self.params("restarts.random_trial_num"), n)
             ) / np.sqrt(
                 n
             )  # the expectation of the norm is 1

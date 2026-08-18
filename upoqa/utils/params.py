@@ -185,7 +185,7 @@ class UPOQAParameterList(ParameterList):
             else:
                 self.params["general.npt"].append(2 * ele_dim + 1)
         # decide when to shift surrogate model center according to norm(center - xk)
-        self.params["general.center_shift_threshold"] = 5.0
+        self.params["general.center_shift_threshold"] = 2.0
         # maximum tolerable short steps
         self.params["general.max_short_steps"] = 5 + 2 * noise_level
         # if the step size is smaller than `general.short_step_thresh` * `resolution`,
@@ -240,7 +240,7 @@ class UPOQAParameterList(ParameterList):
         # when reduce resolution or encounter a short step, new_radius = alpha2 * old_radius
         self.params["tr_radius.alpha2"] = 0.95 if noise_level else 0.5
         # when launching a geometry-improvement step, the shrinkage factor for the radius.
-        self.params["tr_radius.alpha3"] = 0.1
+        self.params["tr_radius.alpha3"] = 0.5
 
         ## Slow Progress Thresholds
         # whether to terminate the algorithm when the iterations are slow.

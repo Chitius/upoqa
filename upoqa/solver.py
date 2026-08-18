@@ -75,6 +75,7 @@ def minimize(
     verbose: bool = False,
     debug: bool = False,
     return_internals: bool = False,
+    seed: Optional[int] = None,
     options: Dict[Any, Any] = dict(),
     **kwargs,
 ) -> OptimizeResult:
@@ -275,6 +276,12 @@ def minimize(
         If True, the returned result will contain the fields ``manager``,
         ``interp_set`` and ``model`` for debugging purposes even if 
         ``debug=False``.
+    seed : int, optional
+        Seed for the solver's internal random number generator (used by the
+        restart procedures). Two runs with the same ``seed`` and identical
+        inputs produce identical results, and the solver never touches the
+        global ``numpy`` random state. If None (default), the restarts are
+        non-deterministic.
     options : dict
         Advanced algorithm parameters. See the source code of 
         :class:`~upoqa.utils.params.UPOQAParameterList` for available options.
@@ -519,6 +526,7 @@ def minimize(
             params,
             ele_names,
             disp_level,
+            seed,
         )
 
         # apply bound check for xforms if `bounds` is not None
